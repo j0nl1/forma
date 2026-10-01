@@ -81,7 +81,7 @@ The [live file guide](../skills/codex-design/references/file-windows.md) explain
 
 ## Compose and export social assets
 
-The [social asset guide](../skills/codex-design/references/social-assets.md) documents the separate board, four feed-card platforms and letterboxed story viewer. Bundle `social.js`, compose authored media in `post-card` or `instagram-story`, and place units in `social-frames`. The board provides actual per-format PNG and all-format ZIP downloads at the nominal dimensions in each label. `social.html` demonstrates live copy, format visibility and image-only toggles. Story uploads use the existing image source service; static session editing is explicit. Individual platform shells and full reference visual comparison remain pending.
+The [social asset guide](../skills/codex-design/references/social-assets.md) documents the separate board, four feed-card platforms and letterboxed story viewer. Bundle `social.js`, compose authored media in `post-card` or `instagram-story`, and place units in `social-frames`. The board provides actual per-format PNG and all-format ZIP downloads at the nominal dimensions in each label. `social.html` demonstrates live copy, format visibility and image-only toggles. Story uploads use the existing image source service; static session editing is explicit. The [social phone screen guide](../skills/codex-design/references/social-phone-shells.md) documents the restored X, Instagram and TikTok screens, including every attribute and aspect variant. `social-shells.html` demonstrates their live copy/aspect/image-only changes, source-compatible image editors and real PNG/ZIP downloads. The other five platform shells and full reference visual comparison remain pending.
 
 ## Replace and frame images
 

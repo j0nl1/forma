@@ -4,11 +4,17 @@ window.CodexSocialReady = (async () => {
     import("./post-card.js"),
     import("./instagram-story.js"),
     import("./social-frames.js"),
+    import("./x-shell.js"),
+    import("./instagram-shell.js"),
+    import("./tiktok-shell.js"),
   ]);
   await Promise.all([
     window.CodexPostsReady,
     window.CodexStoriesReady,
     window.CodexSocialFramesReady,
+    window.CodexXReady,
+    window.CodexInstagramReady,
+    window.CodexTikTokReady,
   ]);
   const names = {
     instagram: "Instagram",

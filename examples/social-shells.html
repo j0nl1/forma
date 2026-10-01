@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Social phone screens — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 15px/1.6 system-ui;
+      }
+      nav {
+        padding: 16px 24px;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      a {
+        color: inherit;
+      }
+      main {
+        max-width: 1700px;
+        margin: auto;
+        padding: 36px 24px 80px;
+      }
+      h1 {
+        font:
+          46px/1.12 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 18px;
+      }
+      .lead {
+        max-width: 65em;
+        margin: 0 0 24px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 0 18px;
+      }
+      button {
+        font: inherit;
+        padding: 8px 14px;
+        border: 1px solid #9dad9c;
+        background: #fffdf7;
+        color: inherit;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid #269d80;
+        outline-offset: 3px;
+      }
+      .viewport {
+        overflow: auto;
+        max-width: 100%;
+        border: 1px solid #ccd5c5;
+        border-radius: 16px;
+        background: #ebeee3;
+      }
+      social-frames {
+        min-width: 460px;
+      }
+      .plate {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        top: 80px;
+        pointer-events: none;
+        color: #fffdf4;
+        text-shadow: 0 1px 2px #0002;
+      }
+      .plate small {
+        font: 12px system-ui;
+        letter-spacing: 0.12em;
+      }
+      .plate h2 {
+        font:
+          42px/1.08 Georgia,
+          serif;
+        margin: 20px 0;
+      }
+      x-shell .plate {
+        top: 24px;
+      }
+      .short .plate {
+        top: 110px;
+        right: 90px;
+      }
+      .note {
+        max-width: 75em;
+        font-size: 13px;
+        margin-top: 24px;
+      }
+      #result {
+        padding: 12px 16px;
+        border-left: 3px solid #269d80;
+        background: #e3ecdf;
+        overflow-wrap: anywhere;
+      }
+      @media (max-width: 600px) {
+        main {
+          padding: 24px 18px 50px;
+        }
+        h1 {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">← All examples</a> ·
+      <a href="social.html">Social asset board</a>
+    </nav>
+    <main>
+      <h1>Three screens.<br />One original study.</h1>
+      <p class="lead">
+        The complete post-detail, photo-feed and short-video contexts share a
+        physical phone size. Switch aspect ratios or hide the surrounding
+        viewer, then download the artwork at its nominal dimensions.
+      </p>
+      <div class="controls">
+        <button id="images" aria-pressed="false">Show images only</button
+        ><button id="aspects" aria-pressed="false">
+          Try square and portrait</button
+        ><button id="copy">Change the captions</button>
+      </div>
+      <div class="viewport">
+        <social-frames label="Reading room phone campaign">
+          <x-shell
+            id="reading-x"
+            name="Reading room"
+            handle="@readingroom"
+            text="Read with room for the thought."
+            image-src="social/portrait.svg"
+            image-credit="Original vector study"
+            editable="session"
+            ><div class="plate">
+              <small>FIELD NOTES / 01</small>
+              <h2>A little room.</h2>
+            </div></x-shell
+          >
+          <instagram-shell
+            id="reading-instagram"
+            username="readingroom"
+            location="Reading room studio"
+            caption="Attention is a design material."
+            comments="View all 92 comments"
+            image-src="social/portrait.svg"
+            image-credit="Original vector study"
+            editable="session"
+            ><div class="plate">
+              <small>FIELD NOTES / 02</small>
+              <h2>Stay with<br />the page.</h2>
+            </div></instagram-shell
+          >
+          <tiktok-shell
+            id="reading-short"
+            class="short"
+            username="@readingroom"
+            caption="Read a little. See a little more."
+            image-src="social/portrait.svg"
+            image-credit="Original vector study"
+            editable="session"
+            ><div class="plate">
+              <small>FIELD NOTES / 03</small>
+              <h2>Read a little.<br />See a little<br />more.</h2>
+            </div></tiktok-shell
+          >
+        </social-frames>
+      </div>
+      <p id="result" role="status">
+        Each PNG contains only its artwork. The ZIP includes all three formats.
+      </p>
+      <p class="note">
+        This is a local design study. Account details, counts and viewer
+        controls are illustrative. Image edits in this public demonstration stay
+        in browser storage. A source-connected local preview saves actual
+        project files. On narrow screens, scroll the board to inspect the
+        fixed-size phones.
+      </p>
+    </main>
+    <script src="starters/social.js"></script>
+    <script>
+      const shells = [
+        ...document.querySelectorAll("x-shell,instagram-shell,tiktok-shell"),
+      ];
+      document.getElementById("images").onclick = function () {
+        const enabled = this.getAttribute("aria-pressed") !== "true";
+        this.setAttribute("aria-pressed", String(enabled));
+        this.textContent = enabled
+          ? "Show platform context"
+          : "Show images only";
+        for (const shell of shells)
+          shell.setAttribute("image-only", String(enabled));
+      };
+      document.getElementById("aspects").onclick = function () {
+        const enabled = this.getAttribute("aria-pressed") !== "true";
+        this.setAttribute("aria-pressed", String(enabled));
+        this.textContent = enabled
+          ? "Use wide and square"
+          : "Try square and portrait";
+        shells[0].setAttribute("aspect", enabled ? "square" : "wide");
+        shells[1].setAttribute("aspect", enabled ? "portrait" : "square");
+      };
+      document.getElementById("copy").onclick = function () {
+        shells[0].setAttribute("text", "An idea deserves a little space.");
+        shells[1].setAttribute("caption", "Leave room for the thought.");
+        shells[2].setAttribute("caption", "One quiet page can change the day.");
+        document.getElementById("result").textContent =
+          "Updated all three captions without replacing the artwork or image editors.";
+      };
+      document
+        .querySelector("social-frames")
+        .addEventListener("social-frames:export", ({ detail }) => {
+          document.getElementById("result").textContent =
+            `Downloaded ${detail.name} — ${detail.frames.map((frame) => `${frame.width}×${frame.height}`).join(", ")}`;
+        });
+    </script>
+  </body>
+</html>

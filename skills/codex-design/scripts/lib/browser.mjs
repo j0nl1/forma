@@ -49,6 +49,9 @@ export async function withPage(
         window.CodexPostsReady,
         window.CodexStoriesReady,
         window.CodexSocialFramesReady,
+        window.CodexXReady,
+        window.CodexInstagramReady,
+        window.CodexTikTokReady,
       ].filter(Boolean);
       if (readiness.length)
         await Promise.race([

@@ -16,6 +16,7 @@ export function descendants(root) {
     if (node.shadowRoot) visit(node.shadowRoot);
     for (const child of node.childNodes) visit(child);
   };
+  if (root.shadowRoot) visit(root.shadowRoot);
   for (const child of root.childNodes) visit(child);
   return nodes;
 }
