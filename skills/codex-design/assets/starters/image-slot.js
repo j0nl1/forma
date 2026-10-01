@@ -2,6 +2,23 @@
    Uploads stay in the browser. Image/crop edits persist when local storage permits. */
 (() => {
   class ImageSlot extends HTMLElement {
+    static cloneStorageKey(from, to) {
+      try {
+        const value = localStorage.getItem("codex-design-image:" + from);
+        if (value) localStorage.setItem("codex-design-image:" + to, value);
+      } catch {}
+    }
+    reloadStoredImage() {
+      this.key = this.getAttribute("storage-key");
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem("codex-design-image:" + this.key),
+        );
+        if (saved && typeof saved.src === "string")
+          this.value = { ...this.value, ...saved };
+      } catch {}
+      this.updateImage?.();
+    }
     connectedCallback() {
       if (this.shadowRoot) return;
       const root = this.attachShadow({ mode: "open" });
@@ -48,6 +65,7 @@
               "Storage unavailable; changes remain in this page.";
           }
       };
+      this.updateImage = update;
       root.querySelector("input[type=file]").onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;

@@ -1,11 +1,12 @@
 import { DeckBuilds } from "./deck-builds.js";
+import { DeckEditor } from "./deck-editor.js";
 const interactive =
   'a[href],button,input,textarea,select,summary,label,video[controls],audio[controls],[role="button"],[onclick],[tabindex]:not([tabindex^="-"]),[contenteditable]:not([contenteditable="false" i])';
 const template = `<style>
 :host{display:block;height:100vh;background:#161c25;color:#fff;font:14px system-ui;--rail-width:180px}.layout{display:flex;height:calc(100% - 58px)}.rail{width:var(--rail-width);flex:none;overflow:auto;padding:10px;box-sizing:border-box}.rail button{display:block;width:100%;text-align:left;margin:6px 0}:host([data-fonts-pending]) .viewport,:host([data-fonts-pending]) .rail{opacity:0;pointer-events:none}.viewport{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}.art{position:relative;transform-origin:center;flex:none}slot{display:block}::slotted([data-deck-slide]){box-sizing:border-box;width:100%;height:100%;overflow:hidden;position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none}::slotted([data-deck-active]){visibility:visible;opacity:1;pointer-events:auto}.toolbar{height:58px;display:flex;align-items:center;gap:9px;padding:0 16px;box-sizing:border-box;flex-wrap:wrap;position:relative;z-index:10}button{font:inherit;border:1px solid #687482;border-radius:6px;background:#252e3a;color:#fff;padding:7px 10px;cursor:pointer}button[aria-current="true"]{border-color:#8bacff;background:#344766}.rail button[data-skipped]{opacity:.45}.notes{position:absolute;right:16px;bottom:70px;max-width:420px;max-height:30vh;overflow:auto;background:#fff;color:#1c2836;padding:18px;border-radius:8px;white-space:pre-wrap;z-index:10}[hidden]{display:none!important}:host([no-rail]) .rail,:host([noscale]) .rail,:host([data-fullscreen]) .rail,:host([data-presenting]) .rail{display:none}:host([noscale]) .art{transform:none!important}:host([noscale]) .toolbar{display:none}:host([data-fullscreen]) .layout,:host([data-presenting]) .layout{height:100%}:host([data-fullscreen]) .toolbar,:host([data-presenting]) .toolbar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);height:auto;flex-wrap:nowrap;background:#161c25e8;padding:8px;border-radius:12px;max-width:calc(100% - 32px);opacity:0;transition:opacity .2s;pointer-events:none}:host([data-chrome-visible]) .toolbar,:host([data-fullscreen]) .toolbar:focus-within,:host([data-fullscreen]) .toolbar:hover,:host([data-presenting]) .toolbar:focus-within,:host([data-presenting]) .toolbar:hover{opacity:1;pointer-events:auto}
 @media(max-width:640px){.rail{display:none}.toolbar{height:auto;min-height:58px;padding:8px;gap:6px}.layout{height:calc(100% - var(--toolbar-height,58px))}.toolbar button{font-size:12px;padding:5px 7px}}
 @media print{:host{display:block;height:auto;background:#fff}.layout{display:block;height:auto}.rail,.toolbar,.notes{display:none!important}.viewport{display:block;overflow:visible}.art{transform:none!important;width:auto!important;height:auto!important}::slotted([data-deck-slide]){display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;break-after:page;width:var(--deck-w)!important;height:var(--deck-h)!important}::slotted([data-deck-skip]){display:none!important}::slotted([data-deck-last-visible]){break-after:auto}}
-</style><div class="layout"><nav class="rail" aria-label="Slides"></nav><div class="viewport"><div class="art"><slot></slot></div></div></div><div class="toolbar"><button data-prev aria-label="Previous slide">←</button><output aria-label="Slide position"></output><button data-next aria-label="Next slide or build">→</button><button data-reset aria-label="Reset to first slide">Reset · R</button><button data-full aria-label="Enter fullscreen">Present · F</button><button data-notes>Notes</button><button data-remove>Remove slide</button><button data-restore>Restore slides</button><button data-print>Print / PDF</button></div><aside class="notes" hidden></aside>`;
+</style><div class="layout"><nav class="rail" aria-label="Slides"></nav><div class="viewport"><div class="art"><slot></slot></div></div></div><div class="toolbar"><button data-prev aria-label="Previous slide">←</button><output aria-label="Slide position"></output><button data-next aria-label="Next slide or build">→</button><button data-reset aria-label="Reset to first slide">Reset · R</button><button data-full aria-label="Enter fullscreen">Present · F</button><button data-notes>Notes</button><button data-remove>Remove slide</button><button data-restore aria-label="Restore slides or undo last edit" title="Restore the previous deck state">Undo</button><button data-print>Print / PDF</button></div><aside class="notes" hidden></aside>`;
 export class DeckStage extends HTMLElement {
   static observedAttributes = [
     "noscale",
@@ -23,7 +24,6 @@ export class DeckStage extends HTMLElement {
     this.setAttribute("data-fonts-pending", "");
     this.ready = false;
     this.index = this.index ?? -1;
-    this.removed ??= [];
     this.slides = [];
     this.printing = false;
     this.buildPlayer = new DeckBuilds(this);
@@ -40,25 +40,18 @@ export class DeckStage extends HTMLElement {
         !root.querySelector(".notes").hidden;
       this.updateNotes();
     });
-    bind("[data-remove]", () => {
-      if (this.slides.length <= 1) return;
-      const slide = this.slides[this.index];
-      this.buildPlayer.clear();
-      this.removed.push(slide);
-      slide.remove();
-      this.collect();
-      this.show(
-        Math.min(this.index, this.slides.length - 1),
-        false,
-        "mutation",
-      );
-    });
-    bind("[data-restore]", () => {
-      for (const slide of this.removed) this.append(slide);
-      this.removed = [];
-      this.collect();
-      this.show(this.index, true, "mutation");
-    });
+    this.editor = new DeckEditor(this);
+    bind("[data-remove]", () => this.editor.confirm(this.editor.selected()));
+    bind("[data-restore]", () => this.editor.undo());
+    let extras = root.querySelector("[data-rail-toggle]");
+    if (!extras) {
+      extras = document.createElement("button");
+      extras.dataset.railToggle = "";
+      extras.textContent = "Slides";
+      extras.setAttribute("aria-label", "Toggle slide rail");
+      root.querySelector(".toolbar").append(extras);
+    }
+    bind("[data-rail-toggle]", () => this.editor.toggleRail());
     this.observer = new ResizeObserver(() => this.fit());
     this.observer.observe(root.querySelector(".viewport"));
     this.toolbarObserver = new ResizeObserver(() => {
@@ -195,6 +188,7 @@ export class DeckStage extends HTMLElement {
     this.observer?.disconnect();
     this.toolbarObserver?.disconnect();
     this.buildPlayer?.clear();
+    this.editor?.dispose();
     clearTimeout(this.chromeTimer);
     this.printStyle?.remove();
     this.printStyle = null;
@@ -328,13 +322,16 @@ export class DeckStage extends HTMLElement {
       );
   }
   goTo(index, reason = "api") {
+    if (!["click", "mutation"].includes(reason)) this.editor?.clearSelection();
     if (index !== this.index) this.show(index, false, reason);
   }
   next(reason = "api") {
+    this.editor?.clearSelection();
     if (this.buildPlayer.next()) return;
     this.advance(1, reason);
   }
   prev(reason = "api") {
+    this.editor?.clearSelection();
     this.advance(-1, reason);
   }
   advance(direction, reason) {
@@ -408,6 +405,7 @@ export class DeckStage extends HTMLElement {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
+      this.syncFullscreen();
     } catch {
       this.shadowRoot.querySelector("output").textContent +=
         " · Fullscreen unavailable";
@@ -440,34 +438,7 @@ export class DeckStage extends HTMLElement {
       this.buildPlayer.arrive(this.slides[this.index], true);
   }
   rail() {
-    const rail = this.shadowRoot.querySelector(".rail");
-    rail.replaceChildren();
-    let visible = 0;
-    this.slides.forEach((slide, index) => {
-      const button = document.createElement("button"),
-        skipped = slide.hasAttribute("data-deck-skip");
-      button.textContent = `${skipped ? "–" : ++visible}. ${slide.getAttribute("data-label") || slide.querySelector("h1,h2,h3")?.textContent || "Slide"}`;
-      button.toggleAttribute("data-skipped", skipped);
-      button.setAttribute("aria-current", String(index === this.index));
-      button.onclick = () => this.goTo(index, "click");
-      button.draggable = true;
-      button.ondragstart = (event) =>
-        event.dataTransfer.setData("text/plain", String(index));
-      button.ondragover = (event) => event.preventDefault();
-      button.ondrop = (event) => {
-        event.preventDefault();
-        const from = Number(event.dataTransfer.getData("text/plain"));
-        if (!Number.isInteger(from) || from < 0 || from >= this.slides.length)
-          return;
-        const moved = this.slides[from];
-        this.slides.splice(from, 1);
-        this.slides.splice(index, 0, moved);
-        for (const node of this.slides) this.append(node);
-        this.collect();
-        this.show(index, true, "mutation");
-      };
-      rail.append(button);
-    });
+    this.editor?.reconcile();
   }
 }
 if (!customElements.get("deck-stage"))

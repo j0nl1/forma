@@ -305,15 +305,17 @@ test("all effect frames and masks interpolate in the browser; reduced motion and
   await withPage(fallback.url, async (page) => {
     await ready(page);
     await page.keyboard.press("ArrowRight");
-    const sample = await page.locator(".tile").evaluate((e) => {
-      const a = e.getAnimations()[0];
-      a.pause();
-      a.currentTime = 1000;
-      return {
-        opacity: Number(getComputedStyle(e).opacity),
-        mask: getComputedStyle(e).maskImage,
-      };
-    });
+    const sample = await page
+      .locator("deck-stage > section .tile")
+      .evaluate((e) => {
+        const a = e.getAnimations()[0];
+        a.pause();
+        a.currentTime = 1000;
+        return {
+          opacity: Number(getComputedStyle(e).opacity),
+          mask: getComputedStyle(e).maskImage,
+        };
+      });
     assert.equal(sample.opacity, 0.325);
     assert.equal(sample.mask, "none");
   });
@@ -348,7 +350,10 @@ test("print, capture and reduced motion retain different state contracts while s
         .evaluate((e) => getComputedStyle(e).visibility),
       "visible",
     );
-    assert.equal(await page.locator("[data-deck-skip]").isVisible(), false);
+    assert.equal(
+      await page.locator("deck-stage > [data-deck-skip]").isVisible(),
+      false,
+    );
     await page.emulateMedia({ media: "screen" });
     await page.waitForFunction(
       () => !document.querySelector("deck-stage").printing,
@@ -378,14 +383,22 @@ test("print, capture and reduced motion retain different state contracts while s
     await page.keyboard.press("r");
     assert.equal(await page.locator("deck-stage").evaluate((e) => e.index), 0);
     await page.keyboard.press("f");
-    await page.waitForFunction(() => !!document.fullscreenElement);
+    await page.waitForFunction(
+      () =>
+        !!document.fullscreenElement &&
+        document.querySelector("deck-stage").hasAttribute("data-fullscreen"),
+    );
     assert.equal(
       await page.locator("deck-stage").locator(".rail").isVisible(),
       false,
     );
     await page.evaluate(() => document.activeElement.blur());
     await page.keyboard.press("f");
-    await page.waitForFunction(() => !document.fullscreenElement);
+    await page.waitForFunction(
+      () =>
+        !document.fullscreenElement &&
+        !document.querySelector("deck-stage").hasAttribute("data-fullscreen"),
+    );
     assert.equal(
       await page.locator("deck-stage").locator(".rail").isVisible(),
       true,
@@ -395,7 +408,9 @@ test("print, capture and reduced motion retain different state contracts while s
       .evaluate((e) => e.setAttribute("noscale", ""));
     assert.equal(await page.locator("[data-deck-anim-hidden]").count(), 0);
     assert.equal(
-      await page.locator(".tile").evaluate((e) => e.getAnimations().length),
+      await page
+        .locator("deck-stage > section .tile")
+        .evaluate((e) => e.getAnimations().length),
       0,
     );
   });
@@ -467,7 +482,10 @@ test("gradient masks change rendered pixels throughout the reveal rather than ap
         a.currentTime = 200;
       }, index);
       const low = await coverage(
-        await page.locator(".tile").nth(index).screenshot(),
+        await page
+          .locator("deck-stage > section .tile")
+          .nth(index)
+          .screenshot(),
       );
       await page
         .locator("deck-stage")
@@ -476,7 +494,10 @@ test("gradient masks change rendered pixels throughout the reveal rather than ap
             (deck.buildPlayer.state.animations[0].animation.currentTime = 800),
         );
       const high = await coverage(
-        await page.locator(".tile").nth(index).screenshot(),
+        await page
+          .locator("deck-stage > section .tile")
+          .nth(index)
+          .screenshot(),
       );
       samples.push({ name: names[index], low, high });
       assert.ok(high > low + 0.08, JSON.stringify(samples.at(-1)));
@@ -570,7 +591,10 @@ test("narrow viewports center the actual scaled slide inside the visible stage",
         art.width > 380
       );
     });
-    assert.equal(await page.locator("h2").isVisible(), true);
+    assert.equal(
+      await page.locator("deck-stage > section > h2").isVisible(),
+      true,
+    );
     await page
       .getByRole("button", { name: "Enter fullscreen", exact: true })
       .click();

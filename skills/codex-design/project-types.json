@@ -10,7 +10,10 @@
         "assets/starters/deck-runtime.js",
         "assets/starters/deck-builds.js",
         "assets/starters/deck-effects.js",
-        "assets/starters/deck-masks.js"
+        "assets/starters/deck-masks.js",
+        "assets/starters/deck-editor.js",
+        "assets/starters/deck-thumbnails.js",
+        "assets/starters/deck-operations.js"
       ]
     },
     {

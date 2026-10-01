@@ -53,7 +53,13 @@ This explicitly enables real project saving to `canvas.design-canvas.state.json`
 
 ## HTML deck builds
 
-Follow the [deck runtime guide](../skills/codex-design/references/deck-runtime.md). Canonical `data-anim-duration` and `data-anim-delay` use milliseconds; older short aliases use seconds. The local `deck-effects.html` gallery demonstrates every effect family, directional masks and repeat/reversal. Use Replay to restart the current group. Reduced motion retains click steps; print shows authored base artwork. Complete thumbnail editing and project persistence remain pending rather than excluded.
+Follow the [deck runtime guide](../skills/codex-design/references/deck-runtime.md). Canonical `data-anim-duration` and `data-anim-delay` use milliseconds; older short aliases use seconds. The local `deck-effects.html` gallery demonstrates every effect family, directional masks and repeat/reversal. Use Replay to restart the current group. Reduced motion retains click steps; print shows authored base artwork. The thumbnail rail supports range/toggle selection, skip, move, duplicate, confirmed deletion, native drag and undo. Drag its separator to resize; width and visibility persist in the browser. Static previews report that structural edits stay in the page.
+
+```sh
+node skills/codex-design/scripts/preview.mjs /path/to/design --deck-file deck.html
+```
+
+This connects the first literal HTML deck to actual source writes. Actions preserve metadata and speaker notes, reject stale versions and use the server's undo history. Reload retains saved structural edits; restarting the server clears undo history. Renderer-generated slides and richer presenter workflows remain required work. See the runtime guide for duplicate image state and portability limitations.
 
 Copy all companion deck modules or bundle `deck.js` before full-page standalone export. The demo helper produces a bundled deck runtime automatically.
 

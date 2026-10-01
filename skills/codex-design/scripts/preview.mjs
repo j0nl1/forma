@@ -8,6 +8,7 @@ import { pathToFileURL } from "node:url";
 import { args, contained, main } from "./lib/files.mjs";
 import { readMotionSource, saveMotionSource } from "./lib/motion-source.mjs";
 import { canvasSource } from "./lib/canvas-source.mjs";
+import { deckSource } from "./lib/deck-source.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -29,7 +30,7 @@ const MIME = {
 export async function serve(
   root,
   port = 4311,
-  { motionFile, canvasFile } = {},
+  { motionFile, canvasFile, deckFile } = {},
 ) {
   root = await fs.realpath(root);
   const token = randomBytes(32).toString("hex");
@@ -38,6 +39,7 @@ export async function serve(
   const canvas = canvasFile
     ? await canvasSource(root, canvasFile, token)
     : null;
+  const deck = deckFile ? await deckSource(root, deckFile, token) : null;
   if (motionFile) {
     motionFile = contained(
       root,
@@ -58,6 +60,10 @@ export async function serve(
       }
       if (canvas && req.url === "/__codex_canvas") {
         await canvas.handle(req, res);
+        return;
+      }
+      if (deck && req.url === "/__codex_deck") {
+        await deck.handle(req, res);
         return;
       }
       if (
@@ -195,6 +201,18 @@ export async function serve(
       if (stat.isDirectory()) file = path.join(file, "index.html");
       file = contained(root, await fs.realpath(file));
       let data = await fs.readFile(file);
+      if (deck && file === deck.html) {
+        data = Buffer.from(
+          data
+            .toString("utf8")
+            .replace(
+              /<head(?:\s[^>]*)?>/i,
+              (head) =>
+                head +
+                '<meta name="codex-deck-source" content="/__codex_deck">',
+            ),
+        );
+      }
       if (canvas && file === canvas.html) {
         const meta =
           '<meta name="codex-canvas-source" content="/__codex_canvas">';
@@ -261,10 +279,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--port": "value",
       "--motion-file": "value",
       "--canvas-file": "value",
+      "--deck-file": "value",
     });
     if (positional.length !== 1)
       throw new Error(
-        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html]",
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html]",
       );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -272,6 +291,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
     const { server, url } = await serve(path.resolve(positional[0]), port, {
       motionFile: flags["motion-file"],
       canvasFile: flags["canvas-file"],
+      deckFile: flags["deck-file"],
     });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])

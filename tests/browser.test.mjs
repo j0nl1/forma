@@ -144,8 +144,18 @@ test("deck navigation advances gated builds and print shows every completed slid
     await page
       .getByRole("button", { name: "Remove slide", exact: true })
       .click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Delete", exact: true })
+      .click();
+    await page.waitForFunction(
+      () => document.querySelector("deck-stage").length === 2,
+    );
     assert.equal(await page.locator("deck-stage>section").count(), 2);
     await page.getByRole("button", { name: "Restore slides" }).click();
+    await page.waitForFunction(
+      () => document.querySelector("deck-stage").length === 3,
+    );
     assert.equal(await page.locator("deck-stage>section").count(), 3);
     await page.emulateMedia({ media: "print" });
     for (const slide of await page.locator("deck-stage>section").all())
