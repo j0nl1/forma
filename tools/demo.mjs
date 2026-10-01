@@ -69,6 +69,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/text-editor.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/image-slot.js"),
+    path.join(destination, "starters/image-slot.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

@@ -11,6 +11,8 @@ import { canvasSource } from "./lib/canvas-source.mjs";
 import { deckSource } from "./lib/deck-source.mjs";
 import { tweaksSource } from "./lib/tweaks-source.mjs";
 import { textSource } from "./lib/text-source.mjs";
+import { imageSource, readImageState } from "./lib/image-source.mjs";
+import { injectHead } from "./lib/inject-head.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -32,7 +34,7 @@ const MIME = {
 export async function serve(
   root,
   port = 4311,
-  { motionFile, canvasFile, deckFile, tweaksFile, textFile } = {},
+  { motionFile, canvasFile, deckFile, tweaksFile, textFile, imageFile } = {},
 ) {
   root = await fs.realpath(root);
   const token = randomBytes(32).toString("hex");
@@ -46,6 +48,10 @@ export async function serve(
     ? await tweaksSource(root, tweaksFile, token)
     : null;
   const text = textFile ? await textSource(root, textFile, token) : null;
+  const imageTarget = imageFile ?? deckFile ?? canvasFile;
+  const images = imageTarget
+    ? await imageSource(root, imageTarget, token)
+    : null;
   if (motionFile) {
     motionFile = contained(
       root,
@@ -62,6 +68,10 @@ export async function serve(
       if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(req.headers.host ?? "")) {
         res.writeHead(403);
         res.end();
+        return;
+      }
+      if (images && req.url === "/__codex_images") {
+        await images.handle(req, res);
         return;
       }
       if (text && req.url === "/__codex_text") {
@@ -220,6 +230,34 @@ export async function serve(
       }
       const decoded = decodeURIComponent((req.url ?? "/").split("?")[0]);
       if (
+        ["image-slots.state.json", ".image-slots.state.json"].includes(
+          path.posix.basename(decoded),
+        )
+      ) {
+        const parents = decoded.split("/").slice(0, -1);
+        if (
+          decoded.includes("\0") ||
+          parents.some((part) => part.startsWith("."))
+        )
+          throw new Error("Invalid image state path");
+        const directory = contained(
+          root,
+          await fs.realpath(
+            path.resolve(root, "." + path.posix.dirname(decoded)),
+          ),
+        );
+        const value = await readImageState(root, directory);
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        });
+        res.end(
+          req.method === "HEAD" ? undefined : JSON.stringify(value.slots),
+        );
+        return;
+      }
+      if (
         decoded.includes("\0") ||
         decoded.split("/").some((part) => part.startsWith("."))
       )
@@ -231,39 +269,19 @@ export async function serve(
       let data = await fs.readFile(file);
       const authoredText =
         text && file === text.html ? data.toString("utf8") : null;
-      if (tweaks && file === tweaks.html) {
-        data = Buffer.from(
-          data
-            .toString("utf8")
-            .replace(
-              /<head(?:\s[^>]*)?>/i,
-              (head) =>
-                head +
-                '<meta name="codex-tweaks-source" content="/__codex_tweaks">',
+      for (const [service, name, endpoint] of [
+        [tweaks, "tweaks", "/__codex_tweaks"],
+        [deck, "deck", "/__codex_deck"],
+        [canvas, "canvas", "/__codex_canvas"],
+        [images, "images", "/__codex_images"],
+      ])
+        if (service && file === service.html)
+          data = Buffer.from(
+            injectHead(
+              data.toString("utf8"),
+              `<meta name="codex-${name}-source" content="${endpoint}">`,
             ),
-        );
-      }
-      if (deck && file === deck.html) {
-        data = Buffer.from(
-          data
-            .toString("utf8")
-            .replace(
-              /<head(?:\s[^>]*)?>/i,
-              (head) =>
-                head +
-                '<meta name="codex-deck-source" content="/__codex_deck">',
-            ),
-        );
-      }
-      if (canvas && file === canvas.html) {
-        const meta =
-          '<meta name="codex-canvas-source" content="/__codex_canvas">';
-        data = Buffer.from(
-          data
-            .toString("utf8")
-            .replace(/<head(?:\s[^>]*)?>/i, (head) => head + meta),
-        );
-      }
+          );
       if (text && file === text.html)
         data = Buffer.from(text.inject(data.toString("utf8"), authoredText));
       const headers = {
@@ -326,10 +344,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--deck-file": "value",
       "--tweaks-file": "value",
       "--text-file": "value",
+      "--image-file": "value",
     });
     if (positional.length !== 1)
       throw new Error(
-        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html] [--tweaks-file prototype.html] [--text-file document.html]",
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html] [--tweaks-file prototype.html] [--text-file document.html] [--image-file artwork.html]",
       );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -340,6 +359,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       deckFile: flags["deck-file"],
       tweaksFile: flags["tweaks-file"],
       textFile: flags["text-file"],
+      imageFile: flags["image-file"],
     });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])

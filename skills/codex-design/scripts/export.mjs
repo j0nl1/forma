@@ -30,6 +30,18 @@ export async function exportArtifact(mode, input, output, options = {}) {
     const result = await withPage(
       input,
       async (page, errors) => {
+        await page.evaluate(async () => {
+          document.documentElement.setAttribute("data-codex-exporting", "");
+          const slots = [];
+          const visit = (root) => {
+            for (const element of root.querySelectorAll("*")) {
+              if (element.localName === "image-slot") slots.push(element);
+              if (element.shadowRoot) visit(element.shadowRoot);
+            }
+          };
+          visit(document);
+          await Promise.all(slots.map((slot) => slot.prepareCapture?.()));
+        });
         if (mode === "pdf") {
           await renderPdf(page, temporary, options);
           return {};

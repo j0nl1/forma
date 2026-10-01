@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { parse } from "parse5";
+import { injectHead } from "./inject-head.mjs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -76,20 +76,7 @@ export async function textSource(root, filename, token) {
           ` ${attribute}="${marker}"` +
           source.slice(offset);
       }
-      const tree = parse(source, { sourceCodeLocationInfo: true });
-      const html = tree.childNodes.find((node) => node.tagName === "html");
-      const head = html?.childNodes.find((node) => node.tagName === "head");
-      const body = html?.childNodes.find((node) => node.tagName === "body");
-      const doctype = tree.childNodes.find(
-        (node) => node.nodeName === "#documentType",
-      );
-      const offset =
-        head?.sourceCodeLocation?.startTag?.endOffset ??
-        body?.sourceCodeLocation?.startTag?.startOffset ??
-        html?.sourceCodeLocation?.startTag?.endOffset ??
-        doctype?.sourceCodeLocation?.endOffset ??
-        0;
-      return source.slice(0, offset) + additions + source.slice(offset);
+      return injectHead(source, additions);
     },
     async handle(req, res) {
       const reply = (status, value) => {

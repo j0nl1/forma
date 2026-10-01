@@ -3,6 +3,10 @@ import fs from "node:fs/promises";
 import { parse, serialize } from "parse5";
 import postcss from "postcss";
 import { safeFile } from "./files.mjs";
+import {
+  IMAGE_STATE_FILE,
+  IMAGE_LEGACY_FILE,
+} from "../../assets/starters/image-model.js";
 const MIME = {
   ".json": "application/json",
   ".js": "text/javascript",
@@ -165,5 +169,42 @@ export async function inlineHtml(input, { root: scope } = {}) {
     if (n.content) await visit(n.content);
   }
   await visit(doc);
+  const html = doc.childNodes.find((node) => node.tagName === "html");
+  const head = html?.childNodes.find((node) => node.tagName === "head");
+  if (
+    !head?.childNodes.some((node) =>
+      node.attrs?.some(
+        (attr) => attr.name === "id" && attr.value === "codex-image-state",
+      ),
+    )
+  ) {
+    for (const filename of [IMAGE_STATE_FILE, IMAGE_LEGACY_FILE]) {
+      try {
+        const file = await safeFile(
+          root,
+          path.relative(root, path.join(pageBase, filename)),
+        );
+        const state = JSON.parse(await fs.readFile(file, "utf8"));
+        if (!state || typeof state !== "object" || Array.isArray(state))
+          throw new Error("Image state must be an object keyed by slot id.");
+        const node = {
+          nodeName: "script",
+          tagName: "script",
+          namespaceURI: "http://www.w3.org/1999/xhtml",
+          attrs: [
+            { name: "id", value: "codex-image-state" },
+            { name: "type", value: "application/json" },
+          ],
+          childNodes: [],
+          parentNode: head,
+        };
+        text(node, JSON.stringify(state).replace(/</g, "\\u003c"));
+        head.childNodes.unshift(node);
+        break;
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
+    }
+  }
   return serialize(doc);
 }

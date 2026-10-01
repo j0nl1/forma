@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Image framing — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 15px/1.6 system-ui;
+      }
+      nav {
+        padding: 16px 24px;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      a {
+        color: inherit;
+      }
+      main {
+        max-width: 1180px;
+        margin: auto;
+        padding: 36px 24px 80px;
+      }
+      h1 {
+        font:
+          46px/1.12 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 18px;
+      }
+      .lead {
+        max-width: 70em;
+        margin: 0 0 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 24px;
+      }
+      figure {
+        margin: 0;
+      }
+      .frame {
+        height: 260px;
+        background: #fffdf7;
+      }
+      figcaption {
+        padding-top: 10px;
+        font-size: 12px;
+      }
+      figcaption strong {
+        display: block;
+        font:
+          19px/1.5 Georgia,
+          serif;
+      }
+      .empty {
+        background: #213f38;
+        color: #fffdf7;
+      }
+      .empty image-slot {
+        color: inherit;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 28px 18px 70px;
+        }
+        h1 {
+          font-size: 34px;
+        }
+      }
+      @media print {
+        nav,
+        .lead {
+          display: none;
+        }
+        main {
+          padding: 0;
+        }
+        .frame {
+          height: 180px;
+        }
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav><a href="index.html">← Working collection</a></nav>
+    <main>
+      <h1>Give the image its place.</h1>
+      <p class="lead">
+        An original vector landscape demonstrates image framing. Hover for
+        controls, choose <strong>Edit</strong> or double-click, then drag the
+        image, scroll to zoom or resize from a corner. Escape or clicking
+        outside commits the crop. Drop a PNG, JPEG, WebP or AVIF to replace it.
+        This public example saves in your browser; the local source service
+        saves actual shared image state.
+      </p>
+      <div class="grid">
+        <figure>
+          <div class="frame">
+            <image-slot
+              id="image-hero"
+              src="media/landscape.svg"
+              shape="rounded"
+              radius="16"
+              editable="session"
+              alt="An illustrated landscape with green mountains and a golden sun"
+              credit="Original vector illustration"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>Cover the frame</strong>Frame-filling baseline, movable crop
+            and scale.
+          </figcaption>
+        </figure>
+        <figure>
+          <div class="frame">
+            <image-slot
+              id="image-fit"
+              src="media/landscape.svg"
+              shape="rect"
+              fit="contain"
+              editable="session"
+              alt="A complete illustrated landscape"
+              credit="Original vector illustration"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>Keep it complete</strong>Contain starts with the whole image
+            visible.
+          </figcaption>
+        </figure>
+        <figure>
+          <div class="frame">
+            <image-slot
+              id="image-circle"
+              src="media/landscape.svg"
+              shape="circle"
+              editable="session"
+              alt="A landscape inside an elliptical frame"
+              credit="Original vector illustration"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>A softer outline</strong>A circle becomes an ellipse in a
+            wider box.
+          </figcaption>
+        </figure>
+        <figure>
+          <div class="frame">
+            <image-slot
+              id="image-mask"
+              src="media/landscape.svg"
+              mask="polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)"
+              editable="session"
+              alt="A landscape inside a hexagonal frame"
+              credit="Original vector illustration"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>Choose a mask</strong>The image moves inside the authored
+            polygon.
+          </figcaption>
+        </figure>
+        <figure>
+          <div class="frame">
+            <image-slot
+              id="image-pill"
+              src="media/landscape.svg"
+              shape="pill"
+              editable="session"
+              alt="A landscape inside a pill frame"
+              credit="Original vector illustration"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>A long curve</strong>The outline remains independent of the
+            crop.
+          </figcaption>
+        </figure>
+        <figure>
+          <div class="frame empty">
+            <image-slot
+              id="image-empty"
+              shape="rounded"
+              radius="16"
+              editable="session"
+              placeholder="Drop your own landscape"
+              alt="A user-selected landscape"
+            ></image-slot>
+          </div>
+          <figcaption>
+            <strong>Start with your image</strong>The placeholder inherits the
+            surrounding color.
+          </figcaption>
+        </figure>
+      </div>
+    </main>
+    <script src="starters/image-slot.js"></script>
+  </body>
+</html>

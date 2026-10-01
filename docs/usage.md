@@ -73,6 +73,14 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --tweaks-file proto
 
 One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in Codex. Automatic composer insertion remains under integration review.
 
+## Replace and frame images
+
+```sh
+node skills/codex-design/scripts/preview.mjs /path/to/design --image-file artwork.html
+```
+
+The [image guide](../skills/codex-design/references/images.md) documents authored shapes, masks, safe credits, cover/contain baselines and the full reframe editor. Drop or browse a raster image; double-click or choose Edit to drag, zoom or resize it. Actual state is saved in `image-slots.state.json` beside the selected HTML. Deck/canvas source previews also connect this service for image persistence. Static pages are read-only, and `images.html` is an explicit browser-session demonstration. Portable HTML embeds the saved shared state.
+
 ## Edit literal text
 
 ```sh
