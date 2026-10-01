@@ -13,6 +13,7 @@ import {
   authoredTime,
   retimeScene,
   advancePlayback,
+  captionFrame,
 } from "./motion-model.js";
 export { clamp, Easing, interpolate, animate } from "./motion-model.js";
 export {
@@ -335,8 +336,10 @@ function ExportPanel({ duration, onExport, busy }) {
   );
 }
 
-export function Shot({ from = 0, to = Infinity, children, style, ...rest }) {
+export function Shot({ from, to, children, style, ...rest }) {
   const { T } = useComposition();
+  const start = +from;
+  const visible = Number.isFinite(start) && T >= start && T < +(to ?? Infinity);
   return (
     <div
       {...rest}
@@ -344,7 +347,7 @@ export function Shot({ from = 0, to = Infinity, children, style, ...rest }) {
         position: "absolute",
         inset: 0,
         ...style,
-        visibility: T >= from && T < to ? "visible" : "hidden",
+        visibility: visible ? "visible" : "hidden",
       }}
     >
       {children}
@@ -353,14 +356,8 @@ export function Shot({ from = 0, to = Infinity, children, style, ...rest }) {
 }
 export function Captions({ items = [], style }) {
   const { T } = useComposition();
-  const sorted = items
-    .filter((item) => Number.isFinite(item.at))
-    .toSorted((a, b) => a.at - b.at);
-  const index = sorted.findLastIndex((item) => item.at <= T);
-  const item = sorted[index];
-  const end = item?.until ?? sorted[index + 1]?.at ?? Infinity;
-  if (!item || T >= end) return null;
-  const opacity = clamp(Math.min((T - item.at) / 0.18, (end - T) / 0.18));
+  const frame = captionFrame(items, T);
+  if (!frame) return null;
   return (
     <div
       data-codex-caption
@@ -371,14 +368,14 @@ export function Captions({ items = [], style }) {
         bottom: "7%",
         textAlign: "center",
         pointerEvents: "none",
-        font: "500 30px system-ui",
+        font: "500 30px Inter, system-ui, sans-serif",
         color: "#f6f4ef",
-        textShadow: "0 1px 14px #0008",
+        textShadow: "0 1px 14px rgb(0 0 0 / 45%)",
+        opacity: frame.opacity,
         ...style,
-        opacity,
       }}
     >
-      {item.text}
+      {frame.item.text}
     </div>
   );
 }

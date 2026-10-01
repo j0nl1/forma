@@ -70,6 +70,29 @@ export function animate({
         : from + (to - from) * ease((time - start) / (end - start));
 }
 
+// Select one caption in authored time. An expired latest entry leaves a gap;
+// it must not revive an earlier overlapping caption.
+export function captionFrame(items, time) {
+  const sorted = (items || [])
+    .filter((item) => item && Number.isFinite(+item.at))
+    .toSorted((a, b) => +a.at - +b.at);
+  const index = sorted.findLastIndex((item) => +item.at <= time);
+  const item = sorted[index];
+  if (!item) return null;
+  const next = sorted[index + 1];
+  const end =
+    typeof item.until === "number" && Number.isFinite(item.until)
+      ? item.until
+      : next
+        ? +next.at
+        : Infinity;
+  if (time >= end) return null;
+  return {
+    item,
+    opacity: clamp(Math.min((time - +item.at) / 0.18, (end - time) / 0.18)),
+  };
+}
+
 export function parseScenes(raw) {
   if (typeof raw === "string" && raw.length > 16384)
     throw new Error("Scene data exceeds 16 KiB");

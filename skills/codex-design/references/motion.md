@@ -6,6 +6,10 @@ Use `assets/starters/animations.jsx` for animation projects. It independently re
 
 Import `CompositionStage`, `useComposition`, `Shot`, `Captions`, `Easing`, `interpolate`, and `animate`. Render one persistent element tree inside `CompositionStage`. `useComposition()` supplies `{T, CUES, time, duration, authoredTotal, playing}`. All visible choreography must derive from authored time `T` and `CUES.SectionName`. Elements crossing a boundary remain mounted. `Shot` changes visibility without unmounting its children. `Captions` displays at most one caption, with `at`, optional `until`, and `text`.
 
+`Shot from={start} to={end}` is visible from the inclusive authored start to the exclusive end. Numeric strings are accepted. A missing or non-finite start, or an empty interval, stays hidden. An omitted or null end means an open interval. Hidden images and videos remain mounted and keep their decoded readiness; visibility does not suspend the underlying shared clock or change a `VideoSprite` source interval. Retiming a section moves the playback boundary while retaining its authored gate.
+
+Caption entries are sorted by their numeric `at` value without mutating the input. Null entries and non-finite starts are ignored; numeric strings are accepted. Only a finite numeric `until` supplies an explicit end; otherwise the next caption start is inferred, with an open end for the last entry. The latest entry at or before `T` wins, including the last of equal starts. If it has already expired, the gap stays empty rather than reviving an earlier overlapping caption. Captions fade in and out over 180 ms of authored time, so stretching a section stretches the fade in playback time. The defaults are centered 30 px, weight 500, `Inter, system-ui, sans-serif`, 8% side insets, 7% bottom inset and a 45% black shadow. Supply a local font face when exact Inter output is required. Every property in `style`, including `opacity`, overrides the corresponding default; an explicit opacity deliberately replaces the automatic fade envelope.
+
 Declare scene and playback JSON strings in a dedicated plain inline script in the main HTML document:
 
 ```html
