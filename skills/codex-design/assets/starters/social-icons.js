@@ -23,6 +23,28 @@ const paths = {
   person: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   music:
     '<path d="M10 17V4l10-2v12M10 7l10-2"/><ellipse cx="7" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="15" rx="3" ry="2"/>',
+  thumb: '<path d="M7 10 12 3l2 2-1 5h6l1 2-2 8H7Zm0 0H3v10h4"/>',
+  globe:
+    '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',
+  video:
+    '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="m10 8 5 3-5 3Z"/>',
+  store:
+    '<path d="M3 9h18l-2-5H5Zm2 3v8h14v-8M9 20v-6h6v6M3 9c0 4 5 4 5 0 0 4 4 4 4 0 0 4 4 4 4 0 0 4 5 4 5 0"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  briefcase:
+    '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V4h8v4"/>',
+  orbit:
+    '<circle cx="12" cy="12" r="7"/><ellipse cx="12" cy="12" rx="11" ry="4" transform="rotate(-20 12 12)"/>',
+  up: '<path d="M12 20V4m-6 6 6-6 6 6"/>',
+  down: '<path d="M12 4v16m-6-6 6 6 6-6"/>',
+  kebab:
+    '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  cast: '<path d="M3 5h18v14h-7M3 5v4M3 13a8 8 0 0 1 8 8M3 17a4 4 0 0 1 4 4"/>',
+  shorts:
+    '<rect x="7" y="3" width="10" height="18" rx="4"/><path d="m10 9 5 3-5 3Z"/>',
+  subscriptions:
+    '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M7 4h10m-7 7 5 3-5 3Z"/>',
+  createCircle: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
 };
 export function icon(name, size = 24, filled = false) {
   return `<svg aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${paths[name] || ""}</svg>`;

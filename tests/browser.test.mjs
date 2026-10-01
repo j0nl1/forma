@@ -42,6 +42,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "files.html",
     "social.html",
     "social-shells.html",
+    "social-feeds.html",
   ])
     await t.test(file, async () => {
       await withPage(url + file, async (page) => {

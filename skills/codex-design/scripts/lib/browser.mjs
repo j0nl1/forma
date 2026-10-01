@@ -52,6 +52,11 @@ export async function withPage(
         window.CodexXReady,
         window.CodexInstagramReady,
         window.CodexTikTokReady,
+        window.CodexFacebookReady,
+        window.CodexLinkedInReady,
+        window.CodexPinterestReady,
+        window.CodexRedditReady,
+        window.CodexYouTubeReady,
       ].filter(Boolean);
       if (readiness.length)
         await Promise.race([

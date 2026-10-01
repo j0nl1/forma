@@ -7,6 +7,11 @@ window.CodexSocialReady = (async () => {
     import("./x-shell.js"),
     import("./instagram-shell.js"),
     import("./tiktok-shell.js"),
+    import("./facebook-shell.js"),
+    import("./linkedin-shell.js"),
+    import("./pinterest-shell.js"),
+    import("./reddit-shell.js"),
+    import("./youtube-shell.js"),
   ]);
   await Promise.all([
     window.CodexPostsReady,
@@ -15,6 +20,11 @@ window.CodexSocialReady = (async () => {
     window.CodexXReady,
     window.CodexInstagramReady,
     window.CodexTikTokReady,
+    window.CodexFacebookReady,
+    window.CodexLinkedInReady,
+    window.CodexPinterestReady,
+    window.CodexRedditReady,
+    window.CodexYouTubeReady,
   ]);
   const names = {
     instagram: "Instagram",
