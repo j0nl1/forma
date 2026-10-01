@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Component gallery study</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 20px/1.6 system-ui;
+        padding: 60px 70px;
+      }
+      h1 {
+        font:
+          60px/1.15 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 36px;
+      }
+      .eyebrow {
+        font-size: 14px;
+        letter-spacing: 0.08em;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .card {
+        padding: 32px;
+        background: #fffdf7;
+        border: 1px solid #ccd5c5;
+        border-radius: 18px;
+      }
+      button {
+        font: inherit;
+        color: #fffdf7;
+        background: #263c34;
+        padding: 14px 24px;
+        border: 0;
+        border-radius: 9px;
+      }
+      input {
+        font: inherit;
+        max-width: 100%;
+        padding: 12px;
+        border: 1px solid #9dad9c;
+        border-radius: 8px;
+      }
+      .palette {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .palette span {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #269d80;
+      }
+      .palette span:nth-child(2) {
+        background: #e4b754;
+      }
+      .palette span:nth-child(3) {
+        background: #365bcf;
+      }
+      footer {
+        margin-top: 70px;
+        padding-top: 30px;
+        border-top: 1px solid #ccd5c5;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">LOCAL DESIGN SYSTEM / STUDY</p>
+    <h1 id="title">A quiet library.</h1>
+    <div class="cards">
+      <section class="card">
+        <h2>Actions</h2>
+        <button>Save to library</button>
+      </section>
+      <section class="card">
+        <h2>Fields</h2>
+        <input aria-label="Library title" placeholder="Your collection" />
+      </section>
+      <section class="card">
+        <h2>Materials</h2>
+        <div class="palette"><span></span><span></span><span></span></div>
+      </section>
+      <section class="card">
+        <h2>Typography</h2>
+        <p>One clear idea.<br />Room to breathe.</p>
+      </section>
+    </div>
+    <footer>
+      This gallery accepts native local title updates while preserving its live
+      content.
+    </footer>
+    <script>
+      window.CodexFileUpdate = (name, kind, content) => {
+        if (name === "library" && typeof content === "string")
+          document.getElementById("title").textContent = content;
+      };
+    </script>
+  </body>
+</html>

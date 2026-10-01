@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Reading room study</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #fffdf7;
+        color: #263c34;
+        font:
+          22px/1.7 Georgia,
+          serif;
+      }
+      header {
+        padding: 52px 80px;
+        border-bottom: 1px solid #ccd5c5;
+        font: 14px system-ui;
+        display: flex;
+        justify-content: space-between;
+      }
+      main {
+        padding: 70px 100px;
+        max-width: 960px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 76px;
+        line-height: 1.08;
+        font-weight: 400;
+        max-width: 700px;
+        margin: 0 0 50px;
+      }
+      .art {
+        height: 480px;
+        background: #269d80;
+        position: relative;
+        overflow: hidden;
+      }
+      .art:before {
+        content: "";
+        position: absolute;
+        width: 370px;
+        height: 370px;
+        border: 50px solid #fffdf7;
+        border-radius: 50%;
+        top: 130px;
+        left: 160px;
+      }
+      .art:after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 340px;
+        background: #e4b754;
+        top: 70px;
+        right: 90px;
+        transform: rotate(18deg);
+      }
+      section {
+        padding: 58px 0;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      h2 {
+        font-weight: 400;
+        font-size: 38px;
+      }
+      footer {
+        padding: 80px 100px;
+        background: #263c34;
+        color: #fffdf7;
+        font: 16px system-ui;
+      }
+    </style>
+  </head>
+  <body>
+    <header><span>THE READING ROOM</span><span>FIELD NOTES / 01</span></header>
+    <main>
+      <h1>Attention is a design material.</h1>
+      <div
+        class="art"
+        role="img"
+        aria-label="Original geometric reading study"
+      ></div>
+      <section>
+        <h2>Leave room for the thought.</h2>
+        <p>
+          A useful page gives each idea the space it needs. The pace comes from
+          the relationship between a heading, an image and a sentence.
+        </p>
+        <p>
+          This is an independently authored local document. Its full layout
+          stays available behind every cropped preview.
+        </p>
+      </section>
+      <section>
+        <h2>Keep the whole story.</h2>
+        <p>
+          Expand the card and scroll through the original document. The preview
+          preserves its real viewport height as you move, including this final
+          section.
+        </p>
+      </section>
+    </main>
+    <footer>END OF FIELD NOTE / KEEP READING</footer>
+  </body>
+</html>

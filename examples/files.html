@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Live files — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 15px/1.6 system-ui;
+      }
+      nav {
+        padding: 16px 24px;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      a {
+        color: inherit;
+      }
+      main {
+        max-width: 1180px;
+        margin: auto;
+        padding: 36px 24px 80px;
+      }
+      h1 {
+        font:
+          46px/1.12 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 18px;
+      }
+      .lead {
+        max-width: 65em;
+        margin: 0 0 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+        gap: 28px;
+      }
+      figure {
+        margin: 0;
+      }
+      file-window {
+        box-sizing: content-box;
+        max-width: calc(100% - 18px);
+        --fw-font: system-ui;
+        --fw-surf: #fffdf7;
+        --fw-muted: #ebece3;
+        --fw-fg: #263c34;
+        --fw-fg3: #657969;
+        --fw-sel: #269d80;
+      }
+      .study {
+        position: relative;
+        height: 224px;
+        padding: 18px;
+        background: #ebece3;
+        border: 1px solid #ccd5c5;
+        border-radius: 12px;
+        color: #657969;
+      }
+      .study svg {
+        height: 100%;
+        width: 100%;
+      }
+      figcaption {
+        padding-top: 10px;
+        font-size: 12px;
+      }
+      figcaption strong {
+        display: block;
+        font:
+          19px/1.5 Georgia,
+          serif;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 34px 0 18px;
+      }
+      button {
+        font: inherit;
+        padding: 8px 14px;
+        border: 1px solid #9dad9c;
+        background: #fffdf7;
+        color: inherit;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 2px solid #269d80;
+        outline-offset: 3px;
+      }
+      output {
+        display: block;
+        padding: 14px 18px;
+        border-left: 3px solid #269d80;
+        background: #e5ebe0;
+        min-height: 55px;
+      }
+      #waiting {
+        margin-top: 24px;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 28px 18px 70px;
+        }
+        h1 {
+          font-size: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav><a href="index.html">← All examples</a></nav>
+    <main>
+      <h1>A window into<br />the working file.</h1>
+      <p class="lead">
+        Each card shows a live project document at its authored size. Select a
+        card to pick its file, or expand it to explore the whole page. The
+        waiting study shows the pencil cycle used while a new file is being
+        created.
+      </p>
+      <div class="grid">
+        <figure>
+          <file-window
+            id="article"
+            file="previews/reading.html"
+            label="Reading room"
+            width="320"
+            height="200"
+            window-width="640"
+            document-width="960"
+            window-x="100"
+            window-y="300"
+            action-label="Select this file"
+          ></file-window>
+          <figcaption>
+            <strong>A deliberate crop.</strong>One document, physical
+            coordinates, complete scrollable preview.
+          </figcaption>
+        </figure>
+        <figure>
+          <file-window
+            id="library"
+            file="previews/library.dc.html"
+            label="Component library"
+            width="320"
+            height="200"
+            window-width="640"
+            document-width="960"
+            action-label="Select this file"
+          ></file-window>
+          <figcaption>
+            <strong>A live component gallery.</strong>Updates reach both the
+            card and its expanded document.
+          </figcaption>
+        </figure>
+        <figure>
+          <div
+            id="study"
+            class="study"
+            aria-label="Twenty waiting layout sketches"
+          ></div>
+          <figcaption>
+            <strong>A file in progress.</strong>Twenty pencil layouts, a seeded
+            phase and a quiet reduced-motion view.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="controls">
+        <button id="refresh">Reload the article</button
+        ><button id="swap">Swap the article file</button
+        ><button id="update">Update the library title</button
+        ><button id="wait">Preview a file in progress</button>
+      </div>
+      <output id="status" aria-live="polite"
+        >Select or expand a card to inspect its file.</output
+      >
+      <div id="waiting"></div>
+    </main>
+    <script src="starters/file-window.js"></script>
+    <script type="module">
+      import { sketch, sketchStyle } from "./starters/file-window-sketch.js";
+      const study = document
+          .getElementById("study")
+          .attachShadow({ mode: "open" }),
+        style = document.createElement("style");
+      style.textContent = sketchStyle;
+      study.append(style, sketch("live-file-study", 320, 200));
+      const article = document.getElementById("article"),
+        library = document.getElementById("library"),
+        status = document.getElementById("status");
+      document.getElementById("refresh").onclick = () => {
+        article.reload();
+        status.textContent = "Reloaded the current project file.";
+      };
+      document.getElementById("swap").onclick = () => {
+        article.setAttribute(
+          "file",
+          article.file.includes("reading")
+            ? "previews/library.dc.html"
+            : "previews/reading.html",
+        );
+        status.textContent = "The card now previews " + article.file;
+      };
+      let version = 1;
+      document.getElementById("update").onclick = () => {
+        window.CodexFileUpdate(
+          "library",
+          "html",
+          "Library edition " + ++version,
+          false,
+          "main",
+          "previews/library.dc.html",
+        );
+        status.textContent =
+          "Updated the embedded title in every open library preview.";
+      };
+      document.getElementById("wait").onclick = () => {
+        if (document.getElementById("pending")) return;
+        const node = document.createElement("file-window");
+        node.id = "pending";
+        node.setAttribute("file", "previews/future.html");
+        node.setAttribute("expect", "");
+        node.setAttribute("label", "A new project file");
+        document.getElementById("waiting").append(node);
+        status.textContent =
+          "Waiting for previews/future.html. In a local project, creating that file replaces the sketch with its real preview.";
+      };
+      document.addEventListener("file-window:pick", (event) => {
+        status.textContent = "Picked " + event.detail.file;
+      });
+      document.addEventListener("file-window:action", (event) => {
+        status.textContent = "Selected " + event.detail.file;
+      });
+    </script>
+  </body>
+</html>

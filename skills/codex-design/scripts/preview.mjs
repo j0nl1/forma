@@ -2,7 +2,7 @@
 import http from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { randomBytes } from "node:crypto";
+import { randomBytes, createHash } from "node:crypto";
 import os from "node:os";
 import { pathToFileURL } from "node:url";
 import { args, contained, main } from "./lib/files.mjs";
@@ -287,6 +287,7 @@ export async function serve(
       const headers = {
         "Content-Type": MIME[path.extname(file)] ?? "application/octet-stream",
         "Content-Length": data.length,
+        ETag: `"${createHash("sha256").update(data).digest("hex")}"`,
         "Accept-Ranges": "bytes",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",

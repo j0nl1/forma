@@ -35,7 +35,8 @@ export async function exportArtifact(mode, input, output, options = {}) {
           const slots = [];
           const visit = (root) => {
             for (const element of root.querySelectorAll("*")) {
-              if (element.localName === "image-slot") slots.push(element);
+              if (["image-slot", "file-window"].includes(element.localName))
+                slots.push(element);
               if (element.shadowRoot) visit(element.shadowRoot);
             }
           };

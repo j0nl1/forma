@@ -77,6 +77,8 @@ One root HTML JSON defaults block becomes the real save target. Partial updates 
 
 The [platform guide](../skills/codex-design/references/platforms.md) lists every iOS, Android, Chrome and macOS composition primitive and prop. Bundle a React entry or use the native `ios-shell` / `chrome-shell` with their fixed physical sizes. `platforms.html` demonstrates live keyboards, titles, tabs and sidebar state without replacing authored input nodes. The native shells support `image-only="true"` and actual `exportAsset("png"|"html")` downloads at the chosen content region's exact size. The earlier generic `frames.js` wrappers remain available.
 
+The [live file guide](../skills/codex-design/references/file-windows.md) explains `file-window.js`: physical crops of actual local HTML, missing/reappearing files, waiting pencil sketches, updates and scrollable expanded views. Copy its companion modules or bundle the loader. `files.html` demonstrates real crops, embedded updates and local pick/action events. Whole-page export settles available frames; portable HTML retains its project-file dependencies.
+
 ## Replace and frame images
 
 ```sh
