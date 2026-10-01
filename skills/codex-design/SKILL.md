@@ -35,7 +35,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Social content and campaign layouts | [campaigns](references/campaigns.md) | `social.js` |
 | Chart, data analysis, diagram, map | [data](references/data.md) | `chart-stage.js`, local D3/Sankey, `data-overlay.js`, `chart.js`, `sources.js` |
 | Current-source research | [research](references/research.md) | `sources.js` |
-| Animation, video, sound, watercolor | [motion](references/motion.md), [watercolor](references/watercolor.md) | `animations.jsx`, `motion-model.js`, `scene-components.jsx`, `watercolor-components.jsx`, `watercolor-kit.js` |
+| Animation, video, sound, watercolor | [motion](references/motion.md), [watercolor](references/watercolor.md) | `animations.jsx`, `motion-model.js`, `motion-fonts.js`, `font-css.js`, `fonts/`, `scene-components.jsx`, `watercolor-components.jsx`, `watercolor-kit.js` |
 | 3D object or scene | [three-dimensional](references/three-dimensional.md) | `three-stage.js` |
 | Create, import, or consume a design system | [design systems](references/design-systems.md) | `controls.js` |
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |

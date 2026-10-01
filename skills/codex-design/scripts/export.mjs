@@ -57,7 +57,10 @@ export async function exportArtifact(mode, input, output, options = {}) {
         }
         return renderVideo(page, errors, output, temporary, config);
       },
-      { deviceScaleFactor: config.deviceScaleFactor ?? 1 },
+      {
+        deviceScaleFactor: config.deviceScaleFactor ?? 1,
+        fontOrigins: options.fontOrigins ?? [],
+      },
     );
     await fs.rename(temporary, output);
     return { output, ...result };

@@ -97,11 +97,6 @@ export async function renderVideo(page, errors, output, temporary, options) {
       kind: "zero_duration",
       message: "The composition has zero duration; one frame is exported",
     });
-  if (await page.evaluate(() => document.fonts.status !== "loaded"))
-    flags.push({
-      kind: "fonts_timeout",
-      message: "Fonts did not finish loading before capture",
-    });
   if (await page.locator("[data-codex-exportable-video-duration]").count()) {
     try {
       await page.waitForFunction(
@@ -135,7 +130,18 @@ export async function renderVideo(page, errors, output, temporary, options) {
     style.textContent =
       "html,body{margin:0;width:100%;height:100%;overflow:hidden}";
     document.head.append(style);
+    void document.body.offsetWidth;
   }, options);
+  try {
+    await page.waitForFunction(() => document.fonts.status === "loaded", null, {
+      timeout: 8000,
+    });
+  } catch {
+    flags.push({
+      kind: "fonts_timeout",
+      message: "Fonts did not finish loading before capture",
+    });
+  }
   const ext = path.extname(output).slice(1).toLowerCase();
   const scale = `scale=${width}:${height}:flags=lanczos,setsar=1`;
   const codec =

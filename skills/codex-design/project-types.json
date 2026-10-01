@@ -55,6 +55,11 @@
       "starters": [
         "assets/starters/animations.jsx",
         "assets/starters/motion-model.js",
+        "assets/starters/motion-fonts.js",
+        "assets/starters/font-css.js",
+        "assets/starters/fonts/inter-medium.woff2",
+        "assets/starters/fonts/OFL.txt",
+        "assets/starters/fonts/README.md",
         "assets/starters/scene-components.jsx",
         "assets/starters/watercolor-components.jsx",
         "assets/starters/watercolor-kit.js"

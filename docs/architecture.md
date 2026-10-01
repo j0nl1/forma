@@ -14,7 +14,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | System browser runtime | `window.CodexDesignSystem` with `React`, `createRoot`, `Components` |
 | Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state; metadata-only HTML retains direct body nodes with a separate viewport |
 | Slides | `deck-stage` with direct element slides and finished base styles; 44 declarative effects, complete click groups and runtime-owned WAAPI state |
-| Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; the simple `motion-stage` remains for existing examples |
+| Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; parsed font styles retain imported-sheet bases and conditions, with packaged Inter and configured remote embedding; the simple `motion-stage` remains for existing examples |
 | Tweaks | React `useTweaks` and typed controls, a shared JSON-only store, local draft handoff and versioned root-HTML JSON source writes |
 | Charts | General light-DOM `chart-stage`, full local D3/Sankey bundle, keyed redraw context, view scales, refresh transitions, pointer tooltips and actual SVG/2× PNG downloads; basic `data-chart` retained |
 | Data overlay | Authored `data-overlay` views, independent geometry/layout/paint/control modules, exact sentence navigation, JSON or reviewed JS source reload, local request drafts and scoped opacity restoration |
@@ -39,6 +39,7 @@ Native DOM starters are classic scripts except the explicitly bundled 3D module 
 - `export.mjs`: parsed HTML/CSS inlining, Chromium PDF/PNG, deterministic video.
 - `lib/pdf.mjs`: current-runtime paper choices, print layout readiness and real PDF output.
 - `lib/audio.mjs`: frame-grid media inventory, temporary local source snapshots, source-range/pitch-preserving loops and AAC/Opus mixing; the final video stream is copied during muxing.
+- `lib/font-network.mjs`: caller-configured read-only font/stylesheet/fetch origins, per-hop redirect checks and CSS rebasing against the final response URL; the connected editor uses server-start configuration rather than browser-supplied grants.
 - `verify.mjs`: runtime and screenshot probes, not semantic flow verification.
 - `tools/install.mjs`: staged local copy and conflict-aware managed update.
 
@@ -46,4 +47,4 @@ File writes use sibling temporary files and atomic rename. Multi-file generation
 
 ## Trust boundary
 
-Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaScript. Inspection does not evaluate source. Browser previews execute page scripts, so reviewed source and an appropriate environment remain necessary. Browser exporters restrict HTTP input and subresources to loopback; Codex browser tools have their own permissions. This package is not a sandbox for arbitrary imported code.
+Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaScript. Inspection does not evaluate source. Browser previews execute page scripts, so reviewed source and an appropriate environment remain necessary. Browser exporters require loopback HTTP input and keep subresources local by default. Explicit `fontOrigins` grants allow GET/HEAD font, stylesheet and font-embedding fetch requests from selected HTTP(S) origins, without granting scripts or remote writes. Font/stylesheet requests and configured remote embedding requests validate redirect targets before following them. Ordinary authored browser pages retain their own network behavior; the stage's `fontOrigins` prop governs embedding, not a browser sandbox. Codex browser tools have their own permissions. This package is not a sandbox for arbitrary imported code.

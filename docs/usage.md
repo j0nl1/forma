@@ -144,7 +144,7 @@ node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animatio
 node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/section.mp4 --start-ms 2000 --end-ms 4000 --scale 2 --crf 18
 ```
 
-Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports block remote subresources. Existing outputs are refused. MP4/WebM can retain marked media audio; `--audio none` and GIF are silent. Inspect PDF pages for print fidelity.
+Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports use local resources by default. The [portable font contract](../skills/codex-design/references/motion.md#portable-fonts) explains the packaged Inter caption font, SVG font embedding and optional `fontOrigins` configuration for read-only font providers. Connected editor exports receive that configuration from the preview server's `--font-origins` option. Existing outputs are refused. MP4/WebM can retain marked media audio; `--audio none` and GIF are silent. Inspect PDF pages for print fidelity.
 
 ## Build React or 3D source
 

@@ -17,13 +17,15 @@ Research snapshots stay outside the repository. Components and schemas are indep
 | fflate | ZIP decoding | [fflate](https://github.com/101arrowz/fflate) |
 | fzstd | Streaming Zstandard decoding | [fzstd](https://github.com/101arrowz/fzstd) |
 | parse5 | HTML parsing | [parse5](https://github.com/inikulin/parse5) |
-| postcss | CSS inspection and export | [PostCSS](https://github.com/postcss/postcss) |
+| postcss | CSS inspection, font rule parsing and export | [PostCSS](https://github.com/postcss/postcss) |
 | playwright | Chromium verification and capture | [Playwright](https://github.com/microsoft/playwright) |
 | react / react-dom | Optional component systems | [React](https://github.com/facebook/react) |
 | three | Optional 3D | [Three.js](https://github.com/mrdoob/three.js) |
 | prettier | Development source formatting | [Prettier](https://github.com/prettier/prettier) |
 
 Versions and integrity hashes are locked. Use `npm ci --ignore-scripts`; explicit Chromium installation is separate. FFmpeg comes from the OS. Dependencies remain a supply-chain boundary.
+
+The default caption font is Inter Medium 4.1, independently obtained from the [font author's website](https://rsms.me/inter/) and distributed under the SIL Open Font License 1.1. Its [asset notes](../skills/codex-design/assets/starters/fonts/README.md) record the download URL, retrieval date, checksum and included license. The build embeds this font locally; it requires no CDN request.
 
 There is no telemetry, background updater, hosted asset proxy, model selection change, credential collector, or remote install hook. Preview binds to loopback; exports write local files and refuse existing outputs. Browsing, generation, publishing, and transfers use the actual available Codex tools under the user's authorization.
 

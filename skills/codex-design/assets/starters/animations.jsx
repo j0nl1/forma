@@ -2,6 +2,9 @@
 // React; do not load a second animation engine on the same page.
 import React from "react";
 import { flushSync } from "react-dom";
+import { embedMotionFonts } from "./motion-fonts.js";
+import { fontOrigins as normalizeFontOrigins } from "./font-css.js";
+import captionFont from "./fonts/inter-medium.woff2";
 import {
   clamp,
   Easing,
@@ -149,68 +152,35 @@ function TimingSync({ onScenes, onPlayback }) {
   }, [onScenes, onPlayback]);
   return <span ref={marker} hidden />;
 }
-function useInlineFonts(svg) {
+function useInlineFonts(svg, origins) {
+  const key = JSON.stringify(normalizeFontOrigins(origins));
   React.useEffect(() => {
     const root = svg.current;
-    let cancelled = false;
-    const rules = [];
-    const collect = (list, base) => {
-      for (const rule of list) {
-        if (rule.type === CSSRule.FONT_FACE_RULE)
-          rules.push({ css: rule.cssText, base });
-        else if (rule.cssRules) collect(rule.cssRules, base);
-      }
-    };
-    for (const sheet of document.styleSheets) {
-      try {
-        collect(sheet.cssRules, sheet.href || location.href);
-      } catch {
-        root.dataset.codexFontWarning =
-          "A stylesheet could not be read; keep fonts local for portable SVG";
-      }
-    }
-    (async () => {
-      const inline = await Promise.all(
-        rules.map(async ({ css, base }) => {
-          for (const match of css.matchAll(
-            /url\(\s*(["']?)([^"')]+)\1\s*\)/g,
-          )) {
-            const url = new URL(match[2], base);
-            if (url.protocol === "data:") continue;
-            if (url.origin !== location.origin) {
-              root.dataset.codexFontWarning =
-                "A font is remote; download it into the project for portable SVG";
-              continue;
-            }
-            try {
-              const response = await fetch(url);
-              if (!response.ok) throw new Error("Font unavailable");
-              const data = await response.blob();
-              const encoded = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(data);
-              });
-              css = css.replaceAll(match[0], `url("${encoded}")`);
-            } catch {
-              root.dataset.codexFontWarning =
-                "A local font could not be embedded";
-            }
-          }
-          return css;
-        }),
-      );
-      if (cancelled) return;
-      const style = document.createElement("style");
-      style.textContent = inline.join("\n");
-      root.querySelector("foreignObject > div").prepend(style);
-      root.dataset.codexFontsInlined = "true";
-    })();
+    const controller = new AbortController();
+    let cleanup;
+    delete root.dataset.codexFontsInlined;
+    delete root.dataset.codexFontWarning;
+    const pending = embedMotionFonts(root, {
+      origins: JSON.parse(key),
+      signal: controller.signal,
+    })
+      .then((remove) => {
+        cleanup = remove;
+        if (controller.signal.aborted) remove();
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) {
+          root.dataset.codexFontWarning = error.message;
+          root.dataset.codexFontsInlined = "true";
+        }
+      });
+    root.codexFontsReady = pending;
     return () => {
-      cancelled = true;
+      controller.abort();
+      cleanup?.();
+      if (root.codexFontsReady === pending) delete root.codexFontsReady;
     };
-  }, []);
+  }, [key]);
 }
 
 function ExportPanel({ duration, onExport, busy }) {
@@ -713,6 +683,7 @@ export function Stage({
   loop = true,
   playback,
   persistKey = "codex-composition",
+  fontOrigins = [],
   children,
   derived,
   onScenes,
@@ -755,6 +726,14 @@ export function Stage({
     loadState(persistKey + ":editor", true),
   );
   const [scale, setScale] = React.useState(1);
+  const [captionFace] = React.useState(() =>
+    [...document.fonts].some(
+      (face) =>
+        face.family.replace(/^["']|["']$/g, "").toLowerCase() === "inter",
+    )
+      ? ""
+      : `@font-face{font-family:Inter;font-weight:500;font-style:normal;font-display:swap;src:url("${captionFont}") format("woff2")}`,
+  );
   const [exportPanel, setExportPanel] = React.useState(false);
   const root = React.useRef(null),
     viewport = React.useRef(null),
@@ -798,7 +777,7 @@ export function Stage({
     clearExternal,
     policy,
   };
-  useInlineFonts(svg);
+  useInlineFonts(svg, fontOrigins);
   React.useEffect(() => {
     if (!capture) storeState(persistKey + ":time", time);
   }, [time, persistKey, capture]);
@@ -924,7 +903,7 @@ export function Stage({
       className="cd-motion"
       data-capture={capture ? "" : undefined}
     >
-      <style>{css}</style>
+      <style>{captionFace + css}</style>
       <div ref={viewport} className="cd-viewport">
         <svg
           ref={svg}

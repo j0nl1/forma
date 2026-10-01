@@ -15,6 +15,7 @@ import { imageSource, readImageState } from "./lib/image-source.mjs";
 import { injectHead } from "./lib/inject-head.mjs";
 import { injectPlainCanvas } from "./lib/plain-canvas.mjs";
 import { injectFixedSheet } from "./lib/fixed-sheet.mjs";
+import { fontOrigins as normalizeFontOrigins } from "./lib/font-network.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -36,9 +37,18 @@ const MIME = {
 export async function serve(
   root,
   port = 4311,
-  { motionFile, canvasFile, deckFile, tweaksFile, textFile, imageFile } = {},
+  {
+    motionFile,
+    canvasFile,
+    deckFile,
+    tweaksFile,
+    textFile,
+    imageFile,
+    fontOrigins = [],
+  } = {},
 ) {
   root = await fs.realpath(root);
+  fontOrigins = normalizeFontOrigins(fontOrigins);
   const token = randomBytes(32).toString("hex");
   let pendingSave = Promise.resolve();
   let exporting = false;
@@ -187,7 +197,7 @@ export async function serve(
                 "video",
                 `http://127.0.0.1:${server.address().port}/${relative}`,
                 output,
-                value,
+                { ...value, fontOrigins },
               );
               const video = await fs.readFile(output);
               res.writeHead(200, {
@@ -354,10 +364,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--tweaks-file": "value",
       "--text-file": "value",
       "--image-file": "value",
+      "--font-origins": "value",
     });
     if (positional.length !== 1)
       throw new Error(
-        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html] [--tweaks-file prototype.html] [--text-file document.html] [--image-file artwork.html]",
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html] [--tweaks-file prototype.html] [--text-file document.html] [--image-file artwork.html] [--font-origins https://fonts.example,https://assets.example]",
       );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -369,6 +380,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       tweaksFile: flags["tweaks-file"],
       textFile: flags["text-file"],
       imageFile: flags["image-file"],
+      fontOrigins: flags["font-origins"]?.split(",") ?? [],
     });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])

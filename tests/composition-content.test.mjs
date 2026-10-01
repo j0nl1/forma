@@ -406,6 +406,13 @@ test("shot gates retain numeric boundary semantics and never discard hidden deco
 
 test("real encoded caption frames retain the authored fade envelope and explicit opacity", async (t) => {
   const { dir, url } = await setup(t);
+  await fs.copyFile(
+    new URL(
+      "../skills/codex-design/assets/starters/fonts/inter-medium.woff2",
+      import.meta.url,
+    ),
+    path.join(dir, "inter-medium.woff2"),
+  );
   const frames = async (name, query) => {
     const output = path.join(dir, name + ".mp4");
     const result = await exportArtifact("video", url + query, output, {
@@ -441,6 +448,7 @@ test("real encoded caption frames retain the authored fade envelope and explicit
     path.join(dir, "caption-reference.html"),
     `<!doctype html><html lang="en"><head><meta name="codex-fixed-sheet" content="off"><title>Independent caption reference</title><style>
     body{margin:0}article{position:relative;width:400px;height:240px;background:#faf8f0}
+    @font-face{font-family:Inter;font-weight:500;font-style:normal;font-display:swap;src:url("inter-medium.woff2") format("woff2")}
     #caption{position:absolute;left:8%;right:8%;bottom:7%;text-align:center;pointer-events:none;font:500 30px Inter,system-ui,sans-serif;color:#f6f4ef;text-shadow:0 1px 14px rgba(0,0,0,.45)}
   </style></head><body><article><div id="caption">Opening caption</div></article></body></html>`,
   );

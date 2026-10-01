@@ -1,11 +1,17 @@
 import { chromium } from "playwright";
 import { localUrl } from "./files.mjs";
+import {
+  fontOrigins as normalizeFontOrigins,
+  fontRequestAllowed,
+  fulfillFontRequest,
+} from "./font-network.mjs";
 export async function withPage(
   url,
   fn,
-  { width = 1440, height = 1000, deviceScaleFactor = 1 } = {},
+  { width = 1440, height = 1000, deviceScaleFactor = 1, fontOrigins = [] } = {},
 ) {
   url = localUrl(url);
+  fontOrigins = normalizeFontOrigins(fontOrigins);
   const browser = await chromium.launch({ headless: true });
   try {
     const context = await browser.newContext({
@@ -17,8 +23,28 @@ export async function withPage(
       try {
         const u = new URL(route.request().url());
         if (["data:", "blob:"].includes(u.protocol)) return route.continue();
-        localUrl(u.href);
-        await route.continue();
+        const request = route.request();
+        let local = false;
+        try {
+          localUrl(u.href);
+          local = true;
+        } catch {
+          /* Consult the configured font origins below. */
+        }
+        if (local && !["font", "stylesheet"].includes(request.resourceType()))
+          await route.continue();
+        else {
+          if (
+            !fontRequestAllowed(
+              u.href,
+              request.method(),
+              request.resourceType(),
+              fontOrigins,
+            )
+          )
+            throw new Error("Unconfigured remote resource");
+          await fulfillFontRequest(route, fontOrigins);
+        }
       } catch {
         await route.abort("blockedbyclient");
       }
