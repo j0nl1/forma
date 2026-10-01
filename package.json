@@ -11,7 +11,7 @@
     "check": "node tools/validate.mjs",
     "test:browser": "node --test tests/browser.test.mjs",
     "install:skill": "node tools/install.mjs",
-    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'skills/codex-design/scripts/**/*.mjs' 'skills/codex-design/assets/starters/*.{js,jsx,html}' 'examples/**/*.{html,css,jsx,json}' package.json skills/codex-design/package.json skills/codex-design/project-types.json"
+    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'skills/codex-design/scripts/**/*.mjs' 'skills/codex-design/assets/starters/*.{js,jsx,html}' 'examples/**/*.{html,css,js,jsx,json}' package.json skills/codex-design/package.json skills/codex-design/project-types.json"
   },
   "devDependencies": {
     "prettier": "3.9.9"

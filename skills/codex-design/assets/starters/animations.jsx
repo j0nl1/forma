@@ -15,6 +15,13 @@ import {
   advancePlayback,
 } from "./motion-model.js";
 export { clamp, Easing, interpolate, animate } from "./motion-model.js";
+export {
+  useWatercolorLayers,
+  WatercolorSheet,
+  WatercolorStroke,
+  WatercolorPainting,
+  WatercolorReveal,
+} from "./watercolor-components.jsx";
 
 export const TimelineContext = React.createContext(null);
 const CompositionContext = React.createContext(null);

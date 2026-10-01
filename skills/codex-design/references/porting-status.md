@@ -29,7 +29,7 @@ Reference snapshot: `JimLiu/baoyu-design`, commit `6530033592bf7fa58bc1a5a2a2ad2
 | SVG/foreignObject, portable fonts, capture without editor | SVG root, local font embedding, `?capture` | Implemented; export and small-layout tests pass. Dedicated font/SVG serialization comparisons remain. |
 | Video export action | Connected local export panel and CLI | Real MP4 download tested. MP4/WebM/GIF frame changes, ranges, custom bridge and 2x capture tested. More quality comparisons remain. |
 | Export quality, sub-range, supersampling, GIF palette, warnings | `export.mjs`, `lib/video.mjs` | Implemented and exercised. Remote fonts are not fetched automatically; localize assets for portable export. |
-| WatercolorPainting/Sheet/Stroke/Reveal and layer hook | Required independent port | Pending. The smaller `watercolor.js` is not an equivalent implementation. |
+| WatercolorPainting/Sheet/Stroke/Reveal and layer hook | `watercolor-components.jsx`, `watercolor-kit.js` | Implemented. Tests exercise synchronous seek, whole-painting retiming, baked frames, real PNG download, and flattened/layered composition equivalence. Visual texture comparison against reference artifacts remains required. |
 | Older Stage/Sprite/TextSprite/ImageSprite/RectSprite/VideoSprite and SceneStage/useScene APIs | Required independent compatibility surface | Pending. Do not migrate an older composition into a reduced model or drop synchronized video behavior. |
 | Hosted nested-video audio mixing | Required local equivalent | Pending. Both reference and current local FFmpeg routes are silent; hosted mixing is a separate behavior to retain. |
 
@@ -41,7 +41,7 @@ The following source surfaces have been identified. Rows marked partial require 
 | --- | --- | --- |
 | `animations-v3.jsx` | Continuous React engine | Remaining checks and integrations listed above. |
 | `animations.jsx`, `animations-v2.jsx` | Simple DOM timeline plus new continuous engine | Older sprite/scene authoring and synchronized video are not yet ported. |
-| `watercolor-kit.js` | `watercolor.js` | Full shape API, pigments/texture, graded washes, glaze, ink/hatch, dry stroke, reserve, captions, seeded seek, layers and baking. |
+| `watercolor-kit.js` | Independent `watercolor-kit.js` | All nine operations, six shape types, named pigments, paper/texture, seeded seek, weighted timelines, cropped layers and baking implemented. Tests cover pigment multiplication, paper restoration, deterministic replay, layer reconstruction, cache identity and live replay/detach. Brush texture is independently generated; reference visual comparison and larger performance checks remain. |
 | `design-canvas.jsx`, canvas patch | `canvas.js` | Sections, post-it notes, grip dragging, focus overlay navigation, sidecar persistence and source-aware updates. |
 | `deck-stage.js`, deck patch, effects demo | `deck.js` | Exact entrance/exit/emphasis/path effects, directional masks and repeat/reverse semantics; persistence and all patch contracts. Several current effects are approximations. |
 | `tweaks-panel.jsx`, tweaks protocols | `controls.js` | React controls/hook, curated palettes, panel drag/visibility, source write-back, and full typed defaults. |

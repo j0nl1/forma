@@ -35,6 +35,6 @@ The stage uses SVG/foreignObject and embeds accessible local font-face rules for
 
 Check deterministic seek, continuous motion at every boundary +/-0.15 seconds, complete playback, finite repetition, a slower and faster section, DOM identity across cuts, editor persistence, and real encoded output. A new implementation test is not proof of whole-project parity. Follow [porting status](porting-status.md) before claiming equivalence.
 
-The watercolor integration components, complete paint kit, older sprite/scene APIs, and hosted audio-mixing behavior still require independent ports. Do not silently replace them with the smaller `watercolor.js` starter or call the animation module fully equivalent yet.
+The complete paint kit and React integration are available in the [watercolor recipe](watercolor.md), with layered strokes, deterministic frames, baking and live replay. Copy both watercolor files alongside `animations.jsx` and `motion-model.js`: the animation module re-exports those components. The older sprite/scene APIs and hosted audio-mixing behavior still require independent ports. Do not call the animation module fully equivalent yet.
 
 For sound, use Web Audio after a user gesture, with mute and gain controls. Local video export is silent, matching the reference's local FFmpeg route; the separate hosted audio-mixing contract remains pending. Explicit audio mixing can be performed after export with source attribution and timing documented.

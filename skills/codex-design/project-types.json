@@ -31,7 +31,9 @@
       "reference": "references/motion.md",
       "starters": [
         "assets/starters/animations.jsx",
-        "assets/starters/motion-model.js"
+        "assets/starters/motion-model.js",
+        "assets/starters/watercolor-components.jsx",
+        "assets/starters/watercolor-kit.js"
       ]
     },
     {

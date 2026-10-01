@@ -4,6 +4,8 @@ Behavioral reference: [JimLiu/baoyu-design](https://github.com/JimLiu/baoyu-desi
 
 Prompts, docs, scripts, and starters here were written anew after inspecting capabilities and source contracts. No upstream executable was run. No upstream prompt, minified bundle, image, `.fig` fixture, or vendor directory was copied into this deliverable. This is an independent rewrite informed by source inspection, not a legal clean-room certification or a guarantee about the reference project's provenance.
 
+The watercolor kit preserves the inspected public pigment names, RGB transmittance values, operation weights, and seeded random-number contract so authored paintings retain their inputs. Those API data are credited to the MIT-licensed reference by Jim Liu (Baoyu). Its raster renderer, paper texture, brush fields, caches, components and controls are independently implemented here; identical brush pixels are not claimed.
+
 Research snapshots stay outside the repository. Components and schemas are independently maintained. The initial rewrite's smaller components reduced functionality beyond the requested Codex adaptation; [porting status](porting-status.md) tracks correcting those reductions, and [capabilities](capabilities.md) documents current differences.
 
 ## Dependencies
