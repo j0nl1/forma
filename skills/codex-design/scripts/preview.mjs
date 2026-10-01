@@ -20,6 +20,9 @@ const MIME = {
   ".webp": "image/webp",
   ".woff2": "font/woff2",
   ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".mp3": "audio/mpeg",
+  ".wav": "audio/wav",
   ".pdf": "application/pdf",
 };
 export async function serve(root, port = 4311, { motionFile } = {}) {
@@ -179,12 +182,45 @@ export async function serve(root, port = 4311, { motionFile } = {}) {
       if (stat.isDirectory()) file = path.join(file, "index.html");
       file = contained(root, await fs.realpath(file));
       const data = await fs.readFile(file);
-      res.writeHead(200, {
+      const headers = {
         "Content-Type": MIME[path.extname(file)] ?? "application/octet-stream",
         "Content-Length": data.length,
+        "Accept-Ranges": "bytes",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
-      });
+      };
+      if (req.method === "GET" && req.headers.range) {
+        const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
+        const start = match?.[1]
+          ? Number(match[1])
+          : Math.max(0, data.length - Number(match?.[2]));
+        const end =
+          match?.[1] && match[2]
+            ? Math.min(data.length - 1, Number(match[2]))
+            : data.length - 1;
+        if (
+          !match ||
+          (!match[1] && !match[2]) ||
+          (!match[1] && Number(match[2]) <= 0) ||
+          !Number.isSafeInteger(start) ||
+          !Number.isSafeInteger(end) ||
+          start < 0 ||
+          start >= data.length ||
+          end < start
+        ) {
+          res.writeHead(416, { "Content-Range": `bytes */${data.length}` });
+          res.end();
+          return;
+        }
+        res.writeHead(206, {
+          ...headers,
+          "Content-Length": end - start + 1,
+          "Content-Range": `bytes ${start}-${end}/${data.length}`,
+        });
+        res.end(data.subarray(start, end + 1));
+        return;
+      }
+      res.writeHead(200, headers);
       res.end(req.method === "HEAD" ? undefined : data);
     } catch (e) {
       res.writeHead(e.code === "ENOENT" ? 404 : 403);

@@ -22,9 +22,20 @@ export {
   WatercolorPainting,
   WatercolorReveal,
 } from "./watercolor-components.jsx";
+export {
+  Sprite,
+  SpriteContext,
+  useSprite,
+  TextSprite,
+  ImageSprite,
+  RectSprite,
+  VideoSprite,
+  SceneStage,
+  useScene,
+} from "./scene-components.jsx";
 
 export const TimelineContext = React.createContext(null);
-const CompositionContext = React.createContext(null);
+export const CompositionContext = React.createContext(null);
 export const useTimeline = () => React.useContext(TimelineContext);
 export const useTime = () => useTimeline().time;
 export function useComposition() {
@@ -79,7 +90,14 @@ const css = `
 @media(max-width:600px){.cd-section-fields{grid-template-columns:1fr 1fr}.cd-description{grid-column:1/-1}.cd-section-fields label:first-child{grid-column:1/-1}.cd-time{min-width:56px}.cd-transport{gap:6px;padding:6px}.cd-editor{max-height:48vh}}
 `;
 
-function CompositionClock({ derived, cues, children, unknown, onUnknown }) {
+function CompositionClock({
+  derived,
+  cues,
+  playback,
+  children,
+  unknown,
+  onUnknown,
+}) {
   const timeline = useTimeline();
   const value = {
     T: authoredTime(derived, timeline.time),
@@ -88,6 +106,9 @@ function CompositionClock({ derived, cues, children, unknown, onUnknown }) {
     duration: timeline.duration,
     authoredTotal: derived.authoredTotal,
     playing: timeline.playing || timeline.extPlaying,
+    scenes: derived.scenes,
+    sections: derived.sections,
+    playback,
   };
   React.useLayoutEffect(() => {
     onUnknown([...unknown.current].sort().join(", "));
@@ -626,6 +647,8 @@ export function Stage({
   width = 1280,
   height = 720,
   duration = 10,
+  fps = 60,
+  capture: captureOption = false,
   background = "#f6f4ef",
   autoplay = true,
   loop = true,
@@ -646,8 +669,12 @@ export function Stage({
   height = Number(height);
   autoplay = String(autoplay) !== "false";
   loop = String(loop) !== "false";
+  const captureQuery = new URLSearchParams(location.search).get("capture");
   const capture =
-    new URLSearchParams(location.search).has("capture") ||
+    (captureOption != null &&
+      captureOption !== false &&
+      !["0", "false"].includes(String(captureOption))) ||
+    (captureQuery !== null && !["0", "false"].includes(captureQuery)) ||
     document.documentElement.hasAttribute("data-capture");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const policy = parsePlayback(
@@ -704,8 +731,11 @@ export function Stage({
     playing,
     width,
     height,
+    fps: Number(fps) || 60,
+    capture,
     seek,
     playPause,
+    clearExternal,
     policy,
   };
   useInlineFonts(svg);
@@ -762,7 +792,7 @@ export function Stage({
     return () => cancelAnimationFrame(request);
   }, [playing]);
   React.useLayoutEffect(() => {
-    if (window.codexTimeline)
+    if (window.codexTimeline || window.__animStage)
       throw new Error("Only one animation engine can own the timeline");
     const bridge = {
       get duration() {
@@ -774,6 +804,12 @@ export function Stage({
       get height() {
         return live.current.height;
       },
+      get fps() {
+        return live.current.fps;
+      },
+      get captureActive() {
+        return live.current.capture;
+      },
       get time() {
         return live.current.time;
       },
@@ -782,6 +818,7 @@ export function Stage({
       setTime: (t) => flushSync(() => live.current.seek(t)),
       setPlaying: (value) =>
         flushSync(() => {
+          live.current.clearExternal();
           if (value) {
             passes.current = 0;
             if (live.current.time >= live.current.duration) setTime(0);
@@ -790,6 +827,7 @@ export function Stage({
         }),
     };
     window.codexTimeline = bridge;
+    window.__animStage = bridge;
     const onSeek = (event) =>
       flushSync(() =>
         live.current.seek(event.detail?.time, event.detail?.playing === true),
@@ -821,6 +859,7 @@ export function Stage({
     window.addEventListener("keydown", onKey);
     return () => {
       if (window.codexTimeline === bridge) delete window.codexTimeline;
+      if (window.__animStage === bridge) delete window.__animStage;
       node.removeEventListener("codex-seek-to-time", onSeek);
       window.removeEventListener("keydown", onKey);
       clearTimeout(externalTimer.current);
@@ -865,6 +904,7 @@ export function Stage({
                   duration,
                   playing,
                   extPlaying,
+                  playback: policy,
                   setTime: (t) => seek(t),
                   setPlaying,
                 }}
@@ -1151,6 +1191,7 @@ export function CompositionStage({
       <CompositionClock
         derived={derived}
         cues={cues}
+        playback={timing.playback}
         unknown={unknown}
         onUnknown={setDiagnostics}
       >

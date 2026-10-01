@@ -13,7 +13,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Social media and platform shells | `campaigns.md`, `social.js` | All named platform contexts through one generic API |
 | Data science, charts, diagrams, maps | `data.md`, `chart.js`, `sources.js` | Source-driven analysis, local SVG charts and tables; supplied/configured geography |
 | Research and sourced overlays | `research.md`, `sources.js` | Live sources through Codex, local citations |
-| Animation and video | `motion.md`, `animations.jsx` | Continuous React composition, authored cues, persistent shots, captions, local editor, source timing write-back, deterministic seek and video export; older APIs remain pending |
+| Animation and video | `motion.md`, `animations.jsx`, `scene-components.jsx` | Continuous composition and older sprite/scene APIs, authored cues/local time, persistent shots, captions, frozen scene overlap, local editor, timing write-back, deterministic seek and decoded nested-video export |
 | Sound | `motion.md` | Web Audio guidance and explicit post-export audio mixing |
 | Watercolor | `watercolor.md`, `watercolor-kit.js`, `watercolor-components.jsx` | Seeded paper, all nine painting operations, six shapes, pigments, weighted seek, cropped layers, baked frames, live replay and authored-time React reveals |
 | 3D | `three-stage.js` | Orbit, framing, lighting, GLB loading, GLB/OBJ download |

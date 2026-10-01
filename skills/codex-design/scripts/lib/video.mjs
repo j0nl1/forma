@@ -207,6 +207,65 @@ export async function renderVideo(page, errors, output, temporary, options) {
           b.setPlaying?.(false);
           if (b.seek) await b.seek(time);
           else await b.setTime(time);
+          // A React commit changes a video's desired frame synchronously,
+          // but decoding happens later. Capture only after the seek completes.
+          await Promise.all(
+            [
+              ...document.querySelectorAll("video[data-codex-video-target]"),
+            ].map(async (video) => {
+              if (
+                !video.getBoundingClientRect().width ||
+                getComputedStyle(video).visibility === "hidden"
+              )
+                return;
+              video.pause();
+              const target = Number(video.dataset.codexVideoTarget);
+              await new Promise((resolve, reject) => {
+                const events = [
+                  "loadedmetadata",
+                  "loadeddata",
+                  "seeked",
+                  "canplay",
+                  "timeupdate",
+                  "error",
+                ];
+                const clean = () => {
+                  clearTimeout(timer);
+                  events.forEach((event) =>
+                    video.removeEventListener(event, check),
+                  );
+                };
+                const check = () => {
+                  if (video.error) {
+                    clean();
+                    reject(
+                      new Error(
+                        `Nested video could not load (media error ${video.error.code})`,
+                      ),
+                    );
+                  } else if (
+                    video.readyState >= 2 &&
+                    Math.abs(video.currentTime - target) > 0.001
+                  ) {
+                    video.currentTime = target;
+                  } else if (video.readyState >= 2 && !video.seeking) {
+                    clean();
+                    resolve();
+                  }
+                };
+                const timer = setTimeout(() => {
+                  clean();
+                  reject(
+                    new Error(
+                      `Nested video did not decode its requested frame at ${target.toFixed(3)} seconds`,
+                    ),
+                  );
+                }, 8000);
+                events.forEach((event) => video.addEventListener(event, check));
+                check();
+              });
+            }),
+          );
           await new Promise((resolve) =>
             requestAnimationFrame(() => requestAnimationFrame(resolve)),
           );

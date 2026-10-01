@@ -30,7 +30,7 @@ Reference snapshot: `JimLiu/baoyu-design`, commit `6530033592bf7fa58bc1a5a2a2ad2
 | Video export action | Connected local export panel and CLI | Real MP4 download tested. MP4/WebM/GIF frame changes, ranges, custom bridge and 2x capture tested. More quality comparisons remain. |
 | Export quality, sub-range, supersampling, GIF palette, warnings | `export.mjs`, `lib/video.mjs` | Implemented and exercised. Remote fonts are not fetched automatically; localize assets for portable export. |
 | WatercolorPainting/Sheet/Stroke/Reveal and layer hook | `watercolor-components.jsx`, `watercolor-kit.js` | Implemented. Tests exercise synchronous seek, whole-painting retiming, baked frames, real PNG download, and flattened/layered composition equivalence. Visual texture comparison against reference artifacts remains required. |
-| Older Stage/Sprite/TextSprite/ImageSprite/RectSprite/VideoSprite and SceneStage/useScene APIs | Required independent compatibility surface | Pending. Do not migrate an older composition into a reduced model or drop synchronized video behavior. |
+| Older Stage/Sprite/TextSprite/ImageSprite/RectSprite/VideoSprite and SceneStage/useScene APIs | `scene-components.jsx` on the shared engine | Implemented. Tests cover inclusive mount gates, curves, style overrides, active-index mounting, authored local time, metadata, diagnostics, frozen overlap, loop/reset/finite policies and decoded nested-video frames in real MP4 output. Broader reference visual comparison remains required. |
 | Hosted nested-video audio mixing | Required local equivalent | Pending. Both reference and current local FFmpeg routes are silent; hosted mixing is a separate behavior to retain. |
 
 ## Runtime component inventory
@@ -40,7 +40,7 @@ The following source surfaces have been identified. Rows marked partial require 
 | Source surface | Current replacement | Required outstanding work |
 | --- | --- | --- |
 | `animations-v3.jsx` | Continuous React engine | Remaining checks and integrations listed above. |
-| `animations.jsx`, `animations-v2.jsx` | Simple DOM timeline plus new continuous engine | Older sprite/scene authoring and synchronized video are not yet ported. |
+| `animations.jsx`, `animations-v2.jsx` | Shared Stage, sprites and SceneStage | Older scene/sprite authoring and synchronized video implemented with local timing/editor/export integration. Transition and clip seek behaviors have browser tests; reference visual/scale comparisons remain. |
 | `watercolor-kit.js` | Independent `watercolor-kit.js` | All nine operations, six shape types, named pigments, paper/texture, seeded seek, weighted timelines, cropped layers and baking implemented. Tests cover pigment multiplication, paper restoration, deterministic replay, layer reconstruction, cache identity and live replay/detach. Brush texture is independently generated; reference visual comparison and larger performance checks remain. |
 | `design-canvas.jsx`, canvas patch | `canvas.js` | Sections, post-it notes, grip dragging, focus overlay navigation, sidecar persistence and source-aware updates. |
 | `deck-stage.js`, deck patch, effects demo | `deck.js` | Exact entrance/exit/emphasis/path effects, directional masks and repeat/reverse semantics; persistence and all patch contracts. Several current effects are approximations. |

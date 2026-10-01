@@ -202,6 +202,32 @@ test("preview rejects traversal, escaped symlinks, foreign hosts and non-GET met
   const { server, url } = await serve(rootDir, 0);
   t.after(() => new Promise((r) => server.close(r)));
   assert.equal(await (await fetch(url)).text(), "Local");
+  const range = await fetch(url, { headers: { Range: "bytes=1-3" } });
+  assert.equal(range.status, 206);
+  assert.equal(range.headers.get("Content-Range"), "bytes 1-3/5");
+  assert.equal(await range.text(), "oca");
+  assert.equal(
+    await (await fetch(url, { headers: { Range: "bytes=-2" } })).text(),
+    "al",
+  );
+  assert.equal(
+    await (await fetch(url, { headers: { Range: "bytes=2-" } })).text(),
+    "cal",
+  );
+  for (const value of [
+    "bytes=8-",
+    "bytes=3-1",
+    "bytes=-0",
+    "bytes=0-1,3-4",
+    "invalid",
+  ]) {
+    const response = await fetch(url, { headers: { Range: value } });
+    assert.equal(response.status, 416);
+    assert.equal(response.headers.get("Content-Range"), "bytes */5");
+  }
+  const head = await fetch(url, { method: "HEAD" });
+  assert.equal(head.headers.get("Content-Length"), "5");
+  assert.equal(await head.text(), "");
   assert.equal((await fetch(url + "escaped.txt")).status, 403);
   assert.equal((await fetch(url + "%2e%2e%2fsecret.txt")).status, 403);
   assert.equal((await fetch(url, { method: "POST" })).status, 405);

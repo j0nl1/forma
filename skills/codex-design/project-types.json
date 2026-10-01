@@ -32,6 +32,7 @@
       "starters": [
         "assets/starters/animations.jsx",
         "assets/starters/motion-model.js",
+        "assets/starters/scene-components.jsx",
         "assets/starters/watercolor-components.jsx",
         "assets/starters/watercolor-kit.js"
       ]

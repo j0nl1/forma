@@ -35,9 +35,9 @@ The installer copies inspected local files. It does not fetch a remote project, 
 
 ## What is included
 
-- A concise Codex entry point, UI metadata, and 19 task-specific references.
+- A concise Codex entry point, UI metadata, and focused task references.
 - Thirteen routed project types, including HTML slides, mobile, documents, research, email, diagrams, and 3D.
-- Thirteen independently written starter resources with native local controls.
+- Independently written starters with native local controls, continuous composition, scene/sprite authoring, and deterministic watercolor painting.
 - Read-only design-system inspection, compilation, portable imports, and review pages.
 - Offline Figma inventory and materialization with explicit fidelity warnings.
 - A loopback preview server, browser verification, standalone HTML, PDF, PNG, and silent MP4/WebM/GIF export.

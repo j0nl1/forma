@@ -71,6 +71,8 @@ Use exact names or node ids. Ambiguous names and existing destinations fail. Inv
 
 For full continuous animation authoring, use the [motion recipe](../skills/codex-design/references/motion.md) and the React `CompositionStage` example. The basic DOM timeline is retained for existing artifacts. To try local source editing and the video export panel, prepare the demo, then start `preview.mjs <demo-folder> --motion-file animation.html` and open `animation.html?edit-source`. Timing edits save automatically to the selected HTML file. Static/public previews save timing only in the browser.
 
+The showcase is a collection of working examples, not the skill's product interface. `scenes.html` demonstrates older scene/sprite authoring, with `?transition=overlap` for frozen outgoing layers. Enable source editing for that document with `--motion-file scenes.html`. `watercolor.html` compares layered strokes with flattened frames and provides a PNG download; its complete authoring API is documented in the [watercolor recipe](../skills/codex-design/references/watercolor.md).
+
 ```sh
 node skills/codex-design/scripts/export.mjs html designs/reader/index.html /tmp/reader.html
 node skills/codex-design/scripts/export.mjs pdf http://127.0.0.1:4311/ /tmp/reader.pdf

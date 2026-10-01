@@ -19,7 +19,35 @@ Pass these values to `CompositionStage` as `scenes` and `playback`. Use `{mode: 
 
 The editor supports section selection, dragging a right edge to stretch playback, numeric duration and speed, descriptions, repeat count, timing download, and a persistent visibility toggle. Changing speed or duration replays the same authored slice over the new interval. It does not cut choreography. Timing, editor visibility, and playhead persist in browser storage; changing the authored input invalidates old timing state. Use a distinct `persistKey` for each composition.
 
-Space toggles playback; arrows seek by 0.1 seconds, Shift+arrow by one second, and Home/0 resets. Hovering over the scrubber previews a frame without moving the stored playhead. Reduced motion starts on the completed frame without autoplay. `?capture` hides all editor chrome and restores the authored dimensions.
+Space toggles playback; arrows seek by 0.1 seconds, Shift+arrow by one second, and Home/0 resets. Hovering over the scrubber previews a frame without moving the stored playhead. Reduced motion starts on the completed frame without autoplay. `?capture` or the stage's `capture` prop hides all editor chrome and restores the authored dimensions. `?capture=0` and `?capture=false` keep the ordinary preview.
+
+## Sprite and scene authoring
+
+The older authoring surfaces share the same stage and transport. Import `Stage`, `Sprite`, `useSprite`, `TextSprite`, `ImageSprite`, `RectSprite`, `VideoSprite`, `SceneStage` and `useScene` from `animations.jsx`. Copy `scene-components.jsx` alongside the engine and its other imported starters. The scene example uses this surface; continuous compositions still use `CompositionStage`.
+
+`Stage` supplies global `useTime()` and `useTimeline()`, dimensions, duration, background, fps metadata, capture and playback. `Sprite start={seconds} end={seconds}` mounts its children over an inclusive global interval. Children may be a render function receiving `{localTime, progress, duration, visible}` or use `useSprite()`. `keepMounted` retains the subtree outside its interval without automatically hiding it. Infinite or zero durations yield progress 0. `TextSprite` fades/slides, `ImageSprite` fades/scales with optional Ken Burns drift or a labeled placeholder, and `RectSprite` accepts per-frame style overrides through `render(context)`.
+
+`SceneStage` accepts the same scene/playback literals and an object mapping names to component functions:
+
+```jsx
+function Opening() {
+  const { localTime, progress, dur, index, count, total, scene } = useScene();
+  return <div style={{ opacity: Math.min(1, localTime / 0.5) }}>{scene.name}</div>;
+}
+function Build() { return <div>The diagram assembles.</div>; }
+function Close() { return <div>A final invitation.</div>; }
+<SceneStage scenes={window.CODEX_SCENES} playback={window.CODEX_PLAYBACK}>
+  {{ Opening, Build, Close }}
+</SceneStage>
+```
+
+The active component receives the same values as props. `localTime` and `dur` use the section's authored `nat`; progress is 0..1, while `total` is playback duration. Editing duration preserves the complete authored scene. Extra scene metadata is preserved. A cut mounts only the active scene index; moving to another index creates a fresh component instance even when both names map to the same function. The final timestamp belongs to the last scene at progress 1. Missing components and invalid initial lists display a diagnostic. `useScene()` is null outside a scene.
+
+`Sprite` and `VideoSprite` continue to use the global playback clock inside scenes. Use `useScene().localTime` for authored scene choreography. When a sprite must follow editable scene timing, derive its global start/end and entrance/exit durations from `useComposition().sections`, as the scene example does.
+
+Default transitions are cuts. Set `transition="overlap"` only for opaque scenes. At a naturally played adjacent boundary or loop seam, the outgoing subtree retains its exact last committed frame beneath the incoming scene for the boundary and one successor tick, with a 500 ms lifetime bound. Its timeline, scene and composition contexts are frozen, and its DOM identity is retained. Paused seeks, resets, large jumps, timing changes and a finished finite run clear the overlap. External streams must explicitly mark `playing: true` to count as playback.
+
+`VideoSprite src={localClip} start={sourceSeconds} end={sourceSeconds} speed={1}` pauses native playback and seeks its video to `start + ((globalTime * speed) % span)`. Its start/end describe the source clip range. Keep media local and provide a real file; the preview server supports byte ranges. Export waits for the requested video frame to decode and fails clearly on an unavailable frame. Audio mixing remains pending.
 
 ## Local source editing and video export
 
@@ -27,7 +55,7 @@ Start `scripts/preview.mjs <project-folder> --motion-file animation.html`. Only 
 
 The connected editor includes **Export video**, with MP4/WebM/GIF, frame rate, quality, capture scale, and a start/end interval. It saves current timing before rendering and downloads the actual locally encoded file. Chromium and FFmpeg must be installed. CLI export is also available through [exports](exports.md). Both routes use the same deterministic bridge.
 
-`window.codexTimeline` exposes synchronous `seek(seconds)`, `setTime(seconds)`, `setPlaying(boolean)`, live `duration`, dimensions, time, and the single export root. `codex-seek-to-time` on that root supports `{time, playing}`. Marked external playback pauses the internal clock and expires after 400 ms without a successor. Validated `codex-timeline-scenes-update` and `codex-timeline-playback-update` events update timing; malformed updates are ignored. These are local equivalents of the original transport, without its proprietary parent-window messages.
+`window.codexTimeline` exposes synchronous `seek(seconds)`, `setTime(seconds)`, `setPlaying(boolean)`, live `duration`, dimensions, time, fps, captureActive, and the single export root. `window.__animStage` is an alias to the same owner for older export bridges. `codex-seek-to-time` on that root supports `{time, playing}`. Marked external playback pauses the internal clock and expires after 400 ms without a successor. Validated `codex-timeline-scenes-update` and `codex-timeline-playback-update` events update timing; malformed updates are ignored. These are local equivalents of the original transport, without its proprietary parent-window messages.
 
 The stage uses SVG/foreignObject and embeds accessible local font-face rules for portable serialization. Keep fonts in the project; remote or inaccessible fonts produce export warnings. The existing module bundler and standalone HTML exporter make React compositions portable without a CDN.
 
@@ -35,6 +63,6 @@ The stage uses SVG/foreignObject and embeds accessible local font-face rules for
 
 Check deterministic seek, continuous motion at every boundary +/-0.15 seconds, complete playback, finite repetition, a slower and faster section, DOM identity across cuts, editor persistence, and real encoded output. A new implementation test is not proof of whole-project parity. Follow [porting status](porting-status.md) before claiming equivalence.
 
-The complete paint kit and React integration are available in the [watercolor recipe](watercolor.md), with layered strokes, deterministic frames, baking and live replay. Copy both watercolor files alongside `animations.jsx` and `motion-model.js`: the animation module re-exports those components. The older sprite/scene APIs and hosted audio-mixing behavior still require independent ports. Do not call the animation module fully equivalent yet.
+The complete paint kit and React integration are available in the [watercolor recipe](watercolor.md), with layered strokes, deterministic frames, baking and live replay. Copy both watercolor files and `scene-components.jsx` alongside `animations.jsx` and `motion-model.js`: the animation module re-exports those components. Sprite/scene behavior, overlapping frozen trees, retiming and real nested-video output have browser tests. Broader visual comparisons, larger performance cases and hosted audio-mixing behavior remain required. Do not call the animation module fully equivalent yet.
 
 For sound, use Web Audio after a user gesture, with mute and gain controls. Local video export is silent, matching the reference's local FFmpeg route; the separate hosted audio-mixing contract remains pending. Explicit audio mixing can be performed after export with source attribution and timing documented.

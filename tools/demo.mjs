@@ -24,6 +24,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "watercolor.bundle.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "examples/motion/scenes.jsx"),
+    path.join(destination, "scenes.bundle.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
