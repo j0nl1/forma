@@ -13,6 +13,7 @@ import { tweaksSource } from "./lib/tweaks-source.mjs";
 import { textSource } from "./lib/text-source.mjs";
 import { imageSource, readImageState } from "./lib/image-source.mjs";
 import { injectHead } from "./lib/inject-head.mjs";
+import { injectPlainCanvas } from "./lib/plain-canvas.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -269,6 +270,8 @@ export async function serve(
       let data = await fs.readFile(file);
       const authoredText =
         text && file === text.html ? data.toString("utf8") : null;
+      if (path.extname(file) === ".html")
+        data = Buffer.from(await injectPlainCanvas(data.toString("utf8")));
       for (const [service, name, endpoint] of [
         [tweaks, "tweaks", "/__codex_tweaks"],
         [deck, "deck", "/__codex_deck"],

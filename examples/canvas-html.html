@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="design_doc_mode" content="canvas" />
+    <title>Plain HTML comparison canvas — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font: 15px/1.6 system-ui;
+        color: #263c34;
+      }
+      body > header {
+        position: absolute;
+        left: 44px;
+        top: 94px;
+        width: 960px;
+      }
+      h1 {
+        font: 42px/1.1 Georgia;
+        margin: 0 0 14px;
+      }
+      header p {
+        max-width: 60em;
+      }
+      a {
+        color: inherit;
+      }
+      body > .direction {
+        position: absolute;
+        width: 360px;
+        padding: 0;
+      }
+      .direction h2 {
+        font: 14px system-ui;
+        margin: 0 0 12px;
+      }
+      .card {
+        padding: 30px;
+        background: #fffdf7;
+        border: 1px solid #cbd5c5;
+        border-radius: 12px;
+        min-height: 410px;
+        box-shadow: 0 4px 18px #1520190b;
+      }
+      .card small {
+        font: 11px system-ui;
+        letter-spacing: 0.12em;
+      }
+      .card h3 {
+        font: 36px/1.12 Georgia;
+        margin: 26px 0;
+      }
+      .card p {
+        margin: 0 0 25px;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        border: 1px solid #789787;
+        background: #263c34;
+        color: #fffdf7;
+        padding: 8px 14px;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #9daf9c;
+        border-radius: 6px;
+        margin: 0 0 16px;
+        background: white;
+      }
+      .next {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      #quiet {
+        left: 44px;
+        top: 300px;
+      }
+      #curious {
+        left: 452px;
+        top: 300px;
+      }
+      #warm {
+        left: 860px;
+        top: 300px;
+      }
+      .ink .card {
+        background: #263c34;
+        color: #fffdf7;
+      }
+      .ink button {
+        background: #fffdf7;
+        color: #263c34;
+      }
+      .gold .card {
+        background: #edbd54;
+        color: #263c34;
+      }
+      .gold h3 {
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <header aria-label="Comparison overview">
+      <a href="index.html">← All examples</a> ·
+      <a href="canvas-react.html">Section-based canvas</a>
+      <h1>Same task.<br />Three directions.</h1>
+      <p>
+        These original HTML elements stay directly inside the body. Pan the
+        background, zoom or use Fit. Follow an option link to reveal that frame.
+        Select a frame in the toolbar to download its PNG or styled HTML.
+      </p>
+    </header>
+    <article id="quiet" class="direction" aria-label="Quiet reading direction">
+      <h2>01 / Quiet</h2>
+      <div class="card">
+        <small>READING ROOM</small>
+        <h3>A little room<br />for the thought.</h3>
+        <p>A reading list built around the next useful idea.</p>
+        <label for="collection">Collection name</label
+        ><input id="collection" value="Field notes" /><button id="save">
+          Save collection
+        </button>
+        <p id="result" role="status"></p>
+      </div>
+      <p class="next">Compare the <a href="#curious">curious direction</a>.</p>
+    </article>
+    <article
+      id="curious"
+      class="direction ink"
+      aria-label="Curious reading direction"
+    >
+      <h2>02 / Curious</h2>
+      <div class="card">
+        <small>READING ROOM</small>
+        <h3>Follow<br />the question.</h3>
+        <p>Make a place for the ideas that change how you see.</p>
+        <button onclick="this.textContent = 'Collection opened'">
+          Open collection
+        </button>
+      </div>
+      <p class="next">Compare the <a href="#warm">warm direction</a>.</p>
+    </article>
+    <article
+      id="warm"
+      class="direction gold"
+      aria-label="Warm reading direction"
+    >
+      <h2>03 / Warm</h2>
+      <div class="card">
+        <small>READING ROOM</small>
+        <h3>Leave room.<br />Stay curious.</h3>
+        <p>A good page is a place to begin, again.</p>
+        <button onclick="this.textContent = 'Note added'">Add a note</button>
+      </div>
+      <p class="next">Return to the <a href="#quiet">quiet direction</a>.</p>
+    </article>
+    <script
+      src="starters/plain-canvas.js"
+      data-codex-plain-canvas-runtime
+    ></script>
+    <script>
+      document.getElementById("save").addEventListener("click", () => {
+        document.getElementById("result").textContent =
+          "Saved " +
+          document.getElementById("collection").value +
+          " in this demonstration.";
+      });
+    </script>
+  </body>
+</html>

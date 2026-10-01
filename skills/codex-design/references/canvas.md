@@ -46,6 +46,35 @@ Copy `canvas.js` and all `canvas-*.js` modules beside it, or bundle `canvas.js` 
 
 Flat `design-board` children remain supported as an implicit section. Native boards retain the previous 420px/automatic-height defaults and accept numeric or pixel width/height values. Use `::part(card)` for native card styling. `canvas-id` overrides an element's DOM ID when those identities need to differ. The examples include both the flat native canvas and `canvas-react.html` with sections, notes and live controls.
 
+## Plain HTML metadata canvas
+
+The documented HTML host contract uses `<meta name="design_doc_mode" content="canvas">` with absolutely positioned frames directly in `body`. The local preview now recognizes that metadata and adds an independently authored viewport without reparenting those frames. Existing `body > ...` selectors, IDs, inputs, event listeners and authored positions remain usable. Keep each frame's left/top nonnegative; fixed design frames may extend beyond the preview viewport.
+
+```html
+<head>
+  <meta name="design_doc_mode" content="canvas">
+  <style>
+    body > article { position:absolute; width:360px; height:500px; }
+    #one { left:44px; top:100px; }
+    #two { left:452px; top:100px; }
+  </style>
+</head>
+<body>
+  <article id="one">First working direction</article>
+  <article id="two">Second working direction</article>
+</body>
+```
+
+Serve ordinary local HTML with `preview.mjs`; no source mutation or starter copying is required for metadata activation. The preview injects its own bundled runtime only into marked HTML responses. `export.mjs html` embeds that runtime in standalone output, which continues working after source removal. For another static server, bundle `plain-canvas.js`, include it with `data-codex-plain-canvas-runtime` on the script, and keep the metadata. The marker avoids duplicate automatic injection. Raw classic loading requires the editable companions, including `canvas-viewport.js` and `canvas-export.js`.
+
+The body is the transformed world; local toolbar chrome sits outside it. Background dragging and middle-button dragging pan, trackpad scrolling pans, mouse notches and Ctrl/Meta scrolling zoom, and Safari gesture events use the shared viewport module. Ordinary pointer actions inside a direct body frame remain with its authored controls. Plain wheel events on `data-dc-wheel-passthru` or `data-codex-wheel-passthru` content pass through; modifier zoom still works. Toolbar wheel input leaves the artwork unchanged.
+
+Fit uses the authored content extents. Reset view restores 100% at the origin. The viewport persists in browser storage separately from native/React canvases, and an offscreen saved view resets after two visibility checks. Unavailable storage does not prevent interaction. Same-document `#id` links reveal their target at the current scale, retaining the IDs and browser history. Dynamic body frames update the export selector. Disabling metadata restores the original inline body transform and removes owned styles/controls. A native `design-canvas` takes over without a second viewport.
+
+Choose a direct body frame for actual 3× PNG or styled HTML downloads. Those exports normalize the selected root's authored left/top offsets, use natural dimensions independently of viewport zoom, embed local assets, retain current form values and omit runtime chrome. HTML downloads are snapshots with the same script/closure limitations described below. This frame selector is a local addition; it does not invent section titles, reorder state or hidden options for plain HTML. Native/React section editing and its project sidecar remain separate contracts. Metadata activation alone does not enable project-file writes. Opt-in `--text-file` source editing composes with this viewport: its owned editor chrome stays outside the transformed body, and literal edits use the original file version rather than injected response content. Print removes viewport transforms and chrome, using authored layout.
+
+`window.CodexPlainCanvasReady` resolves after installation. `window.CodexPlainCanvas.viewport` exposes `.value`, `.set()`, `.zoom()` and `.fit()`. Metadata changes, native canvas insertion and complete installation teardown restore ownership. `canvas-html.html` demonstrates three original directions with working controls and cross-option links.
+
 ## Interaction
 
 - Drag the background to pan. Middle-button dragging also pans over an artboard. Drag the grip to reorder within a section; the grip supports Left/Right keys. Separate move buttons remain available.
@@ -78,4 +107,4 @@ Assets are local by default. An explicit native `allow-external-assets` attribut
 
 ## Verification status
 
-Tests cover scoped identities, title/label/order/hide persistence, changed-source reconciliation, dynamic React updates, live focus controls, wrapping and empty-section skipping, wheel latching/pinch, scaled grip reordering, cancellation, offscreen recovery, storage failure, versioned source writes and real 3× PNG/HTML output with embedded image pixels. Representative desktop/mobile and focus views have been inspected. Full reference visual comparison, Safari hardware gesture testing, broader font/media exports, multi-canvas layouts and legacy plain-HTML `design_doc_mode=canvas` integration remain pending. Keep those requirements in the functional inventory.
+Tests cover scoped identities, title/label/order/hide persistence, changed-source reconciliation, dynamic React updates, live focus controls, wrapping and empty-section skipping, wheel latching/pinch, scaled grip reordering, cancellation, offscreen recovery, storage failure, versioned source writes and real 3× PNG/HTML output with embedded image pixels. Representative desktop/mobile and focus views have been inspected. Full reference visual comparison, Safari hardware gesture testing, broader font/media exports, multi-canvas layouts and original host appearance remain pending. The plain HTML metadata contract now has tests for direct-node retention, selectors/listeners/form state, dynamic activation, storage/recovery, hash navigation, native handoff, gesture routing, real positioned-frame PNG pixels/HTML and portable source removal. Keep those requirements in the functional inventory.

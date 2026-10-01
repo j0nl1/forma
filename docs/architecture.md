@@ -12,7 +12,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | System source | `system.json`, CSS entry, optional named React exports and sample props |
 | Compiled system | `_ds_manifest.json`, `_ds_tokens.css`, optional `_ds_bundle.js`, SHA-256 hashes |
 | System browser runtime | `window.CodexDesignSystem` with `React`, `createRoot`, `Components` |
-| Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state |
+| Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state; metadata-only HTML retains direct body nodes with a separate viewport |
 | Slides | `deck-stage` with direct element slides and finished base styles; 44 declarative effects, complete click groups and runtime-owned WAAPI state |
 | Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; the simple `motion-stage` remains for existing examples |
 | Tweaks | React `useTweaks` and typed controls, a shared JSON-only store, local draft handoff and versioned root-HTML JSON source writes |
@@ -31,7 +31,7 @@ Native DOM starters are classic scripts except the explicitly bundled 3D module 
 
 ## Tools
 
-- `preview.mjs`: loopback HTTP, host validation, traversal and realpath checks.
+- `preview.mjs`: loopback HTTP, host validation, traversal and realpath checks; metadata-marked HTML receives the independently bundled plain-canvas runtime in its response.
 - `project.mjs`: preserve metadata while registering assets.
 - `design-system.mjs`: read-only inspection, compilation, review generation, hashed portable bindings.
 - `figma.mjs`: offline inventory, raw mount, selected HTML, and system extraction.

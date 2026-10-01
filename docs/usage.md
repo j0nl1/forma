@@ -51,6 +51,8 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --canvas-file canva
 
 This explicitly enables real project saving to `canvas.design-canvas.state.json` beside the selected document. Static/public previews save in the browser and can download/import their state. Source changes invalidate obsolete hides while retaining matching edits. Focus is never persisted. Copy every companion canvas module or bundle `canvas.js` before a standalone full-page export.
 
+For existing plain HTML options, keep `<meta name="design_doc_mode" content="canvas">` and place frames directly in `body`. The local preview activates pan/zoom automatically without rewriting the file or reparenting authored nodes. `canvas-html.html` demonstrates working forms, cross-option links, viewport persistence and natural-size 3× PNG/styled HTML downloads. A standalone HTML export embeds the metadata runtime. This mode preserves authored layout; section names/order/hides and source-sidecar edits belong to the native/React canvas described above.
+
 ## HTML deck builds
 
 Follow the [deck runtime guide](../skills/codex-design/references/deck-runtime.md). Canonical `data-anim-duration` and `data-anim-delay` use milliseconds; older short aliases use seconds. The local `deck-effects.html` gallery demonstrates every effect family, directional masks and repeat/reversal. Use Replay to restart the current group. Reduced motion retains click steps; print shows authored base artwork. The thumbnail rail supports range/toggle selection, skip, move, duplicate, confirmed deletion, native drag and undo. Drag its separator to resize; width and visibility persist in the browser. Static previews report that structural edits stay in the page.

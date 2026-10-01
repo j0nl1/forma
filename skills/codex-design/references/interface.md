@@ -7,3 +7,5 @@ Build the actual application region first. Browser and macOS frames are optional
 Landing pages need a specific proposition, supporting evidence, and a useful call to action. Do not invent customer quotes, performance statistics, or logos. Dashboard metrics need units, time windows, comparable baselines, and drill-down or filtering where the brief calls for it.
 
 Define spacing and type tokens. Test narrow widths, long content, and zoom. Use local SVG icons and assets. Image loading must not collapse layout. For states and flows, also read [prototype](prototype.md).
+
+Existing plain HTML comparison pages can keep `design_doc_mode=canvas` metadata and direct body frames. The local preview and standalone exporter provide their viewport while retaining authored nodes and controls; see the [plain HTML canvas contract](canvas.md#plain-html-metadata-canvas).

@@ -2,6 +2,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { parse, serialize } from "parse5";
 import postcss from "postcss";
+import { injectPlainCanvas } from "./plain-canvas.mjs";
 import { safeFile } from "./files.mjs";
 import {
   IMAGE_STATE_FILE,
@@ -206,5 +207,5 @@ export async function inlineHtml(input, { root: scope } = {}) {
       }
     }
   }
-  return serialize(doc);
+  return injectPlainCanvas(serialize(doc));
 }

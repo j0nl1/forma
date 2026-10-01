@@ -1,12 +1,12 @@
 // Transform writes stay outside React so pointer and wheel input do not remount artboards.
-export function attachViewport(canvas, view, world, output) {
+export function attachViewport(canvas, view, world, output, behavior = {}) {
   const minimum = Number(canvas.getAttribute("min-scale") ?? 0.1);
   const maximum = Number(canvas.getAttribute("max-scale") ?? 8);
   const min = Number.isFinite(minimum) && minimum > 0 ? minimum : 0.1;
   const max =
     Number.isFinite(maximum) && maximum >= min ? maximum : Math.max(8, min);
   const clamp = (scale) => Math.min(max, Math.max(min, scale));
-  const key = `dc-viewport:${location.pathname}:${canvas.id || "default"}`;
+  const key = `dc-viewport:${location.pathname}:${behavior.storageId ?? (canvas.id || "default")}`;
   let transform = { x: 0, y: 0, scale: 1 },
     restored = false,
     interacted = false;
@@ -69,8 +69,14 @@ export function attachViewport(canvas, view, world, output) {
     (event) => {
       interacted = true;
       const path = targetPath(event);
+      if (behavior.ignore?.(path)) return;
       if (
-        path.some((node) => node.localName === "deck-stage") &&
+        path.some(
+          (node) =>
+            node.localName === "deck-stage" ||
+            node.hasAttribute("data-dc-wheel-passthru") ||
+            node.hasAttribute("data-codex-wheel-passthru"),
+        ) &&
         !event.ctrlKey &&
         !event.metaKey
       )
@@ -111,13 +117,15 @@ export function attachViewport(canvas, view, world, output) {
       interacted = true;
       if (event.button !== 0 && event.button !== 1) return;
       const path = targetPath(event);
+      if (behavior.ignore?.(path)) return;
       if (
         event.button === 0 &&
-        path.some((node) =>
-          node.matches(
-            "design-board,design-note,input,button,textarea,select,[contenteditable]",
-          ),
-        )
+        (behavior.interactive?.(path) ??
+          path.some((node) =>
+            node.matches(
+              "design-board,design-note,input,button,textarea,select,[contenteditable]",
+            ),
+          ))
       )
         return;
       event.preventDefault();
@@ -186,14 +194,16 @@ export function attachViewport(canvas, view, world, output) {
   const visibility = () => {
     if (!restored || interacted || checks++ >= 10) return;
     const rect = view.getBoundingClientRect();
-    const boxes = [...canvas.querySelectorAll("design-board,design-section")]
-      .filter((node) => !node.hidden)
-      .map((node) =>
-        node.localName === "design-section"
-          ? node.shadowRoot?.querySelector("header")?.getBoundingClientRect()
-          : node.getBoundingClientRect(),
-      )
-      .filter(Boolean);
+    const boxes =
+      behavior.boxes?.() ??
+      [...canvas.querySelectorAll("design-board,design-section")]
+        .filter((node) => !node.hidden)
+        .map((node) =>
+          node.localName === "design-section"
+            ? node.shadowRoot?.querySelector("header")?.getBoundingClientRect()
+            : node.getBoundingClientRect(),
+        )
+        .filter(Boolean);
     if (boxes.length) {
       const visible = boxes.some(
         (box) =>
@@ -231,14 +241,18 @@ export function attachViewport(canvas, view, world, output) {
     },
     fit() {
       interacted = true;
+      const extent = behavior.extent?.() ?? {
+        width: world.scrollWidth,
+        height: world.scrollHeight,
+      };
       transform = {
         x: 0,
         y: 0,
         scale: clamp(
           Math.min(
             1,
-            view.clientWidth / Math.max(1, world.scrollWidth),
-            view.clientHeight / Math.max(1, world.scrollHeight),
+            view.clientWidth / Math.max(1, extent.width),
+            view.clientHeight / Math.max(1, extent.height),
           ),
         ),
       };

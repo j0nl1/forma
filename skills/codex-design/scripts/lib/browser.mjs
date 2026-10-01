@@ -38,6 +38,7 @@ export async function withPage(
       const readiness = [
         window.CodexDeckReady,
         window.CodexCanvasReady,
+        window.CodexPlainCanvasReady,
         window.CodexOverlayReady,
         window.Codex3DReady,
         window.CodexDocumentReady,

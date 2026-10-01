@@ -247,6 +247,11 @@ export async function exportRegion(
   const snapshot = await clone(card);
   snapshot.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   Object.assign(snapshot.style, {
+    position: "relative",
+    left: "auto",
+    top: "auto",
+    right: "auto",
+    bottom: "auto",
     width: `${width}px`,
     height: `${height}px`,
     boxSizing: "border-box",

@@ -332,5 +332,11 @@ if (!customElements.get("text-editor"))
 if (
   document.getElementById("codex-text-binding") &&
   !document.querySelector("text-editor")
-)
-  document.body.append(document.createElement("text-editor"));
+) {
+  const editor = document.createElement("text-editor");
+  editor.setAttribute("data-codex-injected", "");
+  (document.documentElement.hasAttribute("data-codex-plain-canvas")
+    ? document.documentElement
+    : document.body
+  ).append(editor);
+}
