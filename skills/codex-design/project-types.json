@@ -17,7 +17,15 @@
       "id": "wireframe",
       "name": "Wireframe",
       "reference": "references/wireframe.md",
-      "starters": ["assets/starters/canvas.js"]
+      "starters": [
+        "assets/starters/canvas.js",
+        "assets/starters/canvas-runtime.js",
+        "assets/starters/canvas-components.jsx",
+        "assets/starters/canvas-model.js",
+        "assets/starters/canvas-viewport.js",
+        "assets/starters/canvas-focus.js",
+        "assets/starters/canvas-export.js"
+      ]
     },
     {
       "id": "document",
@@ -41,7 +49,16 @@
       "id": "ui-mockups",
       "name": "UI mockups",
       "reference": "references/interface.md",
-      "starters": ["assets/starters/canvas.js", "assets/starters/image-slot.js"]
+      "starters": [
+        "assets/starters/canvas.js",
+        "assets/starters/canvas-runtime.js",
+        "assets/starters/canvas-components.jsx",
+        "assets/starters/canvas-model.js",
+        "assets/starters/canvas-viewport.js",
+        "assets/starters/canvas-focus.js",
+        "assets/starters/canvas-export.js",
+        "assets/starters/image-slot.js"
+      ]
     },
     {
       "id": "resume",

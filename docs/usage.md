@@ -28,7 +28,7 @@ Use $codex-design to create a 12-second product walkthrough at 1280 by 720.
 Provide timeline controls, inspect scene boundaries, and export MP4 with marked media audio.
 ```
 
-For follow-up changes, refer to the same artifact. Browser tweaks and timing edits are session changes: download JSON or ask Codex to apply them to source.
+For follow-up changes, refer to the same artifact. Browser tweaks remain session changes; canvas and motion editors support documented persistence and opted-in project saves.
 
 ## Preview and verify
 
@@ -40,6 +40,16 @@ node skills/codex-design/scripts/verify.mjs http://127.0.0.1:4311/ --out /tmp/re
 ```
 
 For installed skills, replace `skills/codex-design` with the absolute installed folder. Stop the server with Ctrl+C. A busy port fails clearly; `--port 0` requests an available port. Use the reported URL. The verifier checks runtime errors, overflow, and screenshots, but Codex must exercise the user flow and inspect captures separately.
+
+## Comparison canvases
+
+Use the [canvas authoring guide](../skills/codex-design/references/canvas.md) for native elements or the reference-compatible React names. `canvas-react.html` demonstrates sections, notes, grip dragging, focus navigation and working artboard content. The editor retains names, ordering and hidden boards after reload, and each artboard offers PNG/HTML downloads.
+
+```sh
+node skills/codex-design/scripts/preview.mjs /path/to/design --canvas-file canvas.html
+```
+
+This explicitly enables real project saving to `canvas.design-canvas.state.json` beside the selected document. Static/public previews save in the browser and can download/import their state. Source changes invalidate obsolete hides while retaining matching edits. Focus is never persisted. Copy every companion canvas module or bundle `canvas.js` before a standalone full-page export.
 
 ## Design systems
 

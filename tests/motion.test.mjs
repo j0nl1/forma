@@ -244,8 +244,15 @@ test("continuous React composition seeks synchronously, preserves nodes and pers
         }),
       );
     });
+    // Start at zero so a previously clamped end frame cannot satisfy the wait before React commits Play.
+    await page.evaluate(() => codexTimeline.seek(0));
     await page.getByRole("button", { name: "Play", exact: true }).click();
-    await page.waitForFunction(() => Math.abs(codexTimeline.time - 0.3) < 1e-9);
+    await page.waitForFunction(
+      () =>
+        Math.abs(codexTimeline.time - 0.3) < 1e-9 &&
+        document.querySelector("[data-composition-playing]").textContent ===
+          "false",
+    );
     assert.equal(
       await page.getByRole("button", { name: "Play", exact: true }).count(),
       1,

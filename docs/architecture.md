@@ -12,13 +12,13 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | System source | `system.json`, CSS entry, optional named React exports and sample props |
 | Compiled system | `_ds_manifest.json`, `_ds_tokens.css`, optional `_ds_bundle.js`, SHA-256 hashes |
 | System browser runtime | `window.CodexDesignSystem` with `React`, `createRoot`, `Components` |
-| Canvas | `design-canvas` containing named `design-board` elements |
+| Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state |
 | Slides | `deck-stage` with direct child `section` elements and finished base styles |
 | Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; the simple `motion-stage` remains for existing examples |
 | 3D | Bundled `three-stage` with local Three.js and exporters |
 | Component gallery | Ordinary local `.dc.html`, without hosted import protocol |
 
-Native DOM starters are classic scripts except the explicitly bundled 3D module. React systems and the continuous-composition animation engine use a local build step. Browser edits persist locally where supported. The motion preview service can write scene/playback literals to one explicitly selected HTML document, with same-origin tokens and content-version checks. It also renders video from that document; no caller-selected URL or output path is accepted by the browser endpoint.
+Native DOM starters are classic scripts except the explicitly bundled 3D module. The canvas loader imports editable ES modules; copy its companions or bundle the loader for a single-file runtime. React systems and the continuous-composition animation engine use a local build step. Browser edits persist locally where supported. The motion preview service can write scene/playback literals to one explicitly selected HTML document, with same-origin tokens and content-version checks. The canvas preview service can write a versioned state sidecar beside one explicitly selected HTML document. It connects the first canvas in that document and leaves other canvases on browser storage. The motion service also renders video from its selected document; no caller-selected URL or output path is accepted by the browser endpoint.
 
 ## Tools
 

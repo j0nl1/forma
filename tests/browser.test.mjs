@@ -23,6 +23,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "index.html",
     "prototype.html",
     "canvas.html",
+    "canvas-react.html",
     "deck.html",
     "animation.html",
     "watercolor.html",

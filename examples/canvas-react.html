@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Reading directions · React canvas</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f0eee9;
+        color: #242c31;
+        font: 14px system-ui;
+      }
+      .study-bar {
+        height: 58px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: #fff;
+        border-bottom: 1px solid #deddd6;
+      }
+      .study-bar a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .study-bar span {
+        color: #6c7369;
+        margin-left: auto;
+      }
+      .direction {
+        padding: 30px;
+        font: 15px/1.6 system-ui;
+        height: 100%;
+        color: #25352f;
+      }
+      .direction .eyebrow {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        margin: 0 0 26px;
+      }
+      .direction h2 {
+        font:
+          40px/1.07 Georgia,
+          serif;
+        letter-spacing: -1px;
+        margin: 0 0 22px;
+      }
+      .direction > p:not(.eyebrow) {
+        color: #61736c;
+        font-size: 14px;
+      }
+      .reading-item {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+        margin: 24px 0;
+      }
+      .reading-item > span {
+        padding: 10px;
+        background: #e7edde;
+        font: 28px Georgia;
+      }
+      .reading-item small {
+        font-size: 9px;
+        letter-spacing: 0.08em;
+      }
+      .reading-item h3 {
+        font: 17px/1.3 Georgia;
+        margin: 4px 0;
+      }
+      .direction button {
+        background: #275248;
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        padding: 12px 14px;
+        font: 12px system-ui;
+        cursor: pointer;
+        width: 100%;
+      }
+      .hint {
+        display: block;
+        margin-top: 14px;
+        font-size: 10px;
+        color: #7e887b;
+      }
+      .dense {
+        background: #202c39;
+        color: #f6f4ee;
+      }
+      .dense > p:not(.eyebrow),
+      .dense .hint {
+        color: #abb8c4;
+      }
+      .dense .reading-item > span {
+        background: #36485c;
+      }
+      .dense button {
+        background: #dce9c8;
+        color: #25352f;
+      }
+      .direction label {
+        font-size: 11px;
+      }
+      .direction input {
+        display: block;
+        padding: 10px;
+        margin: 6px 0 16px;
+        width: 100%;
+        border: 1px solid #c5c9bd;
+        border-radius: 4px;
+        font: 12px system-ui;
+      }
+      .capture h2 {
+        font-size: 34px;
+      }
+      @media (max-width: 600px) {
+        .study-bar span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="study-bar">
+      <a href="index.html">← Studio</a><strong>Reading directions</strong
+      ><span>Drag, compare and focus · Arrow keys navigate focus</span>
+    </header>
+    <main id="root"></main>
+    <script src="canvas.bundle.js"></script>
+  </body>
+</html>

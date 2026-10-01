@@ -7,6 +7,7 @@ import os from "node:os";
 import { pathToFileURL } from "node:url";
 import { args, contained, main } from "./lib/files.mjs";
 import { readMotionSource, saveMotionSource } from "./lib/motion-source.mjs";
+import { canvasSource } from "./lib/canvas-source.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -25,11 +26,18 @@ const MIME = {
   ".wav": "audio/wav",
   ".pdf": "application/pdf",
 };
-export async function serve(root, port = 4311, { motionFile } = {}) {
+export async function serve(
+  root,
+  port = 4311,
+  { motionFile, canvasFile } = {},
+) {
   root = await fs.realpath(root);
   const token = randomBytes(32).toString("hex");
   let pendingSave = Promise.resolve();
   let exporting = false;
+  const canvas = canvasFile
+    ? await canvasSource(root, canvasFile, token)
+    : null;
   if (motionFile) {
     motionFile = contained(
       root,
@@ -46,6 +54,10 @@ export async function serve(root, port = 4311, { motionFile } = {}) {
       if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(req.headers.host ?? "")) {
         res.writeHead(403);
         res.end();
+        return;
+      }
+      if (canvas && req.url === "/__codex_canvas") {
+        await canvas.handle(req, res);
         return;
       }
       if (
@@ -182,7 +194,16 @@ export async function serve(root, port = 4311, { motionFile } = {}) {
       const stat = await fs.stat(file);
       if (stat.isDirectory()) file = path.join(file, "index.html");
       file = contained(root, await fs.realpath(file));
-      const data = await fs.readFile(file);
+      let data = await fs.readFile(file);
+      if (canvas && file === canvas.html) {
+        const meta =
+          '<meta name="codex-canvas-source" content="/__codex_canvas">';
+        data = Buffer.from(
+          data
+            .toString("utf8")
+            .replace(/<head(?:\s[^>]*)?>/i, (head) => head + meta),
+        );
+      }
       const headers = {
         "Content-Type": MIME[path.extname(file)] ?? "application/octet-stream",
         "Content-Length": data.length,
@@ -239,16 +260,18 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
     const { positional, flags } = args(process.argv.slice(2), {
       "--port": "value",
       "--motion-file": "value",
+      "--canvas-file": "value",
     });
     if (positional.length !== 1)
       throw new Error(
-        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html]",
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html]",
       );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
       throw new Error("Invalid port");
     const { server, url } = await serve(path.resolve(positional[0]), port, {
       motionFile: flags["motion-file"],
+      canvasFile: flags["canvas-file"],
     });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])

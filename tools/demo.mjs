@@ -29,6 +29,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "scenes.bundle.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "examples/canvas/main.jsx"),
+    path.join(destination, "canvas.bundle.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
