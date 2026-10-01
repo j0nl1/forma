@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Object studio — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f0eee6;
+        color: #283b35;
+        font: 15px/1.5 system-ui;
+      }
+      header {
+        position: absolute;
+        top: 28px;
+        left: 32px;
+        right: 32px;
+        z-index: 1;
+        pointer-events: none;
+      }
+      header a,
+      header button {
+        pointer-events: auto;
+      }
+      a {
+        color: inherit;
+      }
+      header p {
+        margin: 4px 0;
+        max-width: 28em;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 12px 0;
+        font:
+          clamp(36px, 6vw, 72px)/1.02 Georgia,
+          serif;
+        font-weight: normal;
+      }
+      h1 span {
+        display: block;
+      }
+      header button {
+        margin-top: 18px;
+        padding: 8px 16px;
+        border: 1px solid #98a69c;
+        border-radius: 30px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+      three-d-stage {
+        height: 100svh;
+        min-height: 680px;
+      }
+      .spec {
+        position: absolute;
+        right: 32px;
+        top: 36px;
+        z-index: 1;
+        text-align: right;
+        pointer-events: none;
+        font-size: 12px;
+      }
+      .spec b {
+        display: block;
+        font-size: 20px;
+        font-weight: 400;
+      }
+      @media (max-width: 600px) {
+        header {
+          top: 20px;
+          left: 20px;
+          right: 20px;
+        }
+        .spec {
+          top: auto;
+          bottom: 104px;
+          right: 20px;
+        }
+        header p {
+          font-size: 13px;
+          max-width: 25em;
+        }
+        three-d-stage {
+          min-height: 760px;
+        }
+        h1 {
+          font-size: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="index.html">← All studies</a>
+      <p class="eyebrow">14 / Object studio</p>
+      <h1>Form in light.<span>Every part intact.</span></h1>
+      <p>
+        An independently authored desk lamp. Orbit, zoom and pan; export the
+        named assembly at its original meter scale.
+      </p>
+      <button id="turntable" aria-pressed="false">Start turntable</button>
+    </header>
+    <aside class="spec">
+      <b>0.66 m</b>Overall height<br />Y-up · meters<br />Named parts · shared
+      finishes<br />Local Three.js 0.184.0
+    </aside>
+    <three-d-stage
+      name="desk-lamp"
+      background="#f0eee6"
+      aria-label="Interactive desk lamp model"
+    ></three-d-stage>
+    <script src="three-stage.bundle.js"></script>
+    <script src="objects.js"></script>
+  </body>
+</html>

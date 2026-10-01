@@ -54,6 +54,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/data-overlay.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/three-stage.js"),
+    path.join(destination, "three-stage.bundle.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

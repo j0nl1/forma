@@ -33,6 +33,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "data.html",
     "charts.html",
     "overlay.html",
+    "objects.html",
     "document.html",
   ])
     await t.test(file, async () => {
@@ -277,14 +278,7 @@ test("3D source bundles locally and provides real model export controls", async 
   const { server, url } = await serve(dir, 0);
   t.after(() => new Promise((r) => server.close(r)));
   await withPage(url, async (page) => {
-    const fallback = await page.locator("three-stage").innerText();
-    if (fallback.includes("WebGL is unavailable")) {
-      assert.equal(
-        await page.getByRole("button", { name: "Download GLB" }).isDisabled(),
-        true,
-      );
-      return;
-    }
+    await page.locator("three-stage").evaluate((stage) => stage.ready);
     await page.getByRole("button", { name: "Reset camera" }).click();
     const downloadPromise = page.waitForEvent("download");
     await page.getByRole("button", { name: "Download OBJ" }).click();

@@ -79,7 +79,12 @@
       "id": "3d-object",
       "name": "3D object",
       "reference": "references/three-dimensional.md",
-      "starters": ["assets/starters/three-stage.js"]
+      "starters": [
+        "assets/starters/three-stage.js",
+        "assets/starters/three-stage-model.js",
+        "assets/starters/three-stage-export.js",
+        "assets/starters/three-stage-style.js"
+      ]
     },
     {
       "id": "research",

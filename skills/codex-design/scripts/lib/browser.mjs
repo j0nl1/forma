@@ -39,6 +39,7 @@ export async function withPage(
         window.CodexDeckReady,
         window.CodexCanvasReady,
         window.CodexOverlayReady,
+        window.Codex3DReady,
       ].filter(Boolean);
       if (readiness.length)
         await Promise.race([

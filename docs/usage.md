@@ -122,7 +122,7 @@ node skills/codex-design/scripts/build.mjs /path/to/app.jsx /path/to/app.bundle.
 node skills/codex-design/scripts/build.mjs skills/codex-design/assets/starters/three-stage.js /tmp/three-stage.bundle.js
 ```
 
-Load the bundle as a classic script. To try 3D, copy `examples/three.html` alongside the generated bundle in the temporary folder and serve it. GLB and OBJ downloads stay local.
+Load the bundle as a classic script. To try the full 3D contract, copy `examples/objects.html` and `examples/objects.js` alongside the generated bundle in the temporary folder and serve it. The [3D guide](../skills/codex-design/references/three-dimensional.md) explains readiness, meter-scale authoring, studio lighting, camera gestures and actual GLB / OBJ + MTL exports. The earlier `examples/three.html` remains compatible.
 
 ## Record outputs
 

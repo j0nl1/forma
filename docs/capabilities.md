@@ -17,7 +17,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Animation and video | `motion.md`, `animations.jsx`, `scene-components.jsx` | Continuous composition and older sprite/scene APIs, authored cues/local time, persistent shots, captions, frozen scene overlap, local editor, timing write-back, deterministic seek and decoded nested-video export |
 | Sound | `motion.md`, `exports.md`, `lib/audio.mjs` | Marked media loops/ranges/speed, multi-clip local mixing and actual AAC/Opus output; interactive Web Audio guidance |
 | Watercolor | `watercolor.md`, `watercolor-kit.js`, `watercolor-components.jsx` | Seeded paper, all nine painting operations, six shapes, pigments, weighted seek, cropped layers, baked frames, live replay and authored-time React reveals |
-| 3D | `three-stage.js` | Orbit, framing, lighting, GLB loading, GLB/OBJ download |
+| 3D | `three-stage.js` and editable companions | Original `three-d-stage` readiness, orbit/pan/zoom, interrupted turntable, studio shadows, meter-scale framing, reconnect, GLB loading and actual GLB / OBJ + MTL download; earlier `three-stage` retained |
 | Create/use/import systems | `design-system.mjs` | Check, compile, review, hashed local binding; new explicit schema |
 | Design Components and preview | `design-systems.md` | Local `.dc.html` galleries without hosted protocols |
 | Offline Figma | `figma.mjs` | Raw/ZIP, deflate/Zstd, inventory, mount, selected HTML and system extraction |
