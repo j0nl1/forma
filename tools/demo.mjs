@@ -74,6 +74,16 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/image-slot.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "examples/platforms/main.jsx"),
+    path.join(destination, "platforms.bundle.js"),
+    { overwrite: true },
+  );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/frames.js"),
+    path.join(destination, "starters/frames.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

@@ -5,7 +5,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Reference workflow | New resources | Behavior |
 | --- | --- | --- |
 | Hi-fi, frontend direction, prototype, website | `interface.md`, `prototype.md` | Native HTML and real flows; React bundled when useful |
-| Mobile and device/browser/desktop shells | `mobile.md`, `frames.js` | Editable context, responsive content, simplified chrome |
+| Mobile and device/browser/desktop shells | `mobile.md`, `platforms.md`, separate React entries and `platform-shells.js` | Distinct device/window composition, visual keyboards, lists, tabs, sidebars, fixed shells, image-only and actual local asset snapshots; full visual/browser comparison and live file previews remain pending |
 | Wireframes, options stack, canvas | `wireframe.md`, `canvas.md`, `canvas-components.jsx` | Sections, notes, pan/zoom, scoped persistent edits, grip reorder, navigable focus, project sidecar saves and PNG/HTML downloads; further reference comparisons pending |
 | Decks and speaker notes | `slides.md`, `deck-runtime.md`, `deck.js` | 44 effects, directional masks, timed groups, repeat/reverse, held states, navigation, notes, skip, native fullscreen and print; lazy styled thumbnails, multi-selection, move/duplicate/delete, confirmation, undo and opt-in HTML source saves; further reference comparisons and renderer bindings pending |
 | Design feedback and typed tweaks | `tweaks.md`, `tweaks-components.jsx`, `tweaks-store.js` | All typed controls, palette cards, scrub/drag, local persistence, actual root-HTML source writes and clipboard drafts; broader visual and native composer integration pending |

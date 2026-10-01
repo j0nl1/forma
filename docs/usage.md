@@ -73,6 +73,10 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --tweaks-file proto
 
 One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in Codex. Automatic composer insertion remains under integration review.
 
+## Compose device and desktop contexts
+
+The [platform guide](../skills/codex-design/references/platforms.md) lists every iOS, Android, Chrome and macOS composition primitive and prop. Bundle a React entry or use the native `ios-shell` / `chrome-shell` with their fixed physical sizes. `platforms.html` demonstrates live keyboards, titles, tabs and sidebar state without replacing authored input nodes. The native shells support `image-only="true"` and actual `exportAsset("png"|"html")` downloads at the chosen content region's exact size. The earlier generic `frames.js` wrappers remain available.
+
 ## Replace and frame images
 
 ```sh

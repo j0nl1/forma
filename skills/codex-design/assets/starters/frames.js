@@ -42,3 +42,6 @@
     if (!customElements.get(tag))
       customElements.define(tag, class extends Frame {});
 })();
+
+// The reference-compatible fixed shells have a separate editable implementation.
+window.CodexFramesReady = import("./platform-shells.js");

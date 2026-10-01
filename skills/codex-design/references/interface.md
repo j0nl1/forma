@@ -2,7 +2,7 @@
 
 Inventory the reference's hierarchy, navigation, typography, tokens, icon treatment, assets, and density. For faithful recreation, match those decisions before adding polish. For a new direction, choose a distinctive but functional language grounded in the product and audience.
 
-Build the actual application region first. Browser and macOS frames are optional context, not compulsory decoration. Use `frames.js` for that context and `canvas.js` for side-by-side comparisons. A canvas artboard can contain a working prototype.
+Build the actual application region first. Browser and macOS frames are optional context, not compulsory decoration. Use the [platform composition libraries](platforms.md) for distinct Chrome/macOS contracts, or retain `frames.js` for the earlier generic wrappers and `canvas.js` for side-by-side comparisons. A canvas artboard can contain a working prototype.
 
 Landing pages need a specific proposition, supporting evidence, and a useful call to action. Do not invent customer quotes, performance statistics, or logos. Dashboard metrics need units, time windows, comparable baselines, and drill-down or filtering where the brief calls for it.
 

@@ -1,6 +1,6 @@
 # Mobile design
 
-Use `frames.js` with `<device-frame platform="ios">` or `platform="android">` when a device presentation helps. The content remains ordinary responsive HTML. Do not implement a fake status bar as part of the product UI.
+Use the [platform composition guide](platforms.md) for the separate iOS/Android React primitives, keyboards, lists and fixed HTML shells. The earlier interfaces remain available: use `frames.js` with `<device-frame platform="ios">` or `platform="android">` when a device presentation helps. The content remains ordinary responsive HTML. Do not implement a fake status bar as part of the product UI.
 
 Choose platform-appropriate navigation and interaction: bottom tabs for peer destinations, a clear back path, safe-area spacing, touch targets, and useful keyboard/form behavior. Do not rely on hover. Sheets and dialogs must fit the viewport and retain dismissal controls.
 

@@ -38,6 +38,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "documents.html",
     "editing.html",
     "images.html",
+    "platforms.html",
   ])
     await t.test(file, async () => {
       await withPage(url + file, async (page) => {

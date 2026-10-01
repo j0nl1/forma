@@ -65,6 +65,16 @@ export class ImageSlot extends HTMLElement {
       ].map((name) => [name, root.querySelector(`.${name}`)]),
     );
     this.store = imageStore;
+    for (const name of [
+      "toolbar",
+      "credit",
+      "status",
+      "legacy",
+      "spill",
+      "loading",
+      "file",
+    ])
+      this.ui[name].setAttribute("data-codex-chrome", "");
     this.crop = new ImageReframe(this);
     this.view = { s: 1, x: 0, y: 0 };
     this.generation = 0;

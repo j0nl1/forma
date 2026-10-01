@@ -8,11 +8,23 @@ export function downloadBlob(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export async function exportBoard(board, kind) {
+  return exportRegion(board.shadowRoot.querySelector(".card"), kind, {
+    title: board.getAttribute("label") || "Artboard",
+    scale: 3,
+    allowExternal: board.ownerCanvas?.hasAttribute("allow-external-assets"),
+  });
+}
+export async function exportRegion(
+  card,
+  kind,
+  { title = "Asset", scale = 1, allowExternal = false } = {},
+) {
   if (!["png", "html"].includes(kind)) throw new Error("Choose PNG or HTML");
+  if (!(card instanceof Element))
+    throw new Error("Choose an actual content region");
+  if (!Number.isFinite(scale) || scale <= 0 || scale > 4)
+    throw new Error("Choose a capture scale between 0 and 4");
   await document.fonts.ready;
-  const allowExternal = board.ownerCanvas?.hasAttribute(
-    "allow-external-assets",
-  );
   const assets = new Map();
   const embed = (raw, base = location.href) => {
     const url = new URL(raw, base);
@@ -104,7 +116,10 @@ export async function exportBoard(board, kind) {
   const clone = async (source) => {
     if (source.nodeType === Node.TEXT_NODE)
       return document.createTextNode(source.textContent);
-    if (!(source instanceof Element) || source.matches("script,link,style"))
+    if (
+      !(source instanceof Element) ||
+      source.matches("script,link,style,[data-codex-chrome]")
+    )
       return document.createTextNode("");
     if (source.localName === "slot") {
       const fragment = document.createDocumentFragment();
@@ -152,7 +167,6 @@ export async function exportBoard(board, kind) {
     }
     return target;
   };
-  const card = board.shadowRoot.querySelector(".card");
   const width = card.offsetWidth,
     height = card.offsetHeight;
   if (!width || !height) throw new Error("The artboard has no exportable size");
@@ -166,7 +180,6 @@ export async function exportBoard(board, kind) {
     borderRadius: "0",
     margin: "0",
   });
-  const title = board.getAttribute("label") || "Artboard";
   const name =
     title.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "") || "Artboard";
   if (kind === "html") {
@@ -188,8 +201,8 @@ export async function exportBoard(board, kind) {
     return blob;
   }
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", width * 3);
-  svg.setAttribute("height", height * 3);
+  svg.setAttribute("width", Math.round(width * scale));
+  svg.setAttribute("height", Math.round(height * scale));
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   const foreign = document.createElementNS(svg.namespaceURI, "foreignObject");
   foreign.setAttribute("width", width);
@@ -205,8 +218,8 @@ export async function exportBoard(board, kind) {
     encodeURIComponent(new XMLSerializer().serializeToString(svg));
   await image.decode();
   const output = document.createElement("canvas");
-  output.width = width * 3;
-  output.height = height * 3;
+  output.width = Math.round(width * scale);
+  output.height = Math.round(height * scale);
   output.getContext("2d").drawImage(image, 0, 0);
   const blob = await new Promise((resolve) => output.toBlob(resolve));
   if (!blob) throw new Error("PNG encoding failed");
