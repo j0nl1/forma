@@ -1,8 +1,9 @@
+import { sourceTransaction, replaceSource } from "./source-transaction.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
-import { contained, write } from "./files.mjs";
+import { contained } from "./files.mjs";
 import {
   tweakValues,
   mergeTweaks,
@@ -130,25 +131,31 @@ export async function tweaksSource(root, filename, token) {
         )
           throw new Error("Unexpected tweak save option");
         const edits = tweakValues(value.edits);
-        const save = pending.then(async () => {
-          const current = await read();
-          if (current.version !== value.version) {
-            const error = new Error(
-              "Tweak source changed; reload before saving",
+        const save = pending.then(() =>
+          sourceTransaction(html, async () => {
+            const current = await read();
+            if (current.version !== value.version) {
+              const error = new Error(
+                "Tweak source changed; reload before saving",
+              );
+              error.status = 409;
+              throw error;
+            }
+            const merged = mergeTweaks(current.binding.values, edits);
+            const json = JSON.stringify(merged, null, 2).replace(
+              /</g,
+              "\\u003c",
             );
-            error.status = 409;
-            throw error;
-          }
-          const merged = mergeTweaks(current.binding.values, edits);
-          const json = JSON.stringify(merged, null, 2).replace(/</g, "\\u003c");
-          await write(
-            html,
-            current.text.slice(0, current.binding.start) +
-              json +
-              current.text.slice(current.binding.end),
-          );
-          return metadata(await read());
-        });
+            await replaceSource(
+              html,
+              current.text,
+              current.text.slice(0, current.binding.start) +
+                json +
+                current.text.slice(current.binding.end),
+            );
+            return metadata(await read());
+          }),
+        );
         pending = save.catch(() => {});
         reply(200, await save);
       } catch (error) {

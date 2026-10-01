@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Text editing — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 16px/1.7 system-ui;
+      }
+      nav {
+        padding: 16px 24px;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      nav a {
+        color: inherit;
+      }
+      main {
+        max-width: 760px;
+        padding: 48px 28px 270px;
+        margin: auto;
+      }
+      article {
+        border: 1px solid #d5d9ca;
+        background: #fffdf7;
+        padding: 32px;
+        box-shadow: 0 8px 30px #263c3408;
+      }
+      h1 {
+        font:
+          clamp(30px, 6vw, 46px)/1.12 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 24px;
+      }
+      h2 {
+        font:
+          26px/1.25 Georgia,
+          serif;
+      }
+      article p,
+      article li {
+        font-family: Georgia, serif;
+      }
+      .instructions {
+        margin: 0 0 24px;
+        font-size: 14px;
+      }
+      .label {
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+      article a {
+        color: inherit;
+        text-decoration-thickness: 1px;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 32px 18px 300px;
+        }
+        article {
+          padding: 24px;
+        }
+      }
+      @media print {
+        nav,
+        .instructions,
+        .label {
+          display: none;
+        }
+        body {
+          background: white;
+        }
+        main {
+          padding: 0;
+        }
+        article {
+          box-shadow: none;
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav><a href="index.html">← Working collection</a></nav>
+    <main>
+      <p class="label">16 / EDIT CONTENT</p>
+      <p class="instructions">
+        Choose <strong>Edit text</strong>, then click a heading, paragraph,
+        bullet or formatted fragment. Retype, undo, redo or cancel. This public
+        example is a session preview; changes are not saved to the original
+        HTML. The local source editor saves to the selected file.
+      </p>
+      <article>
+        <h1 id="heading">A reading room for the neighborhood.</h1>
+        <p>
+          Keep the <strong>important phrase</strong>, the
+          <em>quiet emphasis</em>, and
+          <a href="#schedule">a useful link</a> while editing each fragment.
+        </p>
+        <h2 id="schedule">An ordinary afternoon</h2>
+        <p>
+          Bring a book, a sketchbook or an unfinished idea. There is room to
+          sit, read and make something small.
+        </p>
+        <ul>
+          <li>Open reading tables, from noon to six.</li>
+          <li>Open reading tables, from noon to six.</li>
+          <li>A small workshop at four.</li>
+        </ul>
+        <p>First line.<br />Second line, with its own source fragment.</p>
+        <p>All names and activities in this example are fictional.</p>
+      </article>
+    </main>
+    <text-editor></text-editor>
+    <script src="starters/text-editor.js"></script>
+  </body>
+</html>

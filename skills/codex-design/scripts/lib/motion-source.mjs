@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
-import { write } from "./files.mjs";
+import { sourceTransaction, replaceSource } from "./source-transaction.mjs";
 import {
   parseScenes,
   parsePlayback,
@@ -116,29 +116,31 @@ export async function readMotionSource(file) {
   };
 }
 export async function saveMotionSource(file, value) {
-  const scenes = parseScenes(value.scenes),
-    playback = parsePlayback(value.playback);
-  const html = await fs.readFile(file, "utf8");
-  const binding = motionBindings(html);
-  if (value.version !== binding.version) {
-    const error = new Error(
-      "Source changed since this preview loaded. Reload before applying timing.",
-    );
-    error.status = 409;
-    throw error;
-  }
-  let updated = html;
-  for (const role of ["scenes", "playback"].sort(
-    (a, b) => binding[b].start - binding[a].start,
-  )) {
-    const serialized = JSON.stringify(
-      JSON.stringify(role === "scenes" ? scenes : playback),
-    ).replaceAll("<", "\\u003c");
-    updated =
-      updated.slice(0, binding[role].start) +
-      serialized +
-      updated.slice(binding[role].end);
-  }
-  await write(file, updated);
-  return { version: version(updated) };
+  return sourceTransaction(file, async () => {
+    const scenes = parseScenes(value.scenes),
+      playback = parsePlayback(value.playback);
+    const html = await fs.readFile(file, "utf8");
+    const binding = motionBindings(html);
+    if (value.version !== binding.version) {
+      const error = new Error(
+        "Source changed since this preview loaded. Reload before applying timing.",
+      );
+      error.status = 409;
+      throw error;
+    }
+    let updated = html;
+    for (const role of ["scenes", "playback"].sort(
+      (a, b) => binding[b].start - binding[a].start,
+    )) {
+      const serialized = JSON.stringify(
+        JSON.stringify(role === "scenes" ? scenes : playback),
+      ).replaceAll("<", "\\u003c");
+      updated =
+        updated.slice(0, binding[role].start) +
+        serialized +
+        updated.slice(binding[role].end);
+    }
+    await replaceSource(file, html, updated);
+    return { version: version(updated) };
+  });
 }

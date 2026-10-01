@@ -28,7 +28,7 @@ Use $codex-design to create a 12-second product walkthrough at 1280 by 720.
 Provide timeline controls, inspect scene boundaries, and export MP4 with marked media audio.
 ```
 
-For follow-up changes, refer to the same artifact. Canvas, motion, deck and typed tweak editors support their documented persistence and opted-in project saves. The older native CSS controls remain session-only.
+For follow-up changes, refer to the same artifact. Canvas, motion, deck, literal-text and typed tweak editors support their documented persistence and opted-in project saves. The older native CSS controls remain session-only.
 
 ## Preview and verify
 
@@ -72,6 +72,14 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --tweaks-file proto
 ```
 
 One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in Codex. Automatic composer insertion remains under integration review.
+
+## Edit literal text
+
+```sh
+node skills/codex-design/scripts/preview.mjs /path/to/design --text-file document.html
+```
+
+The selected HTML response gets the local editor automatically. Choose **Edit text**, click a literal heading, paragraph, bullet or formatted run, and type. Saves update the actual file while retaining links, emphasis and other markup. Undo/redo also update that file. Conflicting edits stop saves and retain a copyable draft; recovered drafts require review. Renderer-created content is edited in its authoring code. The [text editing guide](../skills/codex-design/references/text-editing.md) explains persistence, cancellation, identity, storage failures and combined editor services. `editing.html` is a session-only public demonstration.
 
 ## Design systems
 

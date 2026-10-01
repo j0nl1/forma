@@ -1,8 +1,9 @@
+import { sourceTransaction, replaceSource } from "./source-transaction.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
-import { contained, write } from "./files.mjs";
+import { contained } from "./files.mjs";
 import {
   validateDeckOperation,
   moveDeckItems,
@@ -205,37 +206,42 @@ export async function deckSource(root, filename, token) {
           )
         )
           throw new Error("Unexpected deck save option");
-        const save = pending.then(async () => {
-          const current = await read();
-          if (
-            value.version !== current.version ||
-            value.count !== current.count
-          ) {
-            const error = new Error(
-              "Deck source changed; reload before editing",
+        const save = pending.then(() =>
+          sourceTransaction(html, async () => {
+            const current = await read();
+            if (
+              value.version !== current.version ||
+              value.count !== current.count
+            ) {
+              const error = new Error(
+                "Deck source changed; reload before editing",
+              );
+              error.status = 409;
+              throw error;
+            }
+            const operation = validateDeckOperation(
+              value.operation,
+              current.count,
             );
-            error.status = 409;
-            throw error;
-          }
-          const operation = validateDeckOperation(
-            value.operation,
-            current.count,
-          );
-          let source;
-          if (operation.type === "undo") {
-            const last = history.at(-1);
-            if (!last || last.after !== current.version)
-              throw new Error("No matching source edit to undo");
-            source = last.before;
-          } else source = applyDeckSource(current.source, operation);
-          await write(html, source);
-          if (operation.type === "undo") history.pop();
-          else {
-            history.push({ before: current.source, after: versionOf(source) });
-            if (history.length > 100) history.shift();
-          }
-          return metadata(await read());
-        });
+            let source;
+            if (operation.type === "undo") {
+              const last = history.at(-1);
+              if (!last || last.after !== current.version)
+                throw new Error("No matching source edit to undo");
+              source = last.before;
+            } else source = applyDeckSource(current.source, operation);
+            await replaceSource(html, current.source, source);
+            if (operation.type === "undo") history.pop();
+            else {
+              history.push({
+                before: current.source,
+                after: versionOf(source),
+              });
+              if (history.length > 100) history.shift();
+            }
+            return metadata(await read());
+          }),
+        );
         pending = save.catch(() => {});
         reply(200, await save);
       } catch (error) {
