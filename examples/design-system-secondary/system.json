@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Trail",
+  "slug": "trail",
+  "css": "tokens.css",
+  "entry": "components.jsx",
+  "components": [
+    { "name": "Button", "props": { "children": "Explore a trail" } }
+  ],
+  "startingPoints": [],
+  "guidance": "Use rounded controls and the forest accent. Prefer concise action labels."
+}

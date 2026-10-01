@@ -11,7 +11,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | Project | `design.json`, schemaVersion 1, `assets` and `designSystems` |
 | System source | `system.json`, CSS entry, optional named React exports and sample props |
 | Compiled system | `_ds_manifest.json`, `_ds_tokens.css`, optional `_ds_bundle.js`, SHA-256 hashes |
-| System browser runtime | `window.CodexDesignSystem` with `React`, `createRoot`, `Components` |
+| System browser runtime | Stable per-system `window[namespace]` and `window.CodexDesignSystems[slug]`, with `React`, `createRoot`, `Components`; `window.CodexDesignSystem` remains the most recently loaded compatibility alias |
 | Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state; metadata-only HTML retains direct body nodes with a separate viewport |
 | Slides | `deck-stage` with direct element slides and finished base styles; 44 declarative effects, complete click groups and runtime-owned WAAPI state |
 | Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; parsed font styles retain imported-sheet bases and conditions, with packaged Inter and configured remote embedding; the simple `motion-stage` remains for existing examples |
@@ -33,7 +33,7 @@ Native DOM starters are classic scripts except the explicitly bundled 3D module 
 
 - `preview.mjs`: loopback HTTP, host validation, traversal and realpath checks; metadata-marked HTML receives the independently bundled plain-canvas runtime in its response; eligible raw HTML receives fixed-sheet detection without rewriting source.
 - `project.mjs`: preserve metadata while registering assets.
-- `design-system.mjs`: read-only inspection, compilation, review generation, hashed portable bindings.
+- `design-system.mjs`: read-only inspection/discovery, stable compilation, review generation, verified wiring and primary selection; `lib/system-manifest.mjs` owns namespace/artifact checks and `lib/system-bindings.mjs` owns staged portable imports, managed updates and merged project metadata.
 - `figma.mjs`: offline inventory, raw mount, selected HTML, and system extraction.
 - `build.mjs`: local JSX/TSX/module bundling.
 - `export.mjs`: parsed HTML/CSS inlining, Chromium PDF/PNG, deterministic video.

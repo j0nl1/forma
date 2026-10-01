@@ -114,9 +114,10 @@ node skills/codex-design/scripts/design-system.mjs check /tmp/harbor-system
 node skills/codex-design/scripts/design-system.mjs compile /tmp/harbor-system
 node skills/codex-design/scripts/design-system.mjs preview /tmp/harbor-system
 node skills/codex-design/scripts/design-system.mjs import /tmp/harbor-system /tmp/reader-design
+node skills/codex-design/scripts/design-system.mjs wiring /tmp/reader-design
 ```
 
-Include copied `_ds/harbor/_ds_tokens.css` and the bundle when using React components. `check` is read-only. Compilation does not evaluate component code; browser preview executes it normally.
+Include copied `_ds/harbor/_ds_tokens.css` and the bundle when using React components. Read each compiled namespace or use `window.CodexDesignSystems.harbor`; component libraries stay independent when several systems are loaded. `check` and `discover <designs-folder>` are read-only. Compilation does not evaluate component code; browser preview executes it normally. The first imported system is primary; `primary <project> <bound-slug>` changes that choice, and `wiring <project>` supplies CSS tags with the primary last. Apply those tags to authored pages. After recompiling a source, use `import <system> <project> --update` to replace its unchanged managed copy. See the [design-system contract](../skills/codex-design/references/design-systems.md) for metadata, conflicts and legacy compatibility. The `systems.html` showcase compares two compiled systems interactively.
 
 ## Offline Figma
 

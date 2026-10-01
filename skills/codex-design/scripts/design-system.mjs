@@ -1,11 +1,27 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createHash } from "node:crypto";
 import { build } from "esbuild";
 import postcss from "postcss";
 import { inlineHtml } from "./lib/inline.mjs";
 import { pathToFileURL, fileURLToPath } from "node:url";
+import {
+  namespaceFor,
+  compiledSystem,
+  systemHash as hash,
+} from "./lib/system-manifest.mjs";
+import {
+  importSystem,
+  wiring,
+  discoverSystems,
+  setPrimary,
+} from "./lib/system-bindings.mjs";
+export {
+  importSystem,
+  wiring,
+  discoverSystems,
+  setPrimary,
+} from "./lib/system-bindings.mjs";
 import {
   args,
   main,
@@ -14,10 +30,8 @@ import {
   readJson,
   write,
   writeJson,
-  exists,
   safeFile,
 } from "./lib/files.mjs";
-const hash = (text) => createHash("sha256").update(text).digest("hex");
 const identifier = /^[A-Za-z_$][\w$]*$/;
 export async function inspect(root) {
   root = await fs.realpath(root);
@@ -147,6 +161,7 @@ export async function compile(root) {
   const model = await inspect(root);
   if (model.issues.length) throw new Error(model.issues.join("\n"));
   const { spec, tokens } = model;
+  const namespace = await namespaceFor(root, spec.slug);
   // Resolution checks happen without evaluating imported component source.
   const fence = {
     name: "contained-source",
@@ -193,7 +208,11 @@ export async function compile(root) {
       bundle: true,
       write: false,
       format: "iife",
-      globalName: "CodexDesignSystem",
+      globalName: namespace,
+      banner: { js: `/* @codex-ds namespace=${namespace} */` },
+      footer: {
+        js: `window.CodexDesignSystems ??= Object.create(null);window.CodexDesignSystems[${JSON.stringify(spec.slug)}]=${namespace};window.CodexDesignSystem=${namespace};`,
+      },
       platform: "browser",
       jsx: "automatic",
       nodePaths,
@@ -225,6 +244,7 @@ export async function compile(root) {
     schemaVersion: 1,
     name: spec.name,
     slug: spec.slug,
+    namespace,
     tokens,
     components: spec.components ?? [],
     examples: spec.examples ?? [],
@@ -243,7 +263,7 @@ export async function compile(root) {
   return manifest;
 }
 export async function preview(root) {
-  const m = await readJson(await safeFile(root, "_ds_manifest.json"));
+  const { manifest: m } = await compiledSystem(root);
   const json = JSON.stringify(m.components).replace(/</g, "\\u003c");
   const tokens = Object.entries(m.tokens)
     .map(
@@ -254,74 +274,33 @@ export async function preview(root) {
   const examples = (m.examples ?? [])
     .map((e) => `<article><h2>${html(e.name)}</h2>${e.html ?? ""}</article>`)
     .join("");
-  const content = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${html(m.name)}</title><link rel="stylesheet" href="./_ds_tokens.css"><style>body{margin:0;padding:clamp(20px,4vw,64px);font:16px/1.5 system-ui;color:#18202c;background:#f7f8fa}main{max-width:1100px;margin:auto}article{padding:24px;margin:16px 0;background:white;border:1px solid #d9dfe8;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}h1{font-size:clamp(32px,5vw,56px)}button:focus-visible,a:focus-visible{outline:3px solid #4169e1}</style><main><h1>${html(m.name)}</h1><p>${html(m.guidance)}</p><h2>Tokens</h2><table><thead><tr><th>Name</th><th>Value</th><th>Preview</th></tr></thead><tbody>${tokens}</tbody></table><h2>Components</h2>${examples}<div id="components"></div><h2>Starting points</h2>${m.startingPoints.map((s) => `<p><a href="${html(s.path)}">${html(s.name ?? s.path)}</a></p>`).join("")}</main>${m.bundle ? `<script src="./_ds_bundle.js"></script><script>const ds=window.CodexDesignSystem;for(const c of ${json}){const card=document.createElement('article');const heading=document.createElement('h3');heading.textContent=c.name;card.append(heading);const mount=document.createElement('div');card.append(mount);document.getElementById('components').append(card);const Component=ds.Components[c.export||c.name];if(!Component)throw new Error('Missing component export: '+c.name);ds.createRoot(mount).render(ds.React.createElement(Component,c.props||{}));}</script>` : ""}</html>`;
+  const content = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${html(m.name)}</title><link rel="stylesheet" href="./_ds_tokens.css"><style>body{margin:0;padding:clamp(20px,4vw,64px);font:16px/1.5 system-ui;color:#18202c;background:#f7f8fa}main{max-width:1100px;margin:auto}article{padding:24px;margin:16px 0;background:white;border:1px solid #d9dfe8;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}h1{font-size:clamp(32px,5vw,56px)}button:focus-visible,a:focus-visible{outline:3px solid #4169e1}</style><main><h1>${html(m.name)}</h1><p>${html(m.guidance)}</p><h2>Tokens</h2><table><thead><tr><th>Name</th><th>Value</th><th>Preview</th></tr></thead><tbody>${tokens}</tbody></table><h2>Components</h2>${examples}<div id="components"></div><h2>Starting points</h2>${m.startingPoints.map((s) => `<p><a href="${html(s.path)}">${html(s.name ?? s.path)}</a></p>`).join("")}</main>${m.bundle ? `<script src="./_ds_bundle.js"></script><script>const ds=window[${JSON.stringify(m.namespace ?? "CodexDesignSystem")}];for(const c of ${json}){const card=document.createElement('article');const heading=document.createElement('h3');heading.textContent=c.name;card.append(heading);const mount=document.createElement('div');card.append(mount);document.getElementById('components').append(card);const Component=ds.Components[c.export||c.name];if(!Component)throw new Error('Missing component export: '+c.name);ds.createRoot(mount).render(ds.React.createElement(Component,c.props||{}));}</script>` : ""}</html>`;
   await write(path.join(root, "preview.html"), content);
   return path.join(root, "preview.html");
 }
-export async function importSystem(source, project) {
-  const m = await readJson(await safeFile(source, "_ds_manifest.json"));
-  if (m.schemaVersion !== 1 || slug(m.slug) !== m.slug)
-    throw new Error("Invalid design-system manifest");
-  if (
-    !m.artifacts ||
-    !(m.css in m.artifacts) ||
-    (m.bundle && !(m.bundle in m.artifacts))
-  )
-    throw new Error("Incomplete artifact manifest");
-  const dest = path.resolve(project, "_ds", m.slug);
-  if (await exists(dest))
-    throw new Error(`Design-system binding already exists: ${dest}`);
-  const copies = [];
-  for (const [name, expected] of Object.entries(m.artifacts)) {
-    const file = await safeFile(source, name);
-    const bytes = await fs.readFile(file);
-    if (hash(bytes) !== expected)
-      throw new Error(`Stale compiled artifact: ${name}`);
-    copies.push([name, bytes]);
-  }
-  const metadata = path.join(project, "design.json");
-  const meta = (await exists(metadata))
-    ? await readJson(metadata)
-    : { schemaVersion: 1, designSystems: [], assets: [] };
-  if (meta.schemaVersion !== 1 || !Array.isArray(meta.designSystems))
-    throw new Error("Unsupported project metadata");
-  // Validate every destination before writing; never follow an existing parent symlink.
-  await fs.mkdir(project, { recursive: true });
-  if (
-    (await exists(path.join(project, "_ds"))) &&
-    (await fs.lstat(path.join(project, "_ds"))).isSymbolicLink()
-  )
-    throw new Error("Design-system destination is a symlink");
-  try {
-    await fs.mkdir(dest, { recursive: true });
-    for (const [name, bytes] of copies) {
-      if (path.basename(name) !== name)
-        throw new Error("Artifact names must be basenames");
-      await write(path.join(dest, name), bytes);
-    }
-    const imported = { ...m };
-    await writeJson(path.join(dest, "_ds_manifest.json"), imported);
-    meta.designSystems.push({
-      slug: m.slug,
-      path: `_ds/${m.slug}/_ds_manifest.json`,
-    });
-    await writeJson(metadata, meta);
-  } catch (e) {
-    await fs.rm(dest, { recursive: true, force: true });
-    throw e;
-  }
-  return { destination: dest, binding: meta.designSystems.at(-1) };
-}
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
   main(async () => {
-    const { positional: p } = args(process.argv.slice(2));
+    const { positional: p, flags } = args(process.argv.slice(2), {
+      "--primary": "boolean",
+      "--update": "boolean",
+    });
     if (
-      !["check", "compile", "preview", "import"].includes(p[0]) ||
-      p.length !== (p[0] === "import" ? 3 : 2)
+      ![
+        "check",
+        "compile",
+        "preview",
+        "import",
+        "discover",
+        "wiring",
+        "primary",
+      ].includes(p[0]) ||
+      p.length !== (["import", "primary"].includes(p[0]) ? 3 : 2)
     )
       throw new Error(
-        "Usage: node design-system.mjs check|compile|preview <folder> | import <system> <project>",
+        "Usage: node design-system.mjs check|compile|preview <folder> | discover <designs-folder> | wiring <project> | primary <project> <slug> | import <system> <project> [--primary] [--update]",
       );
+    if (Object.keys(flags).length && p[0] !== "import")
+      throw new Error("Import options apply only to import");
     const root = path.resolve(p[1]);
     if (p[0] === "check") {
       const m = await inspect(root);
@@ -333,13 +312,18 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
         }),
       );
       if (m.issues.length) process.exitCode = 1;
-    } else
+    } else if (p[0] === "primary")
+      console.log(JSON.stringify(await setPrimary(root, p[2])));
+    else
       console.log(
         JSON.stringify(
-          await { compile, preview, import: importSystem }[p[0]](
-            root,
-            p[2] && path.resolve(p[2]),
-          ),
+          await {
+            compile,
+            preview,
+            import: importSystem,
+            discover: discoverSystems,
+            wiring,
+          }[p[0]](root, p[2] && path.resolve(p[2]), flags),
         ),
       );
   });

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="codex-fixed-sheet" content="off" />
+    <title>Two systems · Codex Design</title>
+    <link id="harbor-css" rel="stylesheet" href="_ds/harbor/_ds_tokens.css" />
+    <link id="trail-css" rel="stylesheet" href="_ds/trail/_ds_tokens.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f6f4ee;
+        color: #202c39;
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 1000px;
+        margin: 60px auto;
+        padding: 0 24px;
+      }
+      a {
+        color: inherit;
+      }
+      .eyebrow {
+        font:
+          12px ui-monospace,
+          monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #5f6c72;
+        margin-top: 48px;
+      }
+      h1 {
+        font:
+          clamp(36px, 6vw, 68px)/1.1 Georgia,
+          serif;
+        max-width: 700px;
+        letter-spacing: -0.03em;
+      }
+      .lead {
+        max-width: 600px;
+        color: #5f6c72;
+      }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin: 32px 0;
+      }
+      select {
+        font: inherit;
+        padding: 8px 12px;
+        border: 1px solid #bcc3c0;
+        border-radius: 6px;
+        background: white;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 24px;
+      }
+      article {
+        background: white;
+        padding: 28px;
+        border: 1px solid #d8ddd8;
+        border-radius: 12px;
+        min-width: 0;
+      }
+      article h2 {
+        margin: 0;
+        font:
+          30px Georgia,
+          serif;
+      }
+      article p {
+        color: #5f6c72;
+      }
+      .mount {
+        margin: 28px 0 14px;
+      }
+      output {
+        display: block;
+        font:
+          13px ui-monospace,
+          monospace;
+        color: #5f6c72;
+      }
+      .note {
+        margin-top: 32px;
+        font-size: 14px;
+        color: #5f6c72;
+        max-width: 650px;
+      }
+      button:focus-visible,
+      select:focus-visible,
+      a:focus-visible {
+        outline: 3px solid #275dad;
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a href="index.html">← Working collection</a>
+      <p class="eyebrow">Design systems / shared project</p>
+      <h1>Two vocabularies.<br />One clear direction.</h1>
+      <p class="lead">
+        Both systems keep their own button behavior. Choose the primary visual
+        language and compare their controls together.
+      </p>
+      <div class="controls">
+        <label for="primary">Preview primary system</label
+        ><select id="primary">
+          <option value="harbor">Harbor · editorial blue</option>
+          <option value="trail">Trail · forest green</option>
+        </select>
+      </div>
+      <div class="grid">
+        <article>
+          <h2>Harbor</h2>
+          <p>Compact editorial controls, quiet borders and warm paper.</p>
+          <div id="harbor" class="mount"></div>
+          <output id="harbor-count">0 interactions</output>
+        </article>
+        <article>
+          <h2>Trail</h2>
+          <p>
+            Rounded controls and concise actions, with the same shared accent
+            token.
+          </p>
+          <div id="trail" class="mount"></div>
+          <output id="trail-count">0 interactions</output>
+        </article>
+      </div>
+      <p class="note">
+        Changing the primary system updates this preview's shared colors. Each
+        control keeps its shape and interaction count. Saved project bindings
+        are changed through the local design-system helper.
+      </p>
+    </main>
+    <script src="_ds/harbor/_ds_bundle.js"></script>
+    <script src="_ds/trail/_ds_bundle.js"></script>
+    <script>
+      const selection = document.getElementById("primary");
+      const applyPrimary = () =>
+        document.head.append(document.getElementById(selection.value + "-css"));
+      selection.addEventListener("change", applyPrimary);
+      applyPrimary();
+      for (const key of ["harbor", "trail"]) {
+        const ds = window.CodexDesignSystems[key];
+        function Control() {
+          const [count, setCount] = ds.React.useState(0);
+          const onClick = () => {
+            setCount(count + 1);
+            document.getElementById(key + "-count").textContent =
+              count + 1 + " interactions";
+          };
+          return ds.React.createElement(
+            ds.Components.Button,
+            { onClick },
+            key === "harbor" ? "Create a reading room" : "Explore a trail",
+          );
+        }
+        ds.createRoot(document.getElementById(key)).render(
+          ds.React.createElement(Control),
+        );
+      }
+    </script>
+  </body>
+</html>

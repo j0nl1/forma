@@ -6,6 +6,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { args, main } from "../skills/codex-design/scripts/lib/files.mjs";
 import { serve } from "../skills/codex-design/scripts/preview.mjs";
 import { bundle } from "../skills/codex-design/scripts/build.mjs";
+import {
+  compile,
+  importSystem,
+} from "../skills/codex-design/scripts/design-system.mjs";
+import { exists } from "../skills/codex-design/scripts/lib/files.mjs";
 export async function prepareDemo(destination) {
   const root = fileURLToPath(new URL("..", import.meta.url));
   await fs.cp(path.join(root, "examples"), destination, { recursive: true });
@@ -104,6 +109,15 @@ export async function prepareDemo(destination) {
     path.join(destination, "campaign.bundle.js"),
     { overwrite: true },
   );
+  for (const [folder, slug] of [
+    ["design-system", "harbor"],
+    ["design-system-secondary", "trail"],
+  ]) {
+    await compile(path.join(destination, folder));
+    await importSystem(path.join(destination, folder), destination, {
+      update: await exists(path.join(destination, "_ds", slug)),
+    });
+  }
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
