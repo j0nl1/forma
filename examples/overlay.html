@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Data on the design · Codex Design</title>
+    <link rel="stylesheet" href="studio.css" />
+    <script src="starters/data-overlay.js"></script>
+    <style>
+      .overlay-page {
+        max-width: 1180px;
+        margin: auto;
+        padding: 38px 24px 70px;
+      }
+      .overlay-page h1 {
+        font-size: clamp(34px, 6vw, 62px);
+        letter-spacing: -2px;
+        margin: 14px 0;
+      }
+      .overlay-page p {
+        line-height: 1.6;
+      }
+      .overlay-actions {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 22px 0;
+      }
+      .overlay-actions label {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .overlay-actions button {
+        border: 1px solid #ccc5b9;
+        background: #fff;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font: inherit;
+        cursor: pointer;
+      }
+      data-overlay {
+        --accent-primary: #376e53;
+        --bg-surface: #fff;
+        --text-primary: #263c31;
+        --text-secondary: #546355;
+        --text-tertiary: #777d73;
+        --border-subtle: #dddcd2;
+      }
+      .workspace {
+        position: relative;
+        min-height: 680px;
+        display: grid;
+        grid-template-columns: 160px minmax(0, 1fr);
+        background: #f9faf5;
+        border-radius: 14px;
+        color: #263c31;
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+      }
+      .workspace-nav {
+        padding: 30px 20px;
+        border-right: 1px solid #e0e3d9;
+      }
+      .workspace-nav strong {
+        display: block;
+        margin-bottom: 28px;
+      }
+      .workspace-nav span {
+        display: block;
+        margin: 18px 0;
+      }
+      .workspace-body {
+        padding: 36px 38px 130px;
+        min-width: 0;
+      }
+      .workspace-body h2 {
+        font-size: 26px;
+        margin: 0 0 8px;
+      }
+      .workspace-body p {
+        margin: 0 0 28px;
+        color: #687164;
+      }
+      .composer {
+        padding: 18px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid #ced6c9;
+        margin: 0 0 68px;
+      }
+      .composer label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .composer input {
+        width: 100%;
+        border: 0;
+        color: #263c31;
+        font: inherit;
+        padding: 6px 0;
+        background: none;
+      }
+      .workspace button {
+        border: 1px solid #ccd5c7;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font: inherit;
+        cursor: pointer;
+        background: #fff;
+        color: #263c31;
+      }
+      .workspace .create {
+        background: #376e53;
+        color: #fff;
+        margin-top: 10px;
+        border-color: #376e53;
+      }
+      .template-row {
+        display: flex;
+        gap: 12px;
+        margin: 0 0 72px;
+      }
+      .template-row > button {
+        flex: 1;
+        padding: 24px 12px;
+        border-radius: 12px;
+        background: #edf0e7;
+      }
+      .workspace-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+      .workspace-help {
+        margin-top: 48px;
+      }
+      .provenance {
+        font-size: 13px;
+        color: #6b7567;
+        margin-top: 22px;
+      }
+      .screen-status {
+        min-height: 24px;
+        margin-top: 20px;
+      }
+      .cover-panel {
+        position: absolute;
+        inset: 100px 20px auto 190px;
+        background: #263c31;
+        color: #fff;
+        padding: 28px;
+        border-radius: 14px;
+        z-index: 50;
+      }
+      .cover-panel[hidden] {
+        display: none;
+      }
+      .fixture-table {
+        margin-top: 20px;
+        overflow: auto;
+      }
+      .fixture-table table {
+        border-collapse: collapse;
+        min-width: 480px;
+        width: 100%;
+        font-size: 13px;
+      }
+      .fixture-table th,
+      .fixture-table td {
+        border-bottom: 1px solid #ddd;
+        padding: 9px;
+        text-align: left;
+      }
+      .overlay-page a {
+        color: inherit;
+      }
+      @media (max-width: 620px) {
+        .workspace {
+          grid-template-columns: 1fr;
+          min-height: 850px;
+        }
+        .workspace-nav {
+          display: none;
+        }
+        .workspace-body {
+          padding: 28px 22px 150px;
+        }
+        .template-row {
+          flex-wrap: wrap;
+        }
+        .template-row > button {
+          flex-basis: 100%;
+        }
+        .workspace-tools {
+          gap: 12px;
+        }
+        .cover-panel {
+          left: 12px;
+          right: 12px;
+        }
+        .overlay-page {
+          padding: 26px 12px 60px;
+        }
+        data-overlay::part(sentence) {
+          font-size: 17px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="index.html">CODEX DESIGN</a
+      ><a href="index.html">Collection ↗</a>
+    </header>
+    <main class="overlay-page">
+      <p class="eyebrow">13 / DATA ON THE DESIGN</p>
+      <h1>The numbers.<br />Where they belong.</h1>
+      <p>
+        Explore authored metric views on a working screen. Every number below
+        comes from an explicit <strong>synthetic fixture</strong>; this is a
+        runtime demonstration, with no connected production analytics.
+      </p>
+      <div class="overlay-actions">
+        <label
+          ><input id="overlay-enabled" type="checkbox" checked /> Show data
+          overlay</label
+        ><label
+          ><input id="overlay-controls" type="checkbox" checked /> Show view
+          controls</label
+        ><button id="cover-toggle">Toggle covering panel</button
+        ><button id="reload-data">Reload data file</button>
+      </div>
+      <data-overlay src="./overlay-data.json" controls="on"
+        ><div class="workspace">
+          <nav class="workspace-nav" data-metric-id="navigation">
+            <strong>HARBOR<br />WORKSPACE</strong><span>Overview</span
+            ><span>Your projects</span><span>Saved templates</span>
+          </nav>
+          <div class="workspace-body">
+            <h2>Make room for an idea.</h2>
+            <p>Start with a thought, or a shape to build on.</p>
+            <div class="composer">
+              <label for="idea">WHAT ARE YOU WORKING ON?</label
+              ><input id="idea" value="A quieter reading room" /><button
+                class="create"
+                data-metric-id="composer"
+              >
+                Create a project
+              </button>
+            </div>
+            <div class="template-row" data-metric-id="templates">
+              <button>Reading room</button><button>Research notes</button>
+            </div>
+            <div class="workspace-tools">
+              <button data-metric-id="share">Share project</button
+              ><button data-metric-id="export">Export HTML</button>
+            </div>
+            <div class="workspace-help">
+              <button data-metric-id="help">Get help</button>
+            </div>
+            <div class="screen-status" role="status"></div>
+          </div>
+          <div class="cover-panel" hidden>
+            <strong>A covering panel</strong>
+            <p>
+              Subjects beneath this panel should stop being painted. Close it
+              using the control above.
+            </p>
+          </div>
+        </div></data-overlay
+      >
+      <details class="fixture-table">
+        <summary>Inspect the synthetic measurements</summary>
+        <p>
+          Unique sample users per action divided by the active sample users in
+          the same window. These are independent action counts, not a sequential
+          funnel.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Window</th>
+              <th>Active users</th>
+              <th>Create</th>
+              <th>Templates</th>
+              <th>Share</th>
+              <th>Export</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Last 28 days</td>
+              <td>100</td>
+              <td>37</td>
+              <td>28</td>
+              <td>12</td>
+              <td>8</td>
+            </tr>
+            <tr>
+              <td>Last 7 days</td>
+              <td>40</td>
+              <td>12</td>
+              <td>14</td>
+              <td>4</td>
+              <td>6</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Help has no matching measurement and is shown hatched. The exact
+          fixture is <a href="overlay-observations.json">available as JSON</a>.
+        </p>
+      </details>
+      <p class="provenance">
+        Switching metric, cohort and window selects already-authored views. An
+        unanswered combination prepares a request draft for Codex; it does not
+        estimate a new result. Refresh requests are copied for you to review and
+        send.
+      </p>
+    </main>
+    <script src="overlay.js"></script>
+  </body>
+</html>

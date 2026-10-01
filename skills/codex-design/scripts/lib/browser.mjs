@@ -35,9 +35,11 @@ export async function withPage(
     });
     await page.goto(url, { waitUntil: "load", timeout: 30000 });
     await page.evaluate(async () => {
-      const readiness = [window.CodexDeckReady, window.CodexCanvasReady].filter(
-        Boolean,
-      );
+      const readiness = [
+        window.CodexDeckReady,
+        window.CodexCanvasReady,
+        window.CodexOverlayReady,
+      ].filter(Boolean);
       if (readiness.length)
         await Promise.race([
           Promise.all(readiness),

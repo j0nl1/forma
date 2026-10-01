@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Restored authored data/feedback overlays with live planar geometry, deterministic callouts, spectra, scoped fading, sentence navigation, provenance, source reloads, review drafts and standalone JSON/JS data exports.
+
 - Restored the general chart stage contract with local pinned D3/Sankey, keyed redraws, container resizing, zoom/pan/pinch, inert hover/tap tooltips, refresh transitions, empty/error recovery and real SVG/2× PNG downloads. Added the chart laboratory and installation/authoring guide.
 
 - Restored the continuous React composition model, named authored cues, persistent shots, single captions, full easing families, section duration/speed editing, finite repetition, keyboard controls, hover previews, and browser timing/playhead/editor persistence.

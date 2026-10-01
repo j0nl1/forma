@@ -49,6 +49,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "chart-libraries.bundle.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/data-overlay.js"),
+    path.join(destination, "starters/data-overlay.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

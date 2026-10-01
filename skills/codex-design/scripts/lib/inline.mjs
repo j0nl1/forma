@@ -4,6 +4,8 @@ import { parse, serialize } from "parse5";
 import postcss from "postcss";
 import { safeFile } from "./files.mjs";
 const MIME = {
+  ".json": "application/json",
+  ".js": "text/javascript",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",

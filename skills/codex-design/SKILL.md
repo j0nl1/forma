@@ -33,7 +33,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Document, resume, flier, brochure | [documents](references/documents.md) | `document.js` |
 | HTML email | [email](references/email.md) | `email.html` |
 | Social content and campaign layouts | [campaigns](references/campaigns.md) | `social.js` |
-| Chart, data analysis, diagram, map | [data](references/data.md) | `chart-stage.js`, local D3/Sankey, `chart.js`, `sources.js` |
+| Chart, data analysis, diagram, map | [data](references/data.md) | `chart-stage.js`, local D3/Sankey, `data-overlay.js`, `chart.js`, `sources.js` |
 | Current-source research | [research](references/research.md) | `sources.js` |
 | Animation, video, sound, watercolor | [motion](references/motion.md), [watercolor](references/watercolor.md) | `animations.jsx`, `motion-model.js`, `scene-components.jsx`, `watercolor-components.jsx`, `watercolor-kit.js` |
 | 3D object or scene | [three-dimensional](references/three-dimensional.md) | `three-stage.js` |
@@ -41,7 +41,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |
 | PDF, standalone HTML, video, Figma/Canva handoff | [exports](references/exports.md) | Local export helpers |
 | Generated images or AI interactions | [assets and AI](references/assets-ai.md) | `image-slot.js` |
-| Feedback, experiments, variants, tweaks | [review](references/review.md), [typed tweaks](references/tweaks.md) | `canvas.js`, `tweaks-components.jsx`, `tweaks-store.js`, `controls.js` |
+| Feedback, experiments, variants, tweaks | [review](references/review.md), [typed tweaks](references/tweaks.md) | `data-overlay.js`, `canvas.js`, `tweaks-components.jsx`, `tweaks-store.js`, `controls.js` |
 
 If the request is simply to be surprised, choose an appropriate concept from the user's context and state it; ask only if the medium or subject is essential and unknown.
 

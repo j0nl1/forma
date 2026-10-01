@@ -85,7 +85,18 @@
       "id": "research",
       "name": "Research",
       "reference": "references/research.md",
-      "starters": ["assets/starters/sources.js"]
+      "starters": [
+        "assets/starters/sources.js",
+        "assets/starters/data-overlay-controls.js",
+        "assets/starters/data-overlay-dom.js",
+        "assets/starters/data-overlay-geometry.js",
+        "assets/starters/data-overlay-layout.js",
+        "assets/starters/data-overlay-model.js",
+        "assets/starters/data-overlay-paint.js",
+        "assets/starters/data-overlay-runtime.js",
+        "assets/starters/data-overlay-style.js",
+        "assets/starters/data-overlay.js"
+      ]
     },
     {
       "id": "html-email",
@@ -113,7 +124,16 @@
       "starters": [
         "assets/starters/chart.js",
         "assets/starters/chart-stage.js",
-        "assets/starters/chart-libraries.js"
+        "assets/starters/chart-libraries.js",
+        "assets/starters/data-overlay-controls.js",
+        "assets/starters/data-overlay-dom.js",
+        "assets/starters/data-overlay-geometry.js",
+        "assets/starters/data-overlay-layout.js",
+        "assets/starters/data-overlay-model.js",
+        "assets/starters/data-overlay-paint.js",
+        "assets/starters/data-overlay-runtime.js",
+        "assets/starters/data-overlay-style.js",
+        "assets/starters/data-overlay.js"
       ]
     },
     {

@@ -134,3 +134,5 @@ node skills/codex-design/scripts/project.mjs record designs/reader cover.png --t
 `design.json` preserves unrelated metadata and records local assets and bindings. Figma/Canva transfer uses a real authorized connector when available. Otherwise Codex delivers a local handoff and states that transfer did not occur.
 
 General interactive charts use the [chart stage contract](../skills/codex-design/references/charts.md) and pinned local D3/Sankey dependencies. Open `charts.html` in the showcase to try wheel/pinch zoom, exact-value tooltips, data updates, explicit empty states and actual SVG/2× PNG downloads. `data.html` retains the basic bar/line API.
+
+The [data overlay guide](../skills/codex-design/references/data-overlay.md) documents live metric/feedback annotations, exact authored-view switching, provenance, reloads and local review drafts. Open `overlay.html` to inspect the explicitly synthetic fixture, turn paint/chrome on and off, and test modal occlusion. Real products require measured values and a reproducible analytics source.
