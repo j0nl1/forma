@@ -110,7 +110,11 @@
       "id": "diagram",
       "name": "Diagram",
       "reference": "references/data.md",
-      "starters": ["assets/starters/chart.js"]
+      "starters": [
+        "assets/starters/chart.js",
+        "assets/starters/chart-stage.js",
+        "assets/starters/chart-libraries.js"
+      ]
     },
     {
       "id": "flier",

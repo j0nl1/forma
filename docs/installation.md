@@ -1,6 +1,6 @@
 # Installation
 
-Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and native HTML starters have no package dependency. Node.js 22+ enables helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio.
+Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and basic native HTML starters have no package dependency. General D3 charts, 3D and React runtimes use the pinned local dependencies and build helper. Node.js 22+ enables helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio.
 
 The [official skill documentation](https://developers.openai.com/codex/skills) describes `SKILL.md` discovery. The inspected local Codex loader supports project and user `.agents/skills` roots. UI metadata lives in `agents/openai.yaml`.
 

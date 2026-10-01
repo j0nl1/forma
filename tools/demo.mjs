@@ -44,6 +44,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/deck.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/chart-libraries.js"),
+    path.join(destination, "chart-libraries.bundle.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

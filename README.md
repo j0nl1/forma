@@ -8,7 +8,7 @@ This is an independent rewrite using [baoyu-design](https://github.com/JimLiu/ba
 
 ## Quick start
 
-Requires Codex. Node.js 22 or newer is needed for the included helpers; the Markdown skill and native HTML starters have no package dependency.
+Requires Codex. Node.js 22 or newer is needed for the included helpers; the Markdown skill and basic native HTML starters have no package dependency. General D3 charts, 3D and React runtimes use the pinned local dependencies and build helper.
 
 From this checkout:
 

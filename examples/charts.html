@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Chart laboratory · Codex Design</title>
+    <link rel="stylesheet" href="studio.css" />
+    <script src="chart-libraries.bundle.js"></script>
+    <script src="starters/chart-stage.js"></script>
+    <style>
+      main.chart-lab {
+        max-width: 1100px;
+        margin: auto;
+        padding: 36px 24px 70px;
+      }
+      .chart-lab h1 {
+        font-size: clamp(34px, 7vw, 64px);
+        margin: 14px 0;
+      }
+      .chart-lab p {
+        line-height: 1.6;
+      }
+      .chart-card {
+        background: #fff;
+        border: 1px solid #deded6;
+        border-radius: 14px;
+        padding: 20px;
+        margin: 24px 0;
+      }
+      .chart-card h2 {
+        margin: 0 0 8px;
+        font-size: 22px;
+      }
+      .chart-card p {
+        color: #67675e;
+        margin: 0 0 18px;
+      }
+      chart-stage {
+        --chart-ink: #253c31;
+        --chart-grid: #deded6;
+        --chart-muted: #67675e;
+        height: 360px;
+      }
+      .chart-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .chart-actions button {
+        border: 1px solid #bcc7bf;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background: #fff;
+        color: #253c31;
+        font: inherit;
+        cursor: pointer;
+      }
+      .grid line {
+        stroke: #e4e6df;
+      }
+      .grid path {
+        display: none;
+      }
+      .series {
+        stroke: #376e53;
+        stroke-width: 3;
+        fill: none;
+      }
+      .point {
+        fill: #376e53;
+        stroke: #fff;
+        stroke-width: 2;
+      }
+      .sankey-link {
+        fill: none;
+        stroke: #98b29f;
+        stroke-opacity: 0.5;
+      }
+      .sankey-node {
+        fill: #376e53;
+      }
+      .sankey-label {
+        fill: #253c31;
+        font-size: 12px;
+      }
+      .chart-lab .source-note {
+        font-size: 13px;
+        color: #67675e;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="index.html">CODEX DESIGN</a
+      ><a href="index.html">Collection ↗</a>
+    </header>
+    <main class="chart-lab">
+      <p class="eyebrow">12 / CHART LABORATORY</p>
+      <h1>Every value.<br />Room to explore.</h1>
+      <p>
+        Container-sized D3 charts with independent zoom, exact-value tooltips
+        and local SVG/PNG downloads. Hover a chart to reveal its export
+        controls.
+      </p>
+      <div class="chart-actions">
+        <button id="update">Update sample data</button
+        ><button id="empty">Toggle empty data</button>
+      </div>
+      <section class="chart-card">
+        <h2>A weekly reading rhythm</h2>
+        <p>
+          Articles completed per week. Wheel, drag or pinch to inspect the date
+          range; reset restores the full period.
+        </p>
+        <chart-stage
+          id="reading"
+          name="reading-by-week"
+          zoom="x"
+          aria-label="Articles completed per week"
+        ></chart-stage>
+        <details>
+          <summary>Inspect the dataset</summary>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Week starting</th>
+                <th scope="col">Articles completed</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </details>
+      </section>
+      <section class="chart-card">
+        <h2>Where reading time goes</h2>
+        <p>
+          Minutes allocated from reading modes to topics. This uses the local D3
+          Sankey library; its stage has zoom disabled.
+        </p>
+        <chart-stage
+          id="flow"
+          name="reading-time-flow"
+          zoom="none"
+          aria-label="Reading time allocation in minutes"
+        ></chart-stage>
+        <details>
+          <summary>Inspect the flow values</summary>
+          <p>
+            Focused → Design: 40 min; Focused → Science: 30 min; Casual →
+            Design: 20 min; Casual → Science: 10 min.
+          </p>
+        </details>
+      </section>
+      <p class="source-note">
+        Source: explicitly synthetic demonstration data, authored for this
+        example. No real reader activity is represented. Dates are UTC. Counts
+        start at zero; the empty dataset is displayed as an explicit state.
+      </p>
+    </main>
+    <script src="charts.js"></script>
+  </body>
+</html>

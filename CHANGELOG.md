@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Restored the general chart stage contract with local pinned D3/Sankey, keyed redraws, container resizing, zoom/pan/pinch, inert hover/tap tooltips, refresh transitions, empty/error recovery and real SVG/2× PNG downloads. Added the chart laboratory and installation/authoring guide.
+
 - Restored the continuous React composition model, named authored cues, persistent shots, single captions, full easing families, section duration/speed editing, finite repetition, keyboard controls, hover previews, and browser timing/playhead/editor persistence.
 - Added opt-in local timing source write-back with version conflict detection and an actual video export/download panel.
 - Restored video intervals, configurable quality, supersampling/downscaling, custom timeline bridges, palette-optimized GIF encoding, and duplicate-frame/font diagnostics.

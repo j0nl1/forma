@@ -33,7 +33,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Document, resume, flier, brochure | [documents](references/documents.md) | `document.js` |
 | HTML email | [email](references/email.md) | `email.html` |
 | Social content and campaign layouts | [campaigns](references/campaigns.md) | `social.js` |
-| Chart, data analysis, diagram, map | [data](references/data.md) | `chart.js`, `sources.js` |
+| Chart, data analysis, diagram, map | [data](references/data.md) | `chart-stage.js`, local D3/Sankey, `chart.js`, `sources.js` |
 | Current-source research | [research](references/research.md) | `sources.js` |
 | Animation, video, sound, watercolor | [motion](references/motion.md), [watercolor](references/watercolor.md) | `animations.jsx`, `motion-model.js`, `scene-components.jsx`, `watercolor-components.jsx`, `watercolor-kit.js` |
 | 3D object or scene | [three-dimensional](references/three-dimensional.md) | `three-stage.js` |
@@ -47,7 +47,7 @@ If the request is simply to be surprised, choose an appropriate concept from the
 
 ## Build
 
-Copy only needed starters from `assets/starters/` to the deliverable. Most use native custom elements and local controls; continuous animation uses the React `CompositionStage` engine. There are no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment. Use vanilla HTML/CSS/JS for ordinary artifacts, and bundle React/TSX locally for animation, typed tweak panels and component systems. Do not replace the continuous animation engine with the smaller DOM timeline to reduce dependencies.
+Copy only needed starters from `assets/starters/` to the deliverable. Most use native custom elements and local controls; continuous animation uses the React `CompositionStage` engine. There are no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment or linked runtime contract. General D3 charts use the [chart contract](references/charts.md) and a local library bundle. Use vanilla HTML/CSS/JS for ordinary artifacts, and bundle React/TSX locally for animation, typed tweak panels and component systems. Do not replace the continuous animation engine with the smaller DOM timeline to reduce dependencies.
 
 Create real interactions, readable content, empty/loading/error states where relevant, keyboard access, and a responsive layout. Avoid adding unsupported claims, fake sources, or nonfunctional controls. Give comparison pages a clear way to select, inspect, and reset variants. Keep chrome and controls outside fixed-size artwork.
 

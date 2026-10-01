@@ -2,7 +2,7 @@
 
 Read the actual dataset and define units, population, time window, missing-value treatment, and transformations. Keep an untouched input copy outside source control when appropriate. Use Python or existing project tools for analysis; never infer numerical facts from a decorative chart.
 
-Choose a chart by the question: bars for category comparison, lines for time, scatter for relationships. Start quantitative bars at zero. Do not use pie charts for many categories. `chart.js` renders accessible SVG bar and line charts with labels and a data table. Use SVG or Mermaid for diagrams and connections when appropriate.
+Choose a chart by the question: bars for category comparison, lines for time, scatter for relationships. Start quantitative bars at zero. Do not use pie charts for many categories. `chart.js` renders accessible SVG bar and line charts with labels and a data table. For general interactive charts, use the full locally bundled D3 API with `chart-stage.js`; read the [chart contract](charts.md) for redraws, container sizing, zoom/pinch, tooltips, transitions, states and SVG/2× PNG exports. Keep the simpler bar/line API for existing artifacts. Use SVG or Mermaid for diagrams and connections when appropriate.
 
 Use `sources.js` for provenance and clearly mark synthetic data. An experiment needs a hypothesis, primary metric, assignment unit, test duration assumptions, and a decision rule. A visual variant picker is not evidence that an experiment has run.
 

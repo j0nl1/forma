@@ -31,6 +31,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "watercolor.html",
     "scenes.html",
     "data.html",
+    "charts.html",
     "document.html",
   ])
     await t.test(file, async () => {
