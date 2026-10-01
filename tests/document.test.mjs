@@ -394,6 +394,245 @@ test("true-size poster PDF preserves exact dimensions without applying orientati
   );
 });
 
+test("true-size sheets fit viewport and container changes without rewriting author geometry or nodes", async (t) => {
+  const { url } = await fixture(
+    t,
+    '<section class="page" style="padding:5%;background:#255d48"><button id="action">Retained action</button><p contenteditable="true" id="draft">Editable draft</p></section>',
+    'width="18in" height="24in" style="font-family:Georgia"',
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() => {
+      window.documentNode = document.querySelector("doc-page");
+      window.authoredPage = document.querySelector(".page");
+      window.actionCount = 0;
+      document
+        .querySelector("#action")
+        .addEventListener("click", () => actionCount++);
+    });
+    const measure = () =>
+      page.locator("doc-page").evaluate((element) => ({
+        scale: element.previewScale,
+        rawWidth: element.sheet.offsetWidth,
+        width: element.sheet.getBoundingClientRect().width,
+        height: element.sheet.getBoundingClientRect().height,
+        overflow: document.documentElement.scrollWidth > innerWidth + 1,
+        authorStyle: element.getAttribute("style"),
+      }));
+    let actual = await measure();
+    close(actual.rawWidth, 1728);
+    close(actual.width, 1728 * actual.scale);
+    assert.ok(actual.scale > 0 && actual.scale < 1);
+    assert.ok(actual.height <= 905);
+    assert.equal(actual.overflow, false);
+    assert.equal(actual.authorStyle, "font-family:Georgia");
+    await page.locator("#action").click();
+    await page.locator("#draft").fill("Edited on the fitted sheet");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(
+      () =>
+        document.querySelector("doc-page").sheet.getBoundingClientRect().width <
+        350,
+    );
+    actual = await measure();
+    close(actual.width, 342);
+    close(actual.rawWidth, 1728);
+    assert.equal(actual.overflow, false);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(() => {
+      const container = document.createElement("div");
+      container.style.width = "300px";
+      document.body.append(container);
+      container.append(documentNode);
+    });
+    await page.waitForFunction(
+      () => documentNode.sheet.getBoundingClientRect().width < 260,
+    );
+    close((await measure()).width, 252);
+    await page.evaluate(
+      () => (documentNode.parentElement.style.width = "500px"),
+    );
+    await page.waitForFunction(
+      () => documentNode.sheet.getBoundingClientRect().width > 440,
+    );
+    close((await measure()).width, 452);
+    assert.equal(
+      await page.locator("#draft").innerText(),
+      "Edited on the fitted sheet",
+    );
+    assert.equal(
+      await page.evaluate(
+        () => authoredPage === document.querySelector(".page"),
+      ),
+      true,
+    );
+    await page.locator("#action").click();
+    assert.equal(await page.evaluate(() => actionCount), 2);
+    await page
+      .locator("doc-page")
+      .evaluate((element) => element.setAttribute("preview", "actual-size"));
+    actual = await measure();
+    assert.equal(actual.scale, 1);
+    close(actual.width, 1728);
+    await page
+      .locator("doc-page")
+      .evaluate((element) => element.removeAttribute("preview"));
+    close((await measure()).width, 452);
+    await page.locator("doc-page").evaluate((element) => {
+      element.setAttribute("width", "210mm");
+      element.setAttribute("height", "297mm");
+    });
+    const metric = await page.locator("doc-page").evaluate((element) => ({
+      natural: parseFloat(getComputedStyle(element.sheet).width),
+      painted: element.sheet.getBoundingClientRect().width,
+      reserved: element.shadowRoot
+        .querySelector(".preview")
+        .getBoundingClientRect().width,
+      scale: element.previewScale,
+    }));
+    close(metric.natural, pixels("210mm"), 0.02);
+    close(metric.painted, metric.natural * metric.scale, 0.02);
+    close(metric.reserved, metric.painted, 0.02);
+    await page.locator("doc-page").evaluate((element) => {
+      element.setAttribute("width", "300px");
+      element.setAttribute("height", "200px");
+      element.setAttribute("margin", "0");
+    });
+    actual = await measure();
+    assert.ok(actual.scale > 1);
+    close(actual.rawWidth, 300);
+    close(actual.width, 452);
+    await page
+      .locator("doc-page")
+      .evaluate((element) => (element.style.display = "none"));
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    );
+    assert.equal(
+      await page
+        .locator("doc-page")
+        .evaluate(
+          (element) =>
+            Number.isFinite(element.previewScale) &&
+            !element.shadowRoot
+              .querySelector("[data-preview-vars]")
+              .textContent.includes("NaN"),
+        ),
+      true,
+    );
+    await page
+      .locator("doc-page")
+      .evaluate((element) => (element.style.display = ""));
+    await page.waitForFunction(
+      () => documentNode.sheet.getBoundingClientRect().width > 440,
+    );
+    close((await measure()).width, 452);
+    await page.locator("doc-page").evaluate((element) => {
+      element.removeAttribute("width");
+      element.removeAttribute("height");
+    });
+    assert.equal((await measure()).scale, 1);
+    close((await measure()).width, 816);
+  });
+});
+
+test("fixed-sheet preview leaves canvas ownership alone and resets scale for real print and portable output", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    '<section class="page" style="padding:5%"><h1>TOP_MARK</h1><p style="position:absolute;bottom:5%">BOTTOM_MARK</p></section><section class="page" style="padding:5%"><h1>SECOND_MARK</h1></section>',
+    'width="18in" height="24in"',
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(
+      () => (window.documentNode = document.querySelector("doc-page")),
+    );
+    const scale = await page.evaluate(() => documentNode.previewScale);
+    assert.ok(scale < 1);
+    const sections = await page.locator(".page").evaluateAll((elements) =>
+      elements.map((element) => ({
+        width: element.getBoundingClientRect().width,
+        height: element.getBoundingClientRect().height,
+        rawWidth: element.offsetWidth,
+      })),
+    );
+    assert.equal(sections.length, 2);
+    close(sections[0].width, sections[1].width);
+    close(sections[0].rawWidth, 1728);
+    // Multiple pages share the same scale; the complete stack remains scrollable.
+    assert.ok(sections[0].height > 850);
+    assert.ok(
+      await page.evaluate(
+        () => document.documentElement.scrollHeight > innerHeight,
+      ),
+    );
+    await page.evaluate(() => {
+      window.modeMarker = document.createElement("meta");
+      modeMarker.name = "design_doc_mode";
+      modeMarker.content = "canvas";
+      document.head.append(modeMarker);
+    });
+    await page.waitForFunction(() => documentNode.previewScale === 1);
+    close(
+      await page
+        .locator(".page")
+        .first()
+        .evaluate((element) => element.getBoundingClientRect().width),
+      1728,
+    );
+    await page.evaluate(() => modeMarker.remove());
+    await page.waitForFunction(() => documentNode.previewScale < 1);
+    await page.evaluate(() => CodexDocument.preparePrint({ paper: "a4" }));
+    await page.emulateMedia({ media: "print" });
+    assert.equal(await page.evaluate(() => documentNode.previewScale), 1);
+    close(
+      await page
+        .locator(".page")
+        .first()
+        .evaluate((element) => element.getBoundingClientRect().width),
+      1728,
+    );
+    await page.emulateMedia({ media: "screen" });
+    await page.evaluate(() => CodexDocument.restorePrint());
+    await page.waitForFunction(() => documentNode.previewScale < 1);
+    close(await page.evaluate(() => documentNode.previewScale), scale, 0.001);
+  });
+  await fs.writeFile(
+    path.join(dir, "portable.html"),
+    await inlineHtml(path.join(dir, "index.html")),
+  );
+  await fs.rm(path.join(dir, "document.js"));
+  await withPage(url + "portable.html", async (page) => {
+    assert.ok(
+      await page
+        .locator("doc-page")
+        .evaluate((element) => element.previewScale < 1),
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(
+      () =>
+        document.querySelector("doc-page").sheet.getBoundingClientRect().width <
+        350,
+    );
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth + 1,
+      ),
+      false,
+    );
+  });
+  const output = path.join(dir, "portable-poster.pdf");
+  await exportArtifact("pdf", url + "portable.html", output, { paper: "a4" });
+  const pages = pdfPages(output);
+  assert.equal(pages.length, 2);
+  close(pages[0].width, 1296);
+  close(pages[0].height, 1728);
+  assert.ok(pages[0].words.some((word) => word.text === "TOP_MARK"));
+  assert.ok(pages[0].words.some((word) => word.text === "BOTTOM_MARK"));
+  assert.ok(pages[1].words.some((word) => word.text === "SECOND_MARK"));
+});
+
 test("standalone document survives source removal and print finishes entrance animations", async (t) => {
   const { dir, url } = await fixture(
     t,
@@ -514,7 +753,45 @@ test("paper laboratory modes preserve named-paper geometry, panel order and nati
   t.after(() => new Promise((resolve) => server.close(resolve)));
   await withPage(url, async (page) => {
     assert.equal(await page.locator("[slot=header]").count(), 1);
+    assert.equal(await page.locator("#preview-choice").isVisible(), false);
+    await page.locator("#mode").selectOption("poster");
+    await page.waitForFunction(
+      () => document.querySelector("doc-page").previewScale < 1,
+    );
+    for (const viewport of [
+      { width: 1440, height: 1000 },
+      { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.waitForFunction(() => {
+        const sheet = document
+          .querySelector("doc-page")
+          .sheet.getBoundingClientRect();
+        return sheet.width <= innerWidth && sheet.bottom <= innerHeight;
+      });
+      assert.equal(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth + 1,
+        ),
+        false,
+      );
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator("#actual-size").check();
+    assert.equal(
+      await page
+        .locator("doc-page")
+        .evaluate((element) => element.previewScale),
+      1,
+    );
+    await page.locator("#actual-size").uncheck();
+    assert.ok(
+      await page
+        .locator("doc-page")
+        .evaluate((element) => element.previewScale < 1),
+    );
     await page.locator("#mode").selectOption("brochure");
+    assert.equal(await page.locator("#preview-choice").isVisible(), false);
     await page.waitForFunction(
       () => document.querySelector("doc-page").paginated,
     );

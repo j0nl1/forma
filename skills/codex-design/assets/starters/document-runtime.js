@@ -1,6 +1,7 @@
 import { geometry, pixels, printOptions } from "./document-model.js";
 import { documentStyle } from "./document-style.js";
 import { syncHead, webkitPrint } from "./document-print.js";
+import { DocumentPreview } from "./document-preview.js";
 class DocPage extends HTMLElement {
   static observedAttributes = [
     "size",
@@ -10,15 +11,16 @@ class DocPage extends HTMLElement {
     "orientation",
     "content-width",
     "content-height",
+    "preview",
   ];
   constructor() {
     super();
     this.attachShadow({ mode: "open" }).innerHTML =
-      `<style>${documentStyle}</style><style data-vars></style><style data-print-vars></style>
-      <div class="sheet" data-screen-label="Document"><table class="frame" role="presentation">
+      `<style>${documentStyle}</style><style data-vars></style><style data-print-vars></style><style data-preview-vars></style>
+      <div class="preview"><div class="sheet" data-screen-label="Document"><table class="frame" role="presentation">
       <thead><tr><th><div class="hdr-space"><slot name="header"></slot></div></th></tr></thead>
       <tbody><tr><td><div class="fit-box"><div class="fit"><slot></slot></div></div></td></tr></tbody>
-      <tfoot><tr><td><div class="ftr-space"><slot name="footer"></slot></div></td></tr></tfoot></table></div>`;
+      <tfoot><tr><td><div class="ftr-space"><slot name="footer"></slot></div></td></tr></tfoot></table></div></div>`;
     this.sheet = this.shadowRoot.querySelector(".sheet");
     this.ready = new Promise((resolve) => (this.resolveReady = resolve));
     this.observer = new MutationObserver(() => this.schedule());
@@ -28,6 +30,10 @@ class DocPage extends HTMLElement {
     this.headerHeight = 0;
     this.footerHeight = 0;
     this.paginated = false;
+    this.previewController = new DocumentPreview(this);
+  }
+  get previewScale() {
+    return this.printing ? 1 : this.previewController.scale;
   }
   get pageWidth() {
     return geometry(this).pageWidth;
@@ -91,12 +97,14 @@ class DocPage extends HTMLElement {
     );
     document.fonts?.ready.then(() => this.schedule());
     this.measure();
+    this.previewController.connect();
     this.resolveReady(this);
   }
   disconnectedCallback() {
     this.events?.abort();
     this.observer.disconnect();
     this.resizeObserver.disconnect();
+    this.previewController.disconnect();
     this.targets = null;
     cancelAnimationFrame(this.frame);
     this.frame = null;
@@ -172,6 +180,7 @@ class DocPage extends HTMLElement {
       const node = this.shadowRoot.querySelector(selector);
       if (node.textContent !== css) node.textContent = css;
     }
+    if (!this.printing) this.previewController.sync(screen);
   }
   preparePrint(options = {}) {
     this.measure();

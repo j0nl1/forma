@@ -9,10 +9,11 @@ window.CodexDocumentReady.then(() => {
     brochure:
       "Exactly two landscape pages. Outside order: inside flap, back cover, front cover. Print double-sided, flip on the short edge, use actual size and fold the right panel in first.",
     poster:
-      "An explicitly requested 22 × 30 in poster. Its PDF retains those true dimensions. Scroll to inspect the actual-size screen preview.",
+      "An explicitly requested 22 × 30 in poster. Its PDF retains those true dimensions. The sheet fits the screen; choose Actual-size preview to inspect it with scrolling.",
     fit: "A 1400 × 990 px design scaled onto the printable area of your selected sheet. It remains one page, with its bottom content intact.",
   };
   function update() {
+    document.querySelector("#preview-choice").hidden = mode.value !== "poster";
     for (const attribute of [
       "width",
       "height",
@@ -32,12 +33,22 @@ window.CodexDocumentReady.then(() => {
       stage.setAttribute("content-width", "1400px");
       stage.setAttribute("content-height", "990px");
     }
+    updatePreview();
     stage.replaceChildren(
       document.querySelector(`#${mode.value}`).content.cloneNode(true),
     );
     document.querySelector("#instructions").textContent = notes[mode.value];
   }
   mode.onchange = paper.onchange = update;
+  function updatePreview() {
+    if (
+      mode.value === "poster" &&
+      document.querySelector("#actual-size").checked
+    )
+      stage.setAttribute("preview", "actual-size");
+    else stage.removeAttribute("preview");
+  }
+  document.querySelector("#actual-size").onchange = updatePreview;
   document.querySelector("#print").onclick = async () => {
     await document.fonts.ready;
     await window.CodexDocument.preparePrint({ paper: paper.value });

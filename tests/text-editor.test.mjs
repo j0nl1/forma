@@ -140,6 +140,57 @@ test("literal text mapping preserves exact surrounding bytes and independent mix
   );
 });
 
+test("fitted true-size sheets preserve source-backed click edits, undo and exact physical PDF size", async (t) => {
+  const { url, file, html } = await fixture(t, {
+    document: true,
+    content: body
+      .replace("<main>", '<doc-page width="18in" height="24in">')
+      .replace("</main>", "</doc-page>"),
+  });
+  await withPage(url, async (page) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(
+      () => document.querySelector("doc-page").previewScale < 0.3,
+    );
+    await edit(page, "#title", "A saved fitted headline");
+    assert.equal(
+      await fs.readFile(file, "utf8"),
+      html.replace("Original title", "A saved fitted headline"),
+    );
+    assert.equal(
+      await page.evaluate(
+        () => originalTitle === document.getElementById("title"),
+      ),
+      true,
+    );
+    await editor(page)
+      .getByRole("button", { name: "Done", exact: true })
+      .click();
+    const output = path.join(path.dirname(file), "fitted-edited.pdf");
+    await exportArtifact("pdf", url, output, { paper: "a4" });
+    const box = execFileSync("pdftotext", ["-bbox", output, "-"], {
+      encoding: "utf8",
+    });
+    assert.match(box, /<page width="1296\.000000" height="1728\.000000">/);
+    assert.match(
+      execFileSync("pdftotext", [output, "-"], { encoding: "utf8" }),
+      /A saved fitted headline/,
+    );
+    await editor(page)
+      .getByRole("button", { name: "Undo", exact: true })
+      .click();
+    await page.waitForFunction(
+      () => document.getElementById("title").textContent === "Original title",
+    );
+    assert.equal(await fs.readFile(file, "utf8"), html);
+    await page.reload();
+    await page.waitForFunction(
+      () => document.querySelector("doc-page")?.previewScale < 0.3,
+    );
+    assert.equal(await page.locator("#title").textContent(), "Original title");
+  });
+});
+
 test("source-backed click editing persists to real HTML, survives document reparenting and preserves nodes, links and attributes", async (t) => {
   const { url, file, html } = await fixture(t, { document: true });
   await withPage(url, async (page) => {
