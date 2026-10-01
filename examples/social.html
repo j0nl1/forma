@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Social asset board — Codex Design</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 15px/1.6 system-ui;
+      }
+      nav {
+        padding: 16px 24px;
+        border-bottom: 1px solid #ccd5c5;
+      }
+      a {
+        color: inherit;
+      }
+      main {
+        max-width: 1320px;
+        margin: auto;
+        padding: 36px 24px 80px;
+      }
+      h1 {
+        font:
+          46px/1.12 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 18px;
+      }
+      .lead {
+        max-width: 65em;
+        margin: 0 0 24px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 0 18px;
+      }
+      button {
+        font: inherit;
+        padding: 8px 14px;
+        border: 1px solid #9dad9c;
+        background: #fffdf7;
+        color: inherit;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 2px solid #269d80;
+        outline-offset: 3px;
+      }
+      .viewport {
+        overflow: auto;
+        max-width: 100%;
+        background: #ebece3;
+        border: 1px solid #ccd5c5;
+        border-radius: 16px;
+      }
+      social-frames {
+        min-width: 524px;
+      }
+      post-card {
+        width: 420px;
+      }
+      .unit {
+        width: 428px;
+      }
+      .asset {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #269d80;
+        color: #fffdf7;
+        overflow: hidden;
+        border-radius: 16px;
+      }
+      .asset h2 {
+        position: absolute;
+        left: 24px;
+        top: 22px;
+        font:
+          42px/1 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0;
+        z-index: 1;
+      }
+      .asset:before {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border: 22px solid #fffdf7;
+        border-radius: 50%;
+        left: 150px;
+        top: 75px;
+      }
+      .square {
+        aspect-ratio: 1;
+        background: #e4b754;
+        color: #263c34;
+      }
+      .square:before {
+        border-color: #263c34;
+        left: 50px;
+        top: 170px;
+        width: 250px;
+        height: 250px;
+      }
+      .wide {
+        aspect-ratio: 1200/630;
+        background: #365bcf;
+      }
+      .wide:before {
+        left: 210px;
+        top: 45px;
+      }
+      .story-copy {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        top: 150px;
+        color: #fffdf7;
+        font:
+          48px/1.08 Georgia,
+          serif;
+        margin: 0;
+        z-index: 10;
+        pointer-events: none;
+      }
+      .story-copy small {
+        display: block;
+        font: 13px/1.4 system-ui;
+        letter-spacing: 0.09em;
+        margin-bottom: 18px;
+      }
+      output {
+        display: block;
+        padding: 14px 18px;
+        margin-top: 18px;
+        border-left: 3px solid #269d80;
+        background: #e5ebe0;
+        min-height: 55px;
+      }
+      .note {
+        font-size: 12px;
+        margin-top: 14px;
+        max-width: 65em;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 28px 18px 70px;
+        }
+        h1 {
+          font-size: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav><a href="index.html">← All examples</a></nav>
+    <main>
+      <h1>One idea.<br />Every format.</h1>
+      <p class="lead">
+        A working board of independently authored social assets. Inspect each
+        piece in context, switch to the bare artwork, or download exact-size PNG
+        files together in one ZIP. The phone and viewer stay outside the
+        exported story.
+      </p>
+      <div class="controls">
+        <button id="images">Show images only</button
+        ><button id="copy">Change the post copy</button
+        ><button id="variant">Hide the square format</button>
+      </div>
+      <div
+        class="viewport"
+        tabindex="0"
+        aria-label="Social asset board, scroll to inspect full-size formats"
+      >
+        <social-frames id="board" label="Reading room campaign">
+          <div class="unit">
+            <post-card
+              id="feed"
+              platform="x"
+              name="Reading room"
+              sub="@readingroom · Concept study"
+              text="Leave room for the thought."
+              ><div
+                class="asset"
+                data-codex-frame-export
+                data-codex-frame-label="Feed artwork · 1200×675"
+              >
+                <h2>Room for<br />the thought.</h2>
+              </div></post-card
+            >
+          </div>
+          <div class="unit">
+            <instagram-story
+              id="story"
+              image-src="social/portrait.svg"
+              image-credit="Original vector study"
+              username="readingroom"
+              time="2h"
+              editable="session"
+              ><p class="story-copy">
+                <small>FIELD NOTES / 01</small>Read a little.<br />See a
+                little<br />more.
+              </p></instagram-story
+            >
+          </div>
+          <div id="square" class="unit">
+            <post-card
+              platform="linkedin"
+              name="Reading room"
+              sub="Independent studio · Concept study"
+              text="A page is a place to pay attention."
+              ><div
+                class="asset square"
+                data-codex-frame-export
+                data-codex-frame-label="Square artwork · 1080×1080"
+              >
+                <h2>Attention is<br />a design<br />material.</h2>
+              </div></post-card
+            >
+          </div>
+          <div class="unit">
+            <post-card
+              platform="facebook"
+              name="Reading room"
+              sub="Concept study"
+              text="Field notes from the reading room."
+              link-domain="readingroom.example"
+              link-title="An original visual study"
+              ><div
+                class="asset wide"
+                data-codex-frame-export
+                data-codex-frame-label="Link artwork · 1200×630"
+              >
+                <h2>Keep the<br />whole story.</h2>
+              </div></post-card
+            >
+          </div>
+        </social-frames>
+      </div>
+      <output id="status" aria-live="polite"
+        >Each download contains the artwork at its labeled pixel
+        dimensions.</output
+      >
+      <p class="note">
+        This is a local design study. Account details and reaction counts are
+        illustrative. Story image edits in this demonstration remain in the
+        browser session; use a source-connected local preview to save actual
+        project files. On a narrow screen, scroll the board to inspect the
+        fixed-size devices.
+      </p>
+    </main>
+    <script src="starters/social.js"></script>
+    <script>
+      let bare = false,
+        variant = true,
+        edition = 1;
+      document.getElementById("images").onclick = (event) => {
+        bare = !bare;
+        document
+          .querySelectorAll("post-card,instagram-story")
+          .forEach((node) => node.setAttribute("image-only", String(bare)));
+        event.currentTarget.textContent = bare
+          ? "Show platform context"
+          : "Show images only";
+      };
+      document.getElementById("copy").onclick = () => {
+        document
+          .getElementById("feed")
+          .setAttribute(
+            "text",
+            ++edition % 2
+              ? "Leave room for the thought."
+              : "A quiet idea can travel a long way.",
+          );
+      };
+      document.getElementById("variant").onclick = (event) => {
+        variant = !variant;
+        document.getElementById("square").hidden = !variant;
+        event.currentTarget.textContent = variant
+          ? "Hide the square format"
+          : "Show the square format";
+      };
+      document.addEventListener("social-frames:export", (event) => {
+        document.getElementById("status").textContent =
+          "Downloaded " +
+          event.detail.name +
+          " — " +
+          event.detail.frames
+            .map((frame) => frame.width + "×" + frame.height)
+            .join(", ");
+      });
+      document.addEventListener("social-frames:error", (event) => {
+        document.getElementById("status").textContent = event.detail.message;
+      });
+    </script>
+  </body>
+</html>

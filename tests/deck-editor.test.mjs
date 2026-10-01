@@ -377,6 +377,10 @@ test("real HTML writes persist structural edits and reject stale, foreign and co
     );
     await page.reload();
     await ready(page);
+    // Establish the saved version before introducing an external edit.
+    await page.evaluate(
+      () => document.querySelector("deck-stage").editor.sourceReady,
+    );
     assert.equal(
       await page.evaluate(() =>
         document

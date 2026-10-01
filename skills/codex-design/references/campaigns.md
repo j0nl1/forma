@@ -1,6 +1,6 @@
 # Social and campaign artifacts
 
-Match the requested medium's aspect ratio, audience, and message. Use `social.js` for labeled platform context: Instagram, stories, X, LinkedIn, Reddit, YouTube, TikTok, Facebook, and Pinterest. These are editable generic frames, not exact replicas or endorsed platform products.
+Match the requested medium's aspect ratio, audience, and message. Read [social assets](social-assets.md) for the restored `social-frames`, `post-card` and `instagram-story` contracts. Bundle `social.js` for the complete board/feed/story entry and actual nominal PNG/ZIP downloads. The earlier generic `social-frame` wrapper remains available; it does not replace the pending individual platform-shell ports.
 
 Use `post-card` for feed cards and real image dimensions. Keep essential copy away from crop edges and overlay regions. Create a small set of meaningful copy or visual variations with clear filenames. Do not add fake engagement, endorsements, account verification, or statistics as facts.
 

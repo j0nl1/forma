@@ -12,7 +12,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Design feedback and typed tweaks | `tweaks.md`, `tweaks-components.jsx`, `tweaks-store.js` | All typed controls, palette cards, scrub/drag, local persistence, actual root-HTML source writes and clipboard drafts; broader visual and native composer integration pending |
 | Documents, resume, flier, trifold | `documents.md`, modular `document.js` | Flowing/explicit/true-size/scaled-fit layouts, exact Letter/A4/Legal geometry, live running slots and actual chosen-paper PDF output; literal-text source editing restored; further reference/client checks pending |
 | Email | `email.md`, `email.html` | Tables and inline CSS; client compatibility requires actual client testing |
-| Social media and platform shells | `campaigns.md`, `social.js` | All named platform contexts through one generic API |
+| Social assets and platform context | `campaigns.md`, `social-assets.md`, bundled `social.js` | Dynamic board, four feed anatomies, physical letterboxed story, source-backed image editing and actual nominal PNG/ZIP downloads; distinct platform shells and further visual/integration checks remain pending |
 | Data science, charts, diagrams, maps | `data.md`, `chart.js`, `sources.js` | Source-driven analysis, local SVG charts and tables; supplied/configured geography |
 | Research and sourced overlays | `research.md`, `sources.js` | Live sources through Codex, local citations |
 | Animation and video | `motion.md`, `animations.jsx`, `scene-components.jsx` | Continuous composition and older sprite/scene APIs, authored cues/local time, persistent shots, captions, frozen scene overlap, local editor, timing write-back, deterministic seek and decoded nested-video export |

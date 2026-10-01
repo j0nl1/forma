@@ -17,7 +17,14 @@ export async function exportBoard(board, kind) {
 export async function exportRegion(
   card,
   kind,
-  { title = "Asset", scale = 1, allowExternal = false } = {},
+  {
+    title = "Asset",
+    scale = 1,
+    allowExternal = false,
+    outputWidth,
+    outputHeight,
+    download = true,
+  } = {},
 ) {
   if (!["png", "html"].includes(kind)) throw new Error("Choose PNG or HTML");
   if (!(card instanceof Element))
@@ -64,6 +71,7 @@ export async function exportRegion(
     return css;
   };
   const fonts = [],
+    pseudoRules = [],
     visited = new Set(),
     fetchedCss = new Set();
   const fetchCss = async (raw, base = location.href) => {
@@ -118,7 +126,9 @@ export async function exportRegion(
       return document.createTextNode(source.textContent);
     if (
       !(source instanceof Element) ||
-      source.matches("script,link,style,[data-codex-chrome]")
+      source.matches(
+        "script,link,style,[data-codex-chrome],[data-omelette-chrome]",
+      )
     )
       return document.createTextNode("");
     if (source.localName === "slot") {
@@ -128,6 +138,12 @@ export async function exportRegion(
       return fragment;
     }
     const style = getComputedStyle(source);
+    if (source.shadowRoot)
+      for (const sheet of [
+        ...source.shadowRoot.styleSheets,
+        ...source.shadowRoot.adoptedStyleSheets,
+      ])
+        await walk(sheet);
     let target = document.createElementNS(
       source.namespaceURI,
       source.localName.includes("-") ? "div" : source.localName,
@@ -142,15 +158,39 @@ export async function exportRegion(
       );
     target.style.animation = "none";
     target.style.transition = "none";
+    if (source instanceof HTMLElement) {
+      let pseudoId;
+      for (const name of ["before", "after"]) {
+        const pseudo = getComputedStyle(source, `::${name}`);
+        if (
+          ["none", "normal"].includes(pseudo.content) ||
+          pseudo.display === "none"
+        )
+          continue;
+        const id = (pseudoId ||= String(pseudoRules.length + 1));
+        target.setAttribute("data-codex-capture-pseudo", id);
+        const declaration = document.createElement("span").style;
+        for (const property of pseudo)
+          declaration.setProperty(
+            property,
+            await embedUrls(pseudo.getPropertyValue(property), location.href),
+          );
+        declaration.animation = "none";
+        declaration.transition = "none";
+        pseudoRules.push(
+          `[data-codex-capture-pseudo="${id}"]::${name}{${declaration.cssText}}`,
+        );
+      }
+    }
     if (source instanceof HTMLCanvasElement) {
       target = document.createElement("img");
       target.src = source.toDataURL();
       target.style.cssText = [...style]
         .map((key) => `${key}:${style.getPropertyValue(key)}`)
         .join(";");
-    } else if (source instanceof HTMLImageElement)
+    } else if (source instanceof HTMLImageElement) {
       target.src = await embed(source.currentSrc || source.src);
-    else if (source instanceof HTMLInputElement) {
+    } else if (source instanceof HTMLInputElement) {
       target.value = source.value;
       target.setAttribute("value", source.value);
       if (source.checked) target.setAttribute("checked", "");
@@ -167,14 +207,49 @@ export async function exportRegion(
     }
     return target;
   };
-  const width = card.offsetWidth,
-    height = card.offsetHeight;
+  const box = getComputedStyle(card);
+  const dimension = (axis, sides) => {
+    const size = Number.parseFloat(box[axis]);
+    return Number.isFinite(size)
+      ? size +
+          (box.boxSizing === "border-box"
+            ? 0
+            : sides.reduce(
+                (sum, side) => sum + (Number.parseFloat(box[side]) || 0),
+                0,
+              ))
+      : axis === "width"
+        ? card.offsetWidth
+        : card.offsetHeight;
+  };
+  const width = dimension("width", [
+      "paddingLeft",
+      "paddingRight",
+      "borderLeftWidth",
+      "borderRightWidth",
+    ]),
+    height = dimension("height", [
+      "paddingTop",
+      "paddingBottom",
+      "borderTopWidth",
+      "borderBottomWidth",
+    ]);
   if (!width || !height) throw new Error("The artboard has no exportable size");
+  const pixelWidth = outputWidth ?? Math.round(width * scale),
+    pixelHeight = outputHeight ?? Math.round(height * scale);
+  if (
+    kind === "png" &&
+    ![pixelWidth, pixelHeight].every(
+      (value) => Number.isSafeInteger(value) && value > 0,
+    )
+  )
+    throw new Error("Choose positive integer export dimensions.");
   const snapshot = await clone(card);
   snapshot.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   Object.assign(snapshot.style, {
     width: `${width}px`,
     height: `${height}px`,
+    boxSizing: "border-box",
     transform: "none",
     boxShadow: "none",
     borderRadius: "0",
@@ -189,7 +264,7 @@ export async function exportRegion(
     charset.setAttribute("charset", "utf-8");
     doc.head.prepend(charset);
     const css = doc.createElement("style");
-    css.textContent = fonts.join("\n");
+    css.textContent = [...fonts, ...pseudoRules].join("\n");
     doc.head.append(css);
     doc.body.style.margin = "0";
     doc.body.append(snapshot);
@@ -197,18 +272,19 @@ export async function exportRegion(
       ["<!doctype html>\n", doc.documentElement.outerHTML],
       { type: "text/html" },
     );
-    downloadBlob(blob, `${name}.html`);
+    if (download) downloadBlob(blob, `${name}.html`);
     return blob;
   }
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", Math.round(width * scale));
-  svg.setAttribute("height", Math.round(height * scale));
+  svg.setAttribute("width", pixelWidth);
+  svg.setAttribute("height", pixelHeight);
+  svg.setAttribute("preserveAspectRatio", "none");
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   const foreign = document.createElementNS(svg.namespaceURI, "foreignObject");
   foreign.setAttribute("width", width);
   foreign.setAttribute("height", height);
   const css = document.createElement("style");
-  css.textContent = fonts.join("\n");
+  css.textContent = [...fonts, ...pseudoRules].join("\n");
   snapshot.prepend(css);
   foreign.append(snapshot);
   svg.append(foreign);
@@ -218,11 +294,11 @@ export async function exportRegion(
     encodeURIComponent(new XMLSerializer().serializeToString(svg));
   await image.decode();
   const output = document.createElement("canvas");
-  output.width = Math.round(width * scale);
-  output.height = Math.round(height * scale);
+  output.width = pixelWidth;
+  output.height = pixelHeight;
   output.getContext("2d").drawImage(image, 0, 0);
   const blob = await new Promise((resolve) => output.toBlob(resolve));
   if (!blob) throw new Error("PNG encoding failed");
-  downloadBlob(blob, `${name}.png`);
+  if (download) downloadBlob(blob, `${name}.png`);
   return blob;
 }

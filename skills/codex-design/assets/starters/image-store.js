@@ -71,18 +71,10 @@ export class ImageStore {
       }
       this.slots = incoming;
       if (
-        !this.source &&
+        this.sessionRequested ||
         document.querySelector('image-slot[editable="session"]')
-      ) {
-        try {
-          const saved = localStorage.getItem(this.storageKey);
-          if (saved)
-            this.slots = Object.assign(
-              this.slots,
-              imageSlots(JSON.parse(saved)),
-            );
-        } catch {}
-      }
+      )
+        this.hydrateSession();
       try {
         const retained = localStorage.getItem(this.storageKey + ":draft");
         this.retained = retained ? imageSlots(JSON.parse(retained)) : null;
@@ -97,6 +89,23 @@ export class ImageStore {
   }
   get(id) {
     return Object.hasOwn(this.slots, id) ? this.slots[id] : null;
+  }
+  enableSession() {
+    this.sessionRequested = true;
+    if (this.loaded && this.hydrateSession()) this.notify();
+  }
+  hydrateSession() {
+    if (this.source || this.sessionHydrated) return false;
+    this.sessionHydrated = true;
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      if (saved) Object.assign(this.slots, imageSlots(JSON.parse(saved)));
+      for (const [id, edit] of this.changes) {
+        if (edit.value === null) delete this.slots[id];
+        else this.slots[id] = edit.value;
+      }
+    } catch {}
+    return true;
   }
   set(id, value, session = false) {
     if (!id) return;

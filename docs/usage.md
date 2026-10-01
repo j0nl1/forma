@@ -79,6 +79,10 @@ The [platform guide](../skills/codex-design/references/platforms.md) lists every
 
 The [live file guide](../skills/codex-design/references/file-windows.md) explains `file-window.js`: physical crops of actual local HTML, missing/reappearing files, waiting pencil sketches, updates and scrollable expanded views. Copy its companion modules or bundle the loader. `files.html` demonstrates real crops, embedded updates and local pick/action events. Whole-page export settles available frames; portable HTML retains its project-file dependencies.
 
+## Compose and export social assets
+
+The [social asset guide](../skills/codex-design/references/social-assets.md) documents the separate board, four feed-card platforms and letterboxed story viewer. Bundle `social.js`, compose authored media in `post-card` or `instagram-story`, and place units in `social-frames`. The board provides actual per-format PNG and all-format ZIP downloads at the nominal dimensions in each label. `social.html` demonstrates live copy, format visibility and image-only toggles. Story uploads use the existing image source service; static session editing is explicit. Individual platform shells and full reference visual comparison remain pending.
+
 ## Replace and frame images
 
 ```sh

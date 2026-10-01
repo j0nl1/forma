@@ -173,6 +173,7 @@ export class ImageSlot extends HTMLElement {
   connectedCallback() {
     if (this.connected) return;
     this.connected = true;
+    if (this.getAttribute("editable") === "session") this.store.enableSession();
     this.controller = new AbortController();
     const on = (target, type, fn, options = {}) =>
       target.addEventListener(type, fn, {
@@ -201,6 +202,7 @@ export class ImageSlot extends HTMLElement {
   }
   attributeChangedCallback(name, before, after) {
     if (before === after) return;
+    if (name === "editable" && after === "session") this.store.enableSession();
     if (name === "src") {
       this.generation++;
       this.encoding = false;
@@ -483,6 +485,18 @@ export class ImageSlot extends HTMLElement {
       this.error ||
       (!this.legacy ? this.store.error || this.store.warning : "");
     ui.status.dataset.error = String(!!error);
+    ui.status.setAttribute(
+      "part",
+      !error &&
+        !this.notice &&
+        !this.store.retained &&
+        !this.store.sessionStatus &&
+        !this.store.saving &&
+        !this.store.source &&
+        this.getAttribute("editable") === "session"
+        ? "status status-session"
+        : "status",
+    );
     ui.message.textContent =
       error ||
       this.notice ||

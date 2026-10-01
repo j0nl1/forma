@@ -84,6 +84,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/frames.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "skills/codex-design/assets/starters/social.js"),
+    path.join(destination, "starters/social.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
