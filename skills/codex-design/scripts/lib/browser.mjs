@@ -35,6 +35,19 @@ export async function withPage(
     });
     await page.goto(url, { waitUntil: "load", timeout: 30000 });
     await page.evaluate(async () => {
+      const readiness = [window.CodexDeckReady, window.CodexCanvasReady].filter(
+        Boolean,
+      );
+      if (readiness.length)
+        await Promise.race([
+          Promise.all(readiness),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Design runtime did not initialize")),
+              8000,
+            ),
+          ),
+        ]);
       await Promise.race([
         document.fonts.ready,
         new Promise((resolve) => setTimeout(resolve, 8000)),

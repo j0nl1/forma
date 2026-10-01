@@ -5,7 +5,13 @@
       "id": "slides",
       "name": "HTML presentations",
       "reference": "references/slides.md",
-      "starters": ["assets/starters/deck.js"]
+      "starters": [
+        "assets/starters/deck.js",
+        "assets/starters/deck-runtime.js",
+        "assets/starters/deck-builds.js",
+        "assets/starters/deck-effects.js",
+        "assets/starters/deck-masks.js"
+      ]
     },
     {
       "id": "mobile-app-design",

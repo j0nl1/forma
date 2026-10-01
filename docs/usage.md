@@ -51,6 +51,12 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --canvas-file canva
 
 This explicitly enables real project saving to `canvas.design-canvas.state.json` beside the selected document. Static/public previews save in the browser and can download/import their state. Source changes invalidate obsolete hides while retaining matching edits. Focus is never persisted. Copy every companion canvas module or bundle `canvas.js` before a standalone full-page export.
 
+## HTML deck builds
+
+Follow the [deck runtime guide](../skills/codex-design/references/deck-runtime.md). Canonical `data-anim-duration` and `data-anim-delay` use milliseconds; older short aliases use seconds. The local `deck-effects.html` gallery demonstrates every effect family, directional masks and repeat/reversal. Use Replay to restart the current group. Reduced motion retains click steps; print shows authored base artwork. Complete thumbnail editing and project persistence remain pending rather than excluded.
+
+Copy all companion deck modules or bundle `deck.js` before full-page standalone export. The demo helper produces a bundled deck runtime automatically.
+
 ## Design systems
 
 Generate example outputs outside the repository:

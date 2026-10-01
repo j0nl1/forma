@@ -1,0 +1,1802 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Deck effects · Codex Design</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .effect-slide {
+        background: #f5f2e9;
+        color: #263a34;
+        padding: 56px 64px;
+        font: 18px/1.5 system-ui;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        margin: 0 0 12px;
+      }
+      h1 {
+        font:
+          68px/1.1 Georgia,
+          serif;
+        margin: 0 0 20px;
+        text-transform: capitalize;
+      }
+      .intro {
+        color: #697970;
+        font-size: 16px;
+        margin-bottom: 32px;
+      }
+      .samples {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .sample {
+        width: 260px;
+      }
+      .tile {
+        width: 260px;
+        height: 280px;
+        background: #28574b;
+        color: #f6f4e9;
+        border-radius: 5px;
+        padding: 22px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        transform: translateX(0);
+      }
+      .tile-mark {
+        font: 36px Georgia;
+        opacity: 0.45;
+      }
+      .tile strong {
+        font: 30px/1.12 Georgia;
+        letter-spacing: -0.5px;
+      }
+      .tile > span:last-child {
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        margin-top: auto;
+      }
+      .sample > p {
+        font-size: 11px;
+        color: #65776e;
+      }
+      .effect-slide footer {
+        position: absolute;
+        bottom: 28px;
+        font-size: 11px;
+        color: #718276;
+      }
+      .replay {
+        position: fixed;
+        right: 24px;
+        top: 24px;
+        z-index: 100;
+        border: 1px solid #64756c;
+        background: #eff4e8;
+        color: #263a34;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font: 13px system-ui;
+        cursor: pointer;
+      }
+      .replay:focus-visible {
+        outline: 2px solid #5fafff;
+      }
+      @media print {
+        .replay {
+          display: none;
+        }
+      }
+      :fullscreen .replay {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <deck-stage width="1280" height="720"
+      ><section
+        data-label="fade"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>fade</h1>
+        <p class="intro">
+          fade-in · fade-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fade-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">01</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fade-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fade-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">01</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fade-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fade-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">01</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fade-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fade-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">01</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fade-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="fly"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>fly</h1>
+        <p class="intro">
+          fly-in · fly-out<br />One click starts the group. Authored layout and
+          transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fly-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">02</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fly-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fly-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">02</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fly-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fly-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">02</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fly-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="fly-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">02</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>fly-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="wipe"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>wipe</h1>
+        <p class="intro">
+          wipe-in · wipe-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wipe-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">03</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wipe-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wipe-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">03</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wipe-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wipe-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">03</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wipe-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wipe-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">03</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wipe-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="float"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>float</h1>
+        <p class="intro">
+          float-in · float-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="float-in"
+              data-anim-dir="top"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">04</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>float-in · top</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="float-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">04</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>float-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="float-out"
+              data-anim-dir="top"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">04</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>float-out · top</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="float-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">04</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>float-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="split"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>split</h1>
+        <p class="intro">
+          split-in · split-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="split-in"
+              data-anim-dir="horizontal"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">05</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>split-in · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="split-in"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">05</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>split-in · vertical</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="split-out"
+              data-anim-dir="horizontal"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">05</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>split-out · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="split-out"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">05</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>split-out · vertical</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="bounce"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>bounce</h1>
+        <p class="intro">
+          bounce-in · bounce-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="bounce-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">06</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>bounce-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="bounce-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">06</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>bounce-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="bounce-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">06</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>bounce-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="bounce-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">06</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>bounce-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="zoom"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>zoom</h1>
+        <p class="intro">
+          zoom-in · zoom-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="zoom-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">07</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>zoom-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="zoom-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">07</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>zoom-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="zoom-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">07</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>zoom-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="zoom-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">07</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>zoom-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="wheel"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>wheel</h1>
+        <p class="intro">
+          wheel-in · wheel-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wheel-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">08</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wheel-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wheel-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">08</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wheel-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wheel-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">08</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wheel-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wheel-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">08</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wheel-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="random-bars"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>random bars</h1>
+        <p class="intro">
+          random-bars-in · random-bars-out<br />One click starts the group.
+          Authored layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="random-bars-in"
+              data-anim-dir="horizontal"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">09</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>random-bars-in · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="random-bars-in"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">09</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>random-bars-in · vertical</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="random-bars-out"
+              data-anim-dir="horizontal"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">09</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>random-bars-out · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="random-bars-out"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">09</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>random-bars-out · vertical</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="blinds"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>blinds</h1>
+        <p class="intro">
+          blinds-in · blinds-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="blinds-in"
+              data-anim-dir="horizontal"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">10</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>blinds-in · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="blinds-in"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">10</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>blinds-in · vertical</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="blinds-out"
+              data-anim-dir="horizontal"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">10</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>blinds-out · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="blinds-out"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">10</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>blinds-out · vertical</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="checkerboard"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>checkerboard</h1>
+        <p class="intro">
+          checkerboard-in · checkerboard-out<br />One click starts the group.
+          Authored layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="checkerboard-in"
+              data-anim-dir="horizontal"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">11</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>checkerboard-in · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="checkerboard-in"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">11</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>checkerboard-in · vertical</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="checkerboard-out"
+              data-anim-dir="horizontal"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">11</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>checkerboard-out · horizontal</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="checkerboard-out"
+              data-anim-dir="vertical"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">11</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>checkerboard-out · vertical</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="dissolve"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>dissolve</h1>
+        <p class="intro">
+          dissolve-in · dissolve-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="dissolve-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">12</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>dissolve-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="dissolve-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">12</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>dissolve-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="dissolve-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">12</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>dissolve-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="dissolve-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">12</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>dissolve-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="box"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>box</h1>
+        <p class="intro">
+          box-in · box-out<br />One click starts the group. Authored layout and
+          transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="box-in"
+              data-anim-dir="in"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">13</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>box-in · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="box-in"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">13</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>box-in · out</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="box-out"
+              data-anim-dir="in"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">13</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>box-out · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="box-out"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">13</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>box-out · out</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="circle"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>circle</h1>
+        <p class="intro">
+          circle-in · circle-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="circle-in"
+              data-anim-dir="in"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">14</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>circle-in · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="circle-in"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">14</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>circle-in · out</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="circle-out"
+              data-anim-dir="in"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">14</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>circle-out · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="circle-out"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">14</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>circle-out · out</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="diamond"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>diamond</h1>
+        <p class="intro">
+          diamond-in · diamond-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="diamond-in"
+              data-anim-dir="in"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">15</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>diamond-in · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="diamond-in"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">15</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>diamond-in · out</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="diamond-out"
+              data-anim-dir="in"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">15</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>diamond-out · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="diamond-out"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">15</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>diamond-out · out</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="plus"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>plus</h1>
+        <p class="intro">
+          plus-in · plus-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="plus-in"
+              data-anim-dir="in"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">16</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>plus-in · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="plus-in"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">16</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>plus-in · out</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="plus-out"
+              data-anim-dir="in"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">16</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>plus-out · in</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="plus-out"
+              data-anim-dir="out"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">16</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>plus-out · out</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="strips"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>strips</h1>
+        <p class="intro">
+          strips-in · strips-out<br />One click starts the group. Authored
+          layout and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="strips-in"
+              data-anim-dir="down-right"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">17</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>strips-in · down-right</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="strips-in"
+              data-anim-dir="up-left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">17</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>strips-in · up-left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="strips-out"
+              data-anim-dir="down-right"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">17</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>strips-out · down-right</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="strips-out"
+              data-anim-dir="up-left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">17</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>strips-out · up-left</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="wedge"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>wedge</h1>
+        <p class="intro">
+          wedge-in · wedge-out<br />One click starts the group. Authored layout
+          and transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wedge-in"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">18</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wedge-in · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wedge-in"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">18</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wedge-in · bottom</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wedge-out"
+              data-anim-dir="left"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">18</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wedge-out · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="wedge-out"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">18</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>wedge-out · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="appear"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>appear</h1>
+        <p class="intro">
+          appear<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="appear"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">19</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>appear · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="appear"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">19</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>appear · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="disappear"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>disappear</h1>
+        <p class="intro">
+          disappear<br />One click starts the group. Authored layout and
+          transforms remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="disappear"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">20</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>disappear · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="disappear"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">20</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>disappear · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="spin"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>spin</h1>
+        <p class="intro">
+          spin<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="spin"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">21</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>spin · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="spin"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+              data-anim-repeat="2"
+              data-anim-auto-reverse="true"
+            >
+              <span class="tile-mark">21</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>spin · bottom · 2× + reverse</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="grow"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>grow</h1>
+        <p class="intro">
+          grow<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="grow"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">22</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>grow · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="grow"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+              data-anim-repeat="2"
+              data-anim-auto-reverse="true"
+            >
+              <span class="tile-mark">22</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>grow · bottom · 2× + reverse</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="shrink"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>shrink</h1>
+        <p class="intro">
+          shrink<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="shrink"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">23</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>shrink · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="shrink"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+              data-anim-repeat="2"
+              data-anim-auto-reverse="true"
+            >
+              <span class="tile-mark">23</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>shrink · bottom · 2× + reverse</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="pulse"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>pulse</h1>
+        <p class="intro">
+          pulse<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="pulse"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">24</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>pulse · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="pulse"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">24</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>pulse · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="teeter"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>teeter</h1>
+        <p class="intro">
+          teeter<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="teeter"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">25</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>teeter · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="teeter"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+            >
+              <span class="tile-mark">25</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>teeter · bottom</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section>
+      <section
+        data-label="path"
+        data-speaker-notes="Compare both directions. Press Right or Space to play the build, then advance to the next effect. Replay starts this slide again."
+        class="effect-slide"
+      >
+        <p class="eyebrow">CODEX DESIGN / HTML BUILD EFFECTS</p>
+        <h1>path</h1>
+        <p class="intro">
+          path<br />One click starts the group. Authored layout and transforms
+          remain in place.
+        </p>
+        <div class="samples">
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="path"
+              data-anim-dir="left"
+              data-anim-trigger="click"
+              data-anim-duration="1800"
+              data-anim-path="M 0 0 C 40 -80 120 80 160 0"
+            >
+              <span class="tile-mark">26</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>path · left</p>
+          </div>
+          <div class="sample">
+            <div
+              class="tile"
+              data-anim="path"
+              data-anim-dir="bottom"
+              data-anim-trigger="with"
+              data-anim-duration="1800"
+              data-anim-path="M 0 0 C 40 -80 120 80 160 0"
+              data-anim-repeat="2"
+              data-anim-auto-reverse="true"
+            >
+              <span class="tile-mark">26</span
+              ><strong>Make room<br />for the idea.</strong
+              ><span>HARBOR / DESIGN STUDY</span>
+            </div>
+            <p>path · bottom · 2× + reverse</p>
+          </div>
+        </div>
+        <footer>
+          44 effects · Directions, click steps and held final states
+        </footer>
+      </section></deck-stage
+    ><button class="replay" id="replay">Replay this effect</button>
+    <script src="starters/deck.js"></script>
+    <script>
+      document.getElementById("replay").onclick = async () => {
+        await window.CodexDeckReady;
+        const deck = document.querySelector("deck-stage");
+        deck.buildPlayer.clear();
+        deck.show(deck.index);
+        deck.next();
+      };
+    </script>
+  </body>
+</html>

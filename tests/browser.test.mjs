@@ -25,6 +25,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "canvas.html",
     "canvas-react.html",
     "deck.html",
+    "deck-effects.html",
     "animation.html",
     "watercolor.html",
     "scenes.html",

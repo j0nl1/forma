@@ -7,7 +7,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Hi-fi, frontend direction, prototype, website | `interface.md`, `prototype.md` | Native HTML and real flows; React bundled when useful |
 | Mobile and device/browser/desktop shells | `mobile.md`, `frames.js` | Editable context, responsive content, simplified chrome |
 | Wireframes, options stack, canvas | `wireframe.md`, `canvas.md`, `canvas-components.jsx` | Sections, notes, pan/zoom, scoped persistent edits, grip reorder, navigable focus, project sidecar saves and PNG/HTML downloads; further reference comparisons pending |
-| Decks and speaker notes | `slides.md`, `deck.js` | HTML, scaling, keyboard, thumbnails, reorder/delete, builds, fullscreen, print |
+| Decks and speaker notes | `slides.md`, `deck-runtime.md`, `deck.js` | 44 effects, directional masks, timed groups, repeat/reverse, held states, navigation, notes, skip, native fullscreen and print; full thumbnail editing/persistence still pending |
 | Documents, resume, flier, trifold | `documents.md`, `document.js` | Paper layout and fold-order guidance |
 | Email | `email.md`, `email.html` | Tables and inline CSS; client compatibility requires actual client testing |
 | Social media and platform shells | `campaigns.md`, `social.js` | All named platform contexts through one generic API |
