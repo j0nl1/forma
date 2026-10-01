@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { parse, serialize } from "parse5";
 import postcss from "postcss";
 import { injectPlainCanvas } from "./plain-canvas.mjs";
+import { injectFixedSheet } from "./fixed-sheet.mjs";
 import { safeFile } from "./files.mjs";
 import {
   IMAGE_STATE_FILE,
@@ -207,5 +208,5 @@ export async function inlineHtml(input, { root: scope } = {}) {
       }
     }
   }
-  return injectPlainCanvas(serialize(doc));
+  return injectFixedSheet(await injectPlainCanvas(serialize(doc)));
 }

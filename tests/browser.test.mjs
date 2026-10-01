@@ -36,6 +36,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "objects.html",
     "document.html",
     "documents.html",
+    "sheet.html",
     "editing.html",
     "images.html",
     "platforms.html",
@@ -51,6 +52,12 @@ test("native examples load without runtime errors and fit narrow layouts", async
         assert.ok(await page.title());
         await page.screenshot({ path: path.join(dir, file + ".png") });
         await page.setViewportSize({ width: 390, height: 844 });
+        await page.waitForFunction(
+          () =>
+            !window.CodexFixedSheet?.root ||
+            CodexFixedSheet.root.getBoundingClientRect().right <=
+              innerWidth + 1,
+        );
         if (
           ![
             "document.html",

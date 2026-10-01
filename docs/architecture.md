@@ -20,7 +20,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | Data overlay | Authored `data-overlay` views, independent geometry/layout/paint/control modules, exact sentence navigation, JSON or reviewed JS source reload, local request drafts and scoped opacity restoration |
 | Images | Modular `image-slot.js`, source id / legacy storage-key interfaces, shared directory sidecar, top-layer framing and embedded portable state |
 | Text editor | Literal HTML text-run bindings, response-only identity marks, local source saves, conflict-retained drafts and actual undo/redo |
-| Documents | Native `doc-page`, editable geometry/style/print modules, flow/fixed/explicit/fit modes, automatically fitted true-size screen sheets, repeating running slots and temporary paper choices for local PDF/native print |
+| Documents | Native `doc-page`, editable geometry/style/print modules, flow/fixed/explicit/fit modes, automatically fitted true-size screen sheets, repeating running slots and temporary paper choices for local PDF/native print; raw fixed HTML uses an independent detector and screen-only presentation with actual border-box PDF sizing |
 | 3D | Bundled `three-d-stage` and compatibility `three-stage`, pinned local Three.js, editable resource/naming/export/style modules, studio shadows, lifecycle retention and local export result events |
 | Platforms | Separate iOS/Android/Chrome/macOS React primitives, pinned fixed HTML shells, retained child nodes and native exact-size asset snapshot exports |
 | Social assets | Owned board label layer, slotted feed/story and eight distinct platform phone compositions, shared physical-device/image modules, image-source integration and scoped nominal PNG / ZIP downloads through bundled `social.js`; authored React campaign units add the complete fourteen-placement roster and grouped format controls |
@@ -31,7 +31,7 @@ Native DOM starters are classic scripts except the explicitly bundled 3D module 
 
 ## Tools
 
-- `preview.mjs`: loopback HTTP, host validation, traversal and realpath checks; metadata-marked HTML receives the independently bundled plain-canvas runtime in its response.
+- `preview.mjs`: loopback HTTP, host validation, traversal and realpath checks; metadata-marked HTML receives the independently bundled plain-canvas runtime in its response; eligible raw HTML receives fixed-sheet detection without rewriting source.
 - `project.mjs`: preserve metadata while registering assets.
 - `design-system.mjs`: read-only inspection, compilation, review generation, hashed portable bindings.
 - `figma.mjs`: offline inventory, raw mount, selected HTML, and system extraction.

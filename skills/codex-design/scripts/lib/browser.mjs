@@ -43,6 +43,7 @@ export async function withPage(
         window.CodexOverlayReady,
         window.Codex3DReady,
         window.CodexDocumentReady,
+        window.CodexFixedSheetReady,
         window.CodexTextReady,
         window.CodexImagesReady,
         window.CodexFramesReady,

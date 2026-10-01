@@ -65,6 +65,11 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
+    path.join(root, "skills/codex-design/assets/starters/fixed-sheet.js"),
+    path.join(destination, "starters/fixed-sheet.js"),
+    { overwrite: true },
+  );
+  await bundle(
     path.join(root, "skills/codex-design/assets/starters/text-editor.js"),
     path.join(destination, "starters/text-editor.js"),
     { overwrite: true },

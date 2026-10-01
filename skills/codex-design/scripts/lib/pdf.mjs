@@ -13,7 +13,7 @@ export async function renderPdf(page, output, options = {}) {
     async ({ settings, size }) => {
       if (window.CodexDocument && document.querySelector("doc-page"))
         await window.CodexDocument.preparePrint(settings);
-      else if (size) {
+      else if (!(await window.CodexFixedSheet?.preparePrint()) && size) {
         const rule = document.createElement("style");
         rule.id = "codex-pdf-paper-choice";
         rule.dataset.codexInjected = "";
@@ -42,6 +42,7 @@ export async function renderPdf(page, output, options = {}) {
   } finally {
     await page.evaluate(() => {
       window.CodexDocument?.restorePrint();
+      window.CodexFixedSheet?.restorePrint();
       document.getElementById("codex-pdf-paper-choice")?.remove();
     });
   }
