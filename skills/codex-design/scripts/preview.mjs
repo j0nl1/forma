@@ -107,6 +107,7 @@ export async function serve(root, port = 4311, { motionFile } = {}) {
               "deviceScaleFactor",
               "startMs",
               "endMs",
+              "audio",
             ]);
             if (Object.keys(value).some((key) => !allowed.has(key)))
               throw new Error("Unexpected export option");

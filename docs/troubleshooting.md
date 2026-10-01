@@ -13,7 +13,7 @@
 | PDF clips | Set paper dimensions and print rules, then inspect all exported pages. |
 | Video bridge missing | Mount one `CompositionStage`, or configure an existing `motion-stage`, exposing `window.codexTimeline`; custom bridges can be selected through export configuration. |
 | Video fails | Check Chromium, FFmpeg, runtime errors, even dimensions, duration <=300 seconds, fps 1..60. |
-| Video silent | This is the documented export behavior. Mix audio explicitly afterward when requested. |
+| Video silent | Choose MP4/WebM with audio enabled. Check that media is inside the export root, has source range markers and a real audio stream, and its volume is nonzero. GIF and `--audio none` are silent. Live Web Audio is not automatically recorded. |
 | Figma name ambiguous | Use the stable node id from `outline`. |
 | Figma visual differences | Read warnings and reconcile unsupported properties against a real export. |
 | System check fails | Fix paths, identifiers, token alias cycles, missing inputs, or remote CSS. Check is read-only. |

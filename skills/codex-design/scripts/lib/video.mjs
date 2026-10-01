@@ -2,6 +2,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { createHash } from "node:crypto";
+import { createAudioExport, readAudioTracks } from "./audio.mjs";
 
 export function videoOptions(options = {}) {
   const value = {
@@ -10,6 +11,7 @@ export function videoOptions(options = {}) {
     deviceScaleFactor: 2,
     bridgeGlobal: "codexTimeline",
     captureParam: "capture",
+    audio: "auto",
     ...options,
   };
   for (const key of [
@@ -25,6 +27,8 @@ export function videoOptions(options = {}) {
     if (value[key] !== undefined) value[key] = Number(value[key]);
   if (!Number.isInteger(value.fps) || value.fps < 1 || value.fps > 60)
     throw new Error("fps must be an integer between 1 and 60");
+  if (!["auto", "none"].includes(value.audio))
+    throw new Error("audio must be auto or none");
   if (!Number.isInteger(value.crf) || value.crf < 0 || value.crf > 51)
     throw new Error("crf must be an integer between 0 and 51");
   if (
@@ -196,9 +200,16 @@ export async function renderVideo(page, errors, output, temporary, options) {
     encoder.on("close", (code) => resolve(code)),
   );
   const frames = Math.max(1, Math.ceil(((end - start) / 1000) * fps));
+  const audioJob = createAudioExport({ format: ext, audio: options.audio });
+  let mediaState, audioResult;
   let previousHash,
     duplicates = 0;
   try {
+    if (options.audio !== "none")
+      mediaState = await page.evaluateHandle(() => ({
+        ids: new WeakMap(),
+        next: 0,
+      }));
     for (let i = 0; i < frames; i++) {
       if (failure) throw failure;
       await page.evaluate(
@@ -273,6 +284,18 @@ export async function renderVideo(page, errors, output, temporary, options) {
         { name: bridgeGlobal, time: start / 1000 + i / fps },
       );
       if (errors.length) throw new Error(errors.join("; "));
+      if (mediaState) {
+        const tracks = await page.evaluate(readAudioTracks, {
+          state: mediaState,
+          bridgeGlobal,
+        });
+        await audioJob.record(
+          page,
+          tracks,
+          start / 1000 + i / fps,
+          Math.min(end / 1000, start / 1000 + (i + 1) / fps),
+        );
+      }
       const png = await page.screenshot({ type: "png" });
       const hash = createHash("sha256").update(png).digest("hex");
       if (hash === previousHash) duplicates++;
@@ -291,10 +314,21 @@ export async function renderVideo(page, errors, output, temporary, options) {
     const code = await completion;
     if (failure || code !== 0)
       throw new Error(`FFmpeg failed: ${failure?.message ?? diagnostic}`);
+    audioResult = await audioJob.mix(page, temporary, {
+      start: start / 1000,
+      duration: frames / fps,
+      compositionDuration: Math.max(duration, frames / fps),
+    });
   } catch (error) {
-    encoder.kill();
+    // FFmpeg can be blocked probing an empty input pipe before frame zero.
+    // Closing stdin and killing this owned child guarantees failure cleanup.
+    encoder.stdin.destroy();
+    encoder.kill("SIGKILL");
     await completion;
     throw error;
+  } finally {
+    await audioJob.dispose();
+    await mediaState?.dispose();
   }
   if (frames > 1 && duplicates / (frames - 1) >= 0.8)
     flags.push({
@@ -329,7 +363,9 @@ export async function renderVideo(page, errors, output, temporary, options) {
     endMs: end,
     deviceScaleFactor,
     crf,
-    audio: false,
-    flags,
+    audio: audioResult.audio,
+    audioTracks: audioResult.audioTracks,
+    audioSegments: audioResult.audioSegments,
+    flags: [...flags, ...audioResult.flags],
   };
 }

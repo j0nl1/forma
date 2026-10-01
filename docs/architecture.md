@@ -28,6 +28,7 @@ Native DOM starters are classic scripts except the explicitly bundled 3D module.
 - `figma.mjs`: offline inventory, raw mount, selected HTML, and system extraction.
 - `build.mjs`: local JSX/TSX/module bundling.
 - `export.mjs`: parsed HTML/CSS inlining, Chromium PDF/PNG, deterministic video.
+- `lib/audio.mjs`: frame-grid media inventory, temporary local source snapshots, source-range/pitch-preserving loops and AAC/Opus mixing; the final video stream is copied during muxing.
 - `verify.mjs`: runtime and screenshot probes, not semantic flow verification.
 - `tools/install.mjs`: staged local copy and conflict-aware managed update.
 

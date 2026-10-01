@@ -214,6 +214,7 @@ function useInlineFonts(svg) {
 
 function ExportPanel({ duration, onExport, busy }) {
   const [format, setFormat] = React.useState("mp4");
+  const [includeAudio, setIncludeAudio] = React.useState(true);
   const [fps, setFps] = React.useState(30),
     [crf, setCrf] = React.useState(18),
     [scale, setScale] = React.useState(2);
@@ -231,14 +232,26 @@ function ExportPanel({ duration, onExport, busy }) {
           deviceScaleFactor: scale,
           startMs: start * 1000,
           endMs: Math.min(end, duration) * 1000,
+          audio: includeAudio && format !== "gif" ? "auto" : "none",
         });
       }}
     >
       <strong>Video export</strong>
       <p className="cd-help">
-        Render the saved composition locally. Video is silent.
+        Render the saved composition locally. MP4 and WebM can include marked
+        media audio.
       </p>
       <div className="cd-section-fields">
+        <label>
+          <span>Include marked media audio</span>
+          <input
+            aria-label="Include marked media audio"
+            type="checkbox"
+            checked={includeAudio}
+            disabled={format === "gif" || busy}
+            onChange={(event) => setIncludeAudio(event.target.checked)}
+          />
+        </label>
         <label>
           Format
           <select

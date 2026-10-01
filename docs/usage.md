@@ -25,7 +25,7 @@ codebase, compile it, and verify a review page with real component states.
 
 ```text
 Use $codex-design to create a 12-second product walkthrough at 1280 by 720.
-Provide timeline controls, inspect scene boundaries, and export silent MP4.
+Provide timeline controls, inspect scene boundaries, and export MP4 with marked media audio.
 ```
 
 For follow-up changes, refer to the same artifact. Browser tweaks and timing edits are session changes: download JSON or ask Codex to apply them to source.
@@ -81,7 +81,7 @@ node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animatio
 node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/section.mp4 --start-ms 2000 --end-ms 4000 --scale 2 --crf 18
 ```
 
-Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports block remote subresources. Existing outputs are refused. Video is silent. Inspect PDF pages for print fidelity.
+Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports block remote subresources. Existing outputs are refused. MP4/WebM can retain marked media audio; `--audio none` and GIF are silent. Inspect PDF pages for print fidelity.
 
 ## Build React or 3D source
 

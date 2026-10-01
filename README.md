@@ -40,7 +40,7 @@ The installer copies inspected local files. It does not fetch a remote project, 
 - Independently written starters with native local controls, continuous composition, scene/sprite authoring, and deterministic watercolor painting.
 - Read-only design-system inspection, compilation, portable imports, and review pages.
 - Offline Figma inventory and materialization with explicit fidelity warnings.
-- A loopback preview server, browser verification, standalone HTML, PDF, PNG, and silent MP4/WebM/GIF export.
+- A loopback preview server, browser verification, standalone HTML, PDF, PNG, and MP4/WebM/GIF export with optional marked-media audio.
 - Pinned package versions and lockfiles, meaningful tests, and runnable examples.
 
 See the [capability map](docs/capabilities.md) for retained workflows, exclusions, and differences. This is a new implementation and file format, not binary or source compatibility with the reference project.

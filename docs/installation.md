@@ -1,6 +1,6 @@
 # Installation
 
-Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and native HTML starters have no package dependency. Node.js 22+ enables helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed only for video.
+Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and native HTML starters have no package dependency. Node.js 22+ enables helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio.
 
 The [official skill documentation](https://developers.openai.com/codex/skills) describes `SKILL.md` discovery. The inspected local Codex loader supports project and user `.agents/skills` roots. UI metadata lives in `agents/openai.yaml`.
 
@@ -45,7 +45,7 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-Use the project installation folder instead when applicable. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed.
+Use the project installation folder instead when applicable. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio.
 
 For macOS-specific operations in the maintained workspace, use `ssh sirius`. Other users should follow their own host instructions.
 

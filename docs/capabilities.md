@@ -14,7 +14,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Data science, charts, diagrams, maps | `data.md`, `chart.js`, `sources.js` | Source-driven analysis, local SVG charts and tables; supplied/configured geography |
 | Research and sourced overlays | `research.md`, `sources.js` | Live sources through Codex, local citations |
 | Animation and video | `motion.md`, `animations.jsx`, `scene-components.jsx` | Continuous composition and older sprite/scene APIs, authored cues/local time, persistent shots, captions, frozen scene overlap, local editor, timing write-back, deterministic seek and decoded nested-video export |
-| Sound | `motion.md` | Web Audio guidance and explicit post-export audio mixing |
+| Sound | `motion.md`, `exports.md`, `lib/audio.mjs` | Marked media loops/ranges/speed, multi-clip local mixing and actual AAC/Opus output; interactive Web Audio guidance |
 | Watercolor | `watercolor.md`, `watercolor-kit.js`, `watercolor-components.jsx` | Seeded paper, all nine painting operations, six shapes, pigments, weighted seek, cropped layers, baked frames, live replay and authored-time React reveals |
 | 3D | `three-stage.js` | Orbit, framing, lighting, GLB loading, GLB/OBJ download |
 | Create/use/import systems | `design-system.mjs` | Check, compile, review, hashed local binding; new explicit schema |
@@ -22,7 +22,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Offline Figma | `figma.mjs` | Raw/ZIP, deflate/Zstd, inventory, mount, selected HTML and system extraction |
 | GitHub and HTML imports | `imports.md` | Read-only source analysis and explicit conversion |
 | Standalone, PDF, PNG | `export.mjs` | Structured local inlining, Chromium print/capture |
-| MP4/WebM/GIF | `export.mjs` | Deterministic silent video through FFmpeg |
+| MP4/WebM/GIF | `export.mjs` | Deterministic video through FFmpeg, optional marked-media audio in MP4/WebM, GIF without audio |
 | Figma, Canva, implementation handoff | `exports.md` | Real authorized connector, or clearly identified local handoff |
 | Images, PDF input, model interactions | `assets-ai.md` | Actual Codex tools, source provenance, configured backend or labeled simulation |
 | Feedback, experiments, tweaks protocols | `review.md`, `controls.js` | Local CSS controls, variants, reset, download; no host injection |
@@ -36,7 +36,7 @@ Figma rendering supports saved geometry, common solid/image fills, text, transfo
 
 The deck implements common entrance and path builds, with expanded browser equivalents for the reference vocabulary. Timing follows local click/with/after sequencing; it does not export native PowerPoint semantics. Social/device shells remain smaller implementations. The full watercolor operations and layer contracts have been restored, but independently generated brush texture has not passed reference visual comparison yet. For an exact artifact recreation, reconcile these differences against supplied visual references.
 
-Connectors are conditional on the current Codex environment. The package does not invent services, bundle credentials, or claim transfers that did not happen. Video output is silent, with optional explicit later mixing.
+Connectors are conditional on the current Codex environment. The package does not invent services, bundle credentials, or claim transfers that did not happen. Video export can mix marked local media audio; arbitrary live Web Audio and unmarked playback are not recorded.
 
 ## Migrate an existing project
 

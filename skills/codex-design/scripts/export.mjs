@@ -66,10 +66,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--end-ms": "value",
       "--scale": "value",
       "--bridge": "value",
+      "--audio": "value",
     });
     if (positional.length !== 3)
       throw new Error(
-        "Usage: node export.mjs html|pdf|png|video <input-path-or-loopback-url> <output> [--config video.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline]",
+        "Usage: node export.mjs html|pdf|png|video <input-path-or-loopback-url> <output> [--config video.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none]",
       );
     const config = flags.config
       ? await readJson(path.resolve(flags.config))
@@ -81,6 +82,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "end-ms": "endMs",
       scale: "deviceScaleFactor",
       bridge: "bridgeGlobal",
+      audio: "audio",
     }))
       if (flags[flag] !== undefined) config[key] = flags[flag];
     console.log(JSON.stringify(await exportArtifact(...positional, config)));
