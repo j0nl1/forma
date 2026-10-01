@@ -7,6 +7,7 @@ import { args, main, exists, write, readJson } from "./lib/files.mjs";
 import { inlineHtml } from "./lib/inline.mjs";
 import { withPage } from "./lib/browser.mjs";
 import { videoOptions, renderVideo } from "./lib/video.mjs";
+import { renderPdf } from "./lib/pdf.mjs";
 
 export async function exportArtifact(mode, input, output, options = {}) {
   output = path.resolve(output);
@@ -30,12 +31,7 @@ export async function exportArtifact(mode, input, output, options = {}) {
       input,
       async (page, errors) => {
         if (mode === "pdf") {
-          await page.emulateMedia({ media: "print" });
-          await page.pdf({
-            path: temporary,
-            printBackground: true,
-            preferCSSPageSize: true,
-          });
+          await renderPdf(page, temporary, options);
           return {};
         }
         if (mode === "png") {
@@ -67,10 +63,12 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--scale": "value",
       "--bridge": "value",
       "--audio": "value",
+      "--paper": "value",
+      "--orientation": "value",
     });
     if (positional.length !== 3)
       throw new Error(
-        "Usage: node export.mjs html|pdf|png|video <input-path-or-loopback-url> <output> [--config video.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none]",
+        "Usage: node export.mjs html|pdf|png|video <input-path-or-loopback-url> <output> [--config video.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none] [--paper letter|a4|legal] [--orientation portrait|landscape]",
       );
     const config = flags.config
       ? await readJson(path.resolve(flags.config))
@@ -83,6 +81,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       scale: "deviceScaleFactor",
       bridge: "bridgeGlobal",
       audio: "audio",
+      paper: "paper",
+      orientation: "orientation",
     }))
       if (flags[flag] !== undefined) config[key] = flags[flag];
     console.log(JSON.stringify(await exportArtifact(...positional, config)));

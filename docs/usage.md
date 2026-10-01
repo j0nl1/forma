@@ -107,7 +107,7 @@ The showcase is a collection of working examples, not the skill's product interf
 
 ```sh
 node skills/codex-design/scripts/export.mjs html designs/reader/index.html /tmp/reader.html
-node skills/codex-design/scripts/export.mjs pdf http://127.0.0.1:4311/ /tmp/reader.pdf
+node skills/codex-design/scripts/export.mjs pdf http://127.0.0.1:4311/ /tmp/reader.pdf --paper a4
 node skills/codex-design/scripts/export.mjs png http://127.0.0.1:4311/ /tmp/reader.png
 node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/walkthrough.mp4 --fps 30
 node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/section.mp4 --start-ms 2000 --end-ms 4000 --scale 2 --crf 18
@@ -136,3 +136,5 @@ node skills/codex-design/scripts/project.mjs record designs/reader cover.png --t
 General interactive charts use the [chart stage contract](../skills/codex-design/references/charts.md) and pinned local D3/Sankey dependencies. Open `charts.html` in the showcase to try wheel/pinch zoom, exact-value tooltips, data updates, explicit empty states and actual SVG/2× PNG downloads. `data.html` retains the basic bar/line API.
 
 The [data overlay guide](../skills/codex-design/references/data-overlay.md) documents live metric/feedback annotations, exact authored-view switching, provenance, reloads and local review drafts. Open `overlay.html` to inspect the explicitly synthetic fixture, turn paint/chrome on and off, and test modal occlusion. Real products require measured values and a reproducible analytics source.
+
+The [document guide](../skills/codex-design/references/documents.md) distinguishes flowing text, explicit pages, true-size designs and scaled-fit layouts. `documents.html` exercises all four contracts, running slots and native print; PDF export accepts `--paper letter|a4|legal` and `--orientation portrait|landscape`.

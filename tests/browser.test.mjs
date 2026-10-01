@@ -35,13 +35,14 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "overlay.html",
     "objects.html",
     "document.html",
+    "documents.html",
   ])
     await t.test(file, async () => {
       await withPage(url + file, async (page) => {
         assert.ok(await page.title());
         await page.screenshot({ path: path.join(dir, file + ".png") });
         await page.setViewportSize({ width: 390, height: 844 });
-        if (!["document.html"].includes(file))
+        if (!["document.html", "documents.html"].includes(file))
           assert.equal(
             await page.evaluate(
               () => document.documentElement.scrollWidth > innerWidth + 1,

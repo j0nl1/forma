@@ -40,7 +40,13 @@
       "id": "document",
       "name": "Document",
       "reference": "references/documents.md",
-      "starters": ["assets/starters/document.js"]
+      "starters": [
+        "assets/starters/document.js",
+        "assets/starters/document-runtime.js",
+        "assets/starters/document-model.js",
+        "assets/starters/document-style.js",
+        "assets/starters/document-print.js"
+      ]
     },
     {
       "id": "animation",
@@ -73,7 +79,13 @@
       "id": "resume",
       "name": "Resume",
       "reference": "references/documents.md",
-      "starters": ["assets/starters/document.js"]
+      "starters": [
+        "assets/starters/document.js",
+        "assets/starters/document-runtime.js",
+        "assets/starters/document-model.js",
+        "assets/starters/document-style.js",
+        "assets/starters/document-print.js"
+      ]
     },
     {
       "id": "3d-object",
@@ -145,7 +157,13 @@
       "id": "flier",
       "name": "Flier",
       "reference": "references/documents.md",
-      "starters": ["assets/starters/document.js"]
+      "starters": [
+        "assets/starters/document.js",
+        "assets/starters/document-runtime.js",
+        "assets/starters/document-model.js",
+        "assets/starters/document-style.js",
+        "assets/starters/document-print.js"
+      ]
     }
   ]
 }

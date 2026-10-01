@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Paper laboratory — Codex Design</title>
+    <style>
+      body {
+        margin: 0;
+        color: #263c34;
+        background: #f5f5f4;
+        font: 15px/1.6 system-ui;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .controls {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 20px;
+        background: #fffdf8;
+        border-bottom: 1px solid #d1d7ce;
+      }
+      .controls a {
+        color: inherit;
+        margin-right: auto;
+      }
+      .controls label {
+        font-size: 12px;
+      }
+      .controls select,
+      .controls button {
+        padding: 7px 10px;
+        border: 1px solid #b2bdb2;
+        border-radius: 5px;
+        background: white;
+        color: inherit;
+        font: inherit;
+      }
+      .instructions {
+        margin: 0;
+        padding: 18px 24px 0;
+        max-width: 70em;
+        font-size: 13px;
+      }
+      doc-page {
+        font:
+          15px/1.65 Georgia,
+          serif;
+        color: #243c34;
+      }
+      h1 {
+        font:
+          42px/1.08 Georgia,
+          serif;
+        font-weight: 400;
+      }
+      h2 {
+        font:
+          24px/1.2 Georgia,
+          serif;
+        font-weight: 400;
+      }
+      p {
+        margin: 1em 0;
+      }
+      .eyebrow {
+        font: 11px/1.5 system-ui;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .running {
+        font: 11px/1.5 system-ui;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid #c7d2c6;
+      }
+      .footer {
+        font: 11px/1.5 system-ui;
+        color: #647263;
+      }
+      .page {
+        padding: 5%;
+        font-family: system-ui;
+      }
+      .flier {
+        background: #e4efd7;
+        color: #264638;
+      }
+      .flier h1 {
+        font-size: 10cqh;
+        line-height: 1;
+      }
+      .flier .event {
+        font-size: 3cqh;
+      }
+      .flier .circle {
+        width: 24cqh;
+        height: 24cqh;
+        border-radius: 50%;
+        background: #d5ab65;
+        margin: 4cqh 0;
+      }
+      .brochure {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 0;
+        background: #faf7ed;
+      }
+      .brochure article {
+        position: relative;
+        padding: 8%;
+        border-right: 1px dashed #8e9d90;
+      }
+      .brochure article:last-child {
+        border: 0;
+        background: #234b3d;
+        color: #faf7ed;
+      }
+      .brochure h1 {
+        font-size: 7cqh;
+      }
+      .brochure h2 {
+        font-size: 5cqh;
+      }
+      .brochure p {
+        font-size: 2.7cqh;
+      }
+      .poster {
+        padding: 6%;
+        background: #234b3d;
+        color: #fffaf0;
+      }
+      .poster h1 {
+        font-size: 14cqh;
+      }
+      .poster p {
+        font-size: 4cqh;
+      }
+      .fit-design {
+        position: relative;
+        width: 1400px;
+        height: 990px;
+        padding: 80px;
+        background: #e4efd7;
+      }
+      .fit-design h1 {
+        font-size: 120px;
+        max-width: 7em;
+      }
+      .fit-design .bottom {
+        position: absolute;
+        left: 80px;
+        bottom: 60px;
+        font: 28px system-ui;
+      }
+      @media print {
+        .brochure article {
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="controls"
+      data-doc-controls
+      aria-label="Document preview controls"
+    >
+      <a href="index.html">← All studies</a>
+      <label
+        >Layout
+        <select id="mode">
+          <option value="flow">Flowing report</option>
+          <option value="flier">One-page flier</option>
+          <option value="brochure">Two-sided trifold</option>
+          <option value="poster">True-size poster</option>
+          <option value="fit">Fit a fixed design</option>
+        </select></label
+      >
+      <label
+        >Paper
+        <select id="paper">
+          <option value="letter">Letter</option>
+          <option value="a4">A4</option>
+          <option value="legal">Legal</option>
+        </select></label
+      >
+      <button id="print">Print / Save PDF</button>
+    </nav>
+    <p class="instructions" data-doc-controls id="instructions">
+      Flowing text uses your chosen paper at print. Running headers and footers
+      repeat on every sheet. Sample content describes a fictional study.
+    </p>
+    <doc-page></doc-page>
+    <template id="flow">
+      <header class="running" slot="header">
+        HARBOR / DESIGN RECORD · SYNTHETIC STUDY
+      </header>
+      <h1>A clearer place to return.</h1>
+      <p class="eyebrow">15 / Paper laboratory</p>
+      <p>
+        This fictional reading-product study demonstrates a flowing document.
+        Its content is illustrative, not research evidence or a claim about real
+        users.
+      </p>
+      <h2>The purpose</h2>
+      <p>
+        Help a reader save an article, give it a useful name and find it again.
+        The product's main screen should make the next action visible without
+        competing with the collection itself.
+      </p>
+      <h2>Content and structure</h2>
+      <p>
+        Each saved item includes its title, source, reading state and a short
+        note. An explicit empty state explains how to begin, and errors retain
+        the user's input. The layout should accommodate long titles and larger
+        text.
+      </p>
+      <h2>Interaction</h2>
+      <p>
+        Keyboard focus follows the visible reading order. Filters expose their
+        selected state, and clearing them restores the full collection. A reader
+        can return from an article to the same place in the list.
+      </p>
+      <h2>Review the complete flow</h2>
+      <p>
+        Exercise creation, validation, editing, search and recovery before
+        evaluating individual screens. An attractive first screen does not
+        establish that the whole experience works.
+      </p>
+      <h2>Print as a real document</h2>
+      <p>
+        Paragraphs flow across sheets using the selected physical paper. Running
+        content stays separate from the body. Tables need header rows, figures
+        need captions and short grouped notes should stay together.
+      </p>
+      <h2 style="break-before: page">Verification appendix</h2>
+      <p>
+        This section intentionally starts a new page. Check that its running
+        header and footer remain visible, and that the preceding text is not
+        duplicated or truncated.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th align="left">Scenario</th>
+            <th align="left">Expected result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Empty collection</td>
+            <td>One clear first action</td>
+          </tr>
+          <tr>
+            <td>Invalid input</td>
+            <td>Retained text and a precise error</td>
+          </tr>
+          <tr>
+            <td>Long title</td>
+            <td>Readable wrapping</td>
+          </tr>
+          <tr>
+            <td>Keyboard return</td>
+            <td>Restored focus</td>
+          </tr>
+        </tbody>
+      </table>
+      <footer class="footer" slot="footer">
+        Illustrative content · Local HTML · Original scale
+      </footer>
+    </template>
+    <template id="flier"
+      ><section class="page flier">
+        <p class="eyebrow">Fictional community event</p>
+        <h1>Bring a book.<br />Leave with a story.</h1>
+        <div class="circle" aria-hidden="true"></div>
+        <p class="event">
+          Reading exchange<br />Saturday · 11:00–14:00<br />Harbor Hall · Free
+          entry
+        </p>
+        <p>Demonstration copy only. No real event or booking is advertised.</p>
+      </section></template
+    >
+    <template id="brochure"
+      ><section class="page brochure">
+        <article>
+          <p class="eyebrow">Outside / Inside flap</p>
+          <h2>Start with one good article.</h2>
+          <p>
+            Keep its source, add a short note and return when you have time.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Outside / Back cover</p>
+          <h2>A fictional reading room.</h2>
+          <p>
+            Illustrative product content. This brochure demonstrates panel
+            order, page geometry and print-safe design.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Outside / Front cover</p>
+          <h1>Keep what stays with you.</h1>
+          <p>Harbor / Reading room</p>
+        </article>
+      </section>
+      <section class="page brochure">
+        <article>
+          <p class="eyebrow">Inside / Left</p>
+          <h2>Collect.</h2>
+          <p>
+            Save an article with its original source and a title that remains
+            readable.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Inside / Middle</p>
+          <h2>Connect.</h2>
+          <p>Add a note explaining what you want to remember.</p>
+        </article>
+        <article>
+          <p class="eyebrow">Inside / Right</p>
+          <h2>Return.</h2>
+          <p>Find the idea again through a quiet, useful collection.</p>
+        </article>
+      </section></template
+    >
+    <template id="poster"
+      ><section class="page poster">
+        <p class="eyebrow">Explicit 22 × 30 in design</p>
+        <h1>Room<br />to read.</h1>
+        <p>A fictional poster.<br />Printed at its actual dimensions.</p>
+      </section></template
+    >
+    <template id="fit"
+      ><div class="fit-design">
+        <p class="eyebrow">Authored at 1400 × 990 px</p>
+        <h1>One design.<br />A different sheet.</h1>
+        <p class="bottom">
+          Scaled to the printable area · Full composition retained
+        </p>
+      </div></template
+    >
+    <script src="starters/document.js"></script>
+    <script src="documents.js"></script>
+  </body>
+</html>
