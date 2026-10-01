@@ -99,6 +99,10 @@ await document.querySelector("social-frames").exportAll();
 
 An explicit frame must belong to that board and be visible. Completed exports emit bubbling/composed `social-frames:export` with `{ name, frames: [{ label, width, height, name }] }`. Errors emit `social-frames:error` with `{ message }`. `frames()` exposes the current visible candidates. These replace hosted export requests with actual browser downloads, usable without embedding the page in another app.
 
+## Complete campaigns
+
+Use the [campaign guide](campaigns.md#complete-social-campaign) for the full fourteen-placement roster, platform selection rules, typed Formats/Display controls, conditional units, grouped carousel and actual project/portable delivery. `CampaignBoard` composes authored units over this board runtime; the individual components remain independently usable.
+
 ## Verification and remaining work
 
 Tests cover all four feed defaults and anatomies, literal input, Facebook-only links, Reddit votes, image-only false/presence/true, live attributes, retained inputs/actions, physical story/letterbox geometry, attribution forwarding, late-slot browser storage and actual source-sidecar uploads/reloads, board visibility/conditional rescans, scaled labels, reconnect/clones, scoped ownership, correct per-frame selection, duplicate ZIP names, real decoded nominal PNG bytes, dressing removal, authored pseudo-element artwork, failure/retry, standalone runtime removal and React reconciliation.

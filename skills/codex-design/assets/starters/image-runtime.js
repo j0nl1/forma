@@ -154,6 +154,11 @@ export class ImageSlot extends HTMLElement {
         !!this.store.endpoint)
     );
   }
+  set editable(value) {
+    if (value === null || value === undefined || value === false)
+      this.removeAttribute("editable");
+    else this.setAttribute("editable", String(value));
+  }
   get filled() {
     return this.hasAttribute("data-filled");
   }

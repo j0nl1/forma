@@ -85,6 +85,9 @@ The [live file guide](../skills/codex-design/references/file-windows.md) explain
 
 The [social asset guide](../skills/codex-design/references/social-assets.md) documents the separate board, four feed-card platforms and letterboxed story viewer. Bundle `social.js`, compose authored media in `post-card` or `instagram-story`, and place units in `social-frames`. The board provides actual per-format PNG and all-format ZIP downloads at the nominal dimensions in each label. `social.html` demonstrates live copy, format visibility and image-only toggles. Story uploads use the existing image source service; static session editing is explicit. The [social phone screen guide](../skills/codex-design/references/social-phone-shells.md) documents all eight restored platform screens, including every attribute and aspect variant. `social-shells.html` demonstrates their live copy/aspect/image-only changes, source-compatible image editors and real PNG/ZIP downloads. `social-feeds.html` demonstrates Facebook, LinkedIn, Pinterest, Reddit and YouTube, including the three square variants and viewer controls omitted from downloads. Full reference visual comparison remains pending.
 
+`campaign.html` demonstrates the complete fourteen-placement roster with typed Formats/Display toggles and an optional five-frame carousel. The [campaign guide](../skills/codex-design/references/campaigns.md) explains platform selection, author-owned unit callbacks and actual source/portable delivery. Use `--tweaks-file campaign.html --image-file campaign.html` together to retain format flags in the HTML and all uploaded images in the directory sidecar. JSX image/font module imports are embedded by the build helper; arbitrary runtime URL strings still require localization.
+
+
 ## Replace and frame images
 
 ```sh

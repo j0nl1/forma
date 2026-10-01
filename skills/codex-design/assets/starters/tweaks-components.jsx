@@ -61,10 +61,14 @@ export function TweaksPanel({
   useLayoutEffect(() => {
     const host = document.createElement("div");
     host.dataset.codexTweaksChrome = "";
+    host.setAttribute("data-codex-chrome", "");
     host.className = "export-hidden";
     if (new URLSearchParams(location.search).has("capture")) host.hidden = true;
     const root = host.attachShadow({ mode: "open" });
-    document.body.append(host);
+    (document.documentElement.hasAttribute("data-codex-plain-canvas")
+      ? document.documentElement
+      : document.body
+    ).append(host);
     setShadow(root);
     return () => host.remove();
   }, []);

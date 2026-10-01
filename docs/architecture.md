@@ -23,7 +23,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | Documents | Native `doc-page`, editable geometry/style/print modules, flow/fixed/explicit/fit modes, repeating running slots and temporary paper choices for local PDF/native print |
 | 3D | Bundled `three-d-stage` and compatibility `three-stage`, pinned local Three.js, editable resource/naming/export/style modules, studio shadows, lifecycle retention and local export result events |
 | Platforms | Separate iOS/Android/Chrome/macOS React primitives, pinned fixed HTML shells, retained child nodes and native exact-size asset snapshot exports |
-| Social assets | Owned board label layer, slotted feed/story and eight distinct platform phone compositions, shared physical-device/image modules, image-source integration and scoped nominal PNG / ZIP downloads through bundled `social.js` |
+| Social assets | Owned board label layer, slotted feed/story and eight distinct platform phone compositions, shared physical-device/image modules, image-source integration and scoped nominal PNG / ZIP downloads through bundled `social.js`; authored React campaign units add the complete fourteen-placement roster and grouped format controls |
 | Live file windows | Modular `file-window.js`, actual local existence/rewrite probes, inert physical crops, pending sketches, native update events and measured expanded views |
 | Component gallery | Ordinary local `.dc.html`, without hosted import protocol |
 

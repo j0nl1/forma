@@ -94,6 +94,11 @@ export async function prepareDemo(destination) {
     path.join(destination, "starters/plain-canvas.js"),
     { overwrite: true },
   );
+  await bundle(
+    path.join(root, "examples/campaign/main.jsx"),
+    path.join(destination, "campaign.bundle.js"),
+    { overwrite: true },
+  );
   return destination;
 }
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)

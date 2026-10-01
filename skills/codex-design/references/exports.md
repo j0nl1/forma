@@ -2,7 +2,7 @@
 
 ## Standalone HTML
 
-Run `scripts/export.mjs html <input.html> <output.html>`. The helper parses HTML and CSS using an HTML parser and PostCSS, recursively inlines local classic scripts, stylesheets, CSS imports, fonts, images, SVG references, and srcset, and rejects unresolved or remote assets. Bundle ES modules first with `scripts/build.mjs`. Dynamic JavaScript fetches are not automatically captured; remove them or supply an explicit data embedding strategy. A passing export helper does not establish that arbitrary dynamic code is offline.
+Run `scripts/export.mjs html <input.html> <output.html>`. The helper parses HTML and CSS using an HTML parser and PostCSS, recursively inlines local classic scripts, stylesheets, CSS imports, fonts, images, SVG references, and srcset, and rejects unresolved or remote assets. Bundle ES modules first with `scripts/build.mjs`. Local raster/SVG image and font imports in JSX are embedded as data URLs by the build helper. Use imports for bundle-authored assets that must travel with the document. Arbitrary JavaScript URL strings and dynamic fetches are not automatically captured; remove them or supply an explicit data embedding strategy. A passing export helper does not establish that arbitrary dynamic code is offline.
 
 ## PDF and screenshots
 

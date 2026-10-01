@@ -44,6 +44,7 @@ test("native examples load without runtime errors and fit narrow layouts", async
     "social-shells.html",
     "social-feeds.html",
     "canvas-html.html",
+    "campaign.html",
   ])
     await t.test(file, async () => {
       await withPage(url + file, async (page) => {
@@ -51,9 +52,12 @@ test("native examples load without runtime errors and fit narrow layouts", async
         await page.screenshot({ path: path.join(dir, file + ".png") });
         await page.setViewportSize({ width: 390, height: 844 });
         if (
-          !["document.html", "documents.html", "canvas-html.html"].includes(
-            file,
-          )
+          ![
+            "document.html",
+            "documents.html",
+            "canvas-html.html",
+            "campaign.html",
+          ].includes(file)
         )
           assert.equal(
             await page.evaluate(

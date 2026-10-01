@@ -39,6 +39,7 @@ export async function withPage(
         window.CodexDeckReady,
         window.CodexCanvasReady,
         window.CodexPlainCanvasReady,
+        window.CodexCampaignReady,
         window.CodexOverlayReady,
         window.Codex3DReady,
         window.CodexDocumentReady,

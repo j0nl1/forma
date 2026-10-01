@@ -2,10 +2,12 @@ import { attachViewport } from "./canvas-viewport.js";
 import { exportRegion } from "./canvas-export.js";
 const marker = () =>
   document.querySelector('meta[name="design_doc_mode"][content="canvas"]');
+const ownedOverlay =
+  "text-editor[data-codex-injected],[data-codex-tweaks-chrome]";
 const content = () =>
   [...document.body.children].filter(
     (node) =>
-      !node.matches("script,style,template,link,meta") &&
+      !node.matches("script,style,template,link,meta,[data-codex-chrome]") &&
       !node.hidden &&
       getComputedStyle(node).display !== "none",
   );
@@ -29,7 +31,7 @@ function activate() {
   shadow.innerHTML = `<style>${chromeStyle}</style><div class="bar" role="toolbar" aria-label="Plain HTML canvas"><button data-out aria-label="Zoom out">−</button><output aria-label="Canvas zoom">100%</output><button data-in aria-label="Zoom in">+</button><button data-fit>Fit</button><button data-reset>Reset view</button><select aria-label="Canvas frame"></select><button data-png>Download PNG</button><button data-html>Download HTML</button><span role="status" aria-live="polite"></span></div>`;
   html.append(host);
   for (const editor of body.querySelectorAll(
-    ":scope > text-editor[data-codex-injected]",
+    ":scope > text-editor[data-codex-injected],:scope > [data-codex-tweaks-chrome]",
   ))
     html.append(editor);
   const select = shadow.querySelector("select"),
@@ -62,8 +64,7 @@ function activate() {
     {
       storageId: "plain-body",
       ignore: (path) =>
-        path.includes(host) ||
-        path.some((node) => node.matches("text-editor[data-codex-injected]")),
+        path.includes(host) || path.some((node) => node.matches(ownedOverlay)),
       interactive: (path) =>
         path.some(
           (node) => node.parentElement === body && content().includes(node),
@@ -191,7 +192,7 @@ function activate() {
       html.removeAttribute("data-codex-plain-canvas");
       host.remove();
       for (const editor of html.querySelectorAll(
-        ":scope > text-editor[data-codex-injected]",
+        ":scope > text-editor[data-codex-injected],:scope > [data-codex-tweaks-chrome]",
       ))
         body.append(editor);
       style.remove();

@@ -19,6 +19,16 @@ export async function bundle(
     platform: "browser",
     jsx: "automatic",
     target: ["es2022"],
+    loader: {
+      ".svg": "dataurl",
+      ".png": "dataurl",
+      ".jpg": "dataurl",
+      ".jpeg": "dataurl",
+      ".webp": "dataurl",
+      ".gif": "dataurl",
+      ".woff": "dataurl",
+      ".woff2": "dataurl",
+    },
     nodePaths: [
       fileURLToPath(new URL("../node_modules", import.meta.url)),
       fileURLToPath(new URL("../../../node_modules", import.meta.url)),
