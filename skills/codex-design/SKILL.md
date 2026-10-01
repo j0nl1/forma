@@ -41,13 +41,13 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |
 | PDF, standalone HTML, video, Figma/Canva handoff | [exports](references/exports.md) | Local export helpers |
 | Generated images or AI interactions | [assets and AI](references/assets-ai.md) | `image-slot.js` |
-| Feedback, experiments, variants, tweaks | [review](references/review.md) | `canvas.js`, `controls.js` |
+| Feedback, experiments, variants, tweaks | [review](references/review.md), [typed tweaks](references/tweaks.md) | `canvas.js`, `tweaks-components.jsx`, `tweaks-store.js`, `controls.js` |
 
 If the request is simply to be surprised, choose an appropriate concept from the user's context and state it; ask only if the medium or subject is essential and unknown.
 
 ## Build
 
-Copy only needed starters from `assets/starters/` to the deliverable. Most use native custom elements and local controls; continuous animation uses the React `CompositionStage` engine. There are no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment. Use vanilla HTML/CSS/JS for ordinary artifacts, and bundle React/TSX locally for animation and component systems. Do not replace the continuous animation engine with the smaller DOM timeline to reduce dependencies.
+Copy only needed starters from `assets/starters/` to the deliverable. Most use native custom elements and local controls; continuous animation uses the React `CompositionStage` engine. There are no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment. Use vanilla HTML/CSS/JS for ordinary artifacts, and bundle React/TSX locally for animation, typed tweak panels and component systems. Do not replace the continuous animation engine with the smaller DOM timeline to reduce dependencies.
 
 Create real interactions, readable content, empty/loading/error states where relevant, keyboard access, and a responsive layout. Avoid adding unsupported claims, fake sources, or nonfunctional controls. Give comparison pages a clear way to select, inspect, and reset variants. Keep chrome and controls outside fixed-size artwork.
 

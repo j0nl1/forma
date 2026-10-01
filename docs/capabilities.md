@@ -8,6 +8,7 @@ This implementation is being corrected toward a full functional Codex port. Its 
 | Mobile and device/browser/desktop shells | `mobile.md`, `frames.js` | Editable context, responsive content, simplified chrome |
 | Wireframes, options stack, canvas | `wireframe.md`, `canvas.md`, `canvas-components.jsx` | Sections, notes, pan/zoom, scoped persistent edits, grip reorder, navigable focus, project sidecar saves and PNG/HTML downloads; further reference comparisons pending |
 | Decks and speaker notes | `slides.md`, `deck-runtime.md`, `deck.js` | 44 effects, directional masks, timed groups, repeat/reverse, held states, navigation, notes, skip, native fullscreen and print; lazy styled thumbnails, multi-selection, move/duplicate/delete, confirmation, undo and opt-in HTML source saves; further reference comparisons and renderer bindings pending |
+| Design feedback and typed tweaks | `tweaks.md`, `tweaks-components.jsx`, `tweaks-store.js` | All typed controls, palette cards, scrub/drag, local persistence, actual root-HTML source writes and clipboard drafts; broader visual and native composer integration pending |
 | Documents, resume, flier, trifold | `documents.md`, `document.js` | Paper layout and fold-order guidance |
 | Email | `email.md`, `email.html` | Tables and inline CSS; client compatibility requires actual client testing |
 | Social media and platform shells | `campaigns.md`, `social.js` | All named platform contexts through one generic API |

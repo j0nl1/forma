@@ -35,6 +35,11 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
+    path.join(root, "examples/tweaks/main.jsx"),
+    path.join(destination, "tweaks.bundle.js"),
+    { overwrite: true },
+  );
+  await bundle(
     path.join(root, "skills/codex-design/assets/starters/deck.js"),
     path.join(destination, "starters/deck.js"),
     { overwrite: true },

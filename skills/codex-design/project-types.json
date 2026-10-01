@@ -97,7 +97,14 @@
       "id": "color-type-system",
       "name": "Color and type system",
       "reference": "references/design-systems.md",
-      "starters": ["assets/starters/controls.js"]
+      "starters": [
+        "assets/starters/controls.js",
+        "assets/starters/tweaks-components.jsx",
+        "assets/starters/tweaks-suggestions.jsx",
+        "assets/starters/tweaks-panel.js",
+        "assets/starters/tweaks-model.js",
+        "assets/starters/tweaks-store.js"
+      ]
     },
     {
       "id": "diagram",

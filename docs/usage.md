@@ -28,7 +28,7 @@ Use $codex-design to create a 12-second product walkthrough at 1280 by 720.
 Provide timeline controls, inspect scene boundaries, and export MP4 with marked media audio.
 ```
 
-For follow-up changes, refer to the same artifact. Browser tweaks remain session changes; canvas and motion editors support documented persistence and opted-in project saves.
+For follow-up changes, refer to the same artifact. Canvas, motion, deck and typed tweak editors support their documented persistence and opted-in project saves. The older native CSS controls remain session-only.
 
 ## Preview and verify
 
@@ -62,6 +62,16 @@ node skills/codex-design/scripts/preview.mjs /path/to/design --deck-file deck.ht
 This connects the first literal HTML deck to actual source writes. Actions preserve metadata and speaker notes, reject stale versions and use the server's undo history. Reload retains saved structural edits; restarting the server clears undo history. Renderer-generated slides and richer presenter workflows remain required work. See the runtime guide for duplicate image state and portability limitations.
 
 Copy all companion deck modules or bundle `deck.js` before full-page standalone export. The demo helper produces a bundled deck runtime automatically.
+
+## Typed design controls
+
+The [typed tweaks guide](../skills/codex-design/references/tweaks.md) documents all React controls, palette selection, number/segment dragging, browser state and the movable panel. `tweaks.html` demonstrates live edits without remounting the design. Bundle `tweaks-components.jsx` and its companions locally.
+
+```sh
+node skills/codex-design/scripts/preview.mjs /path/to/design --tweaks-file prototype.html
+```
+
+One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in Codex. Automatic composer insertion remains under integration review.
 
 ## Design systems
 

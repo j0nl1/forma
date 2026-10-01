@@ -9,6 +9,7 @@ import { args, contained, main } from "./lib/files.mjs";
 import { readMotionSource, saveMotionSource } from "./lib/motion-source.mjs";
 import { canvasSource } from "./lib/canvas-source.mjs";
 import { deckSource } from "./lib/deck-source.mjs";
+import { tweaksSource } from "./lib/tweaks-source.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -30,7 +31,7 @@ const MIME = {
 export async function serve(
   root,
   port = 4311,
-  { motionFile, canvasFile, deckFile } = {},
+  { motionFile, canvasFile, deckFile, tweaksFile } = {},
 ) {
   root = await fs.realpath(root);
   const token = randomBytes(32).toString("hex");
@@ -40,6 +41,9 @@ export async function serve(
     ? await canvasSource(root, canvasFile, token)
     : null;
   const deck = deckFile ? await deckSource(root, deckFile, token) : null;
+  const tweaks = tweaksFile
+    ? await tweaksSource(root, tweaksFile, token)
+    : null;
   if (motionFile) {
     motionFile = contained(
       root,
@@ -64,6 +68,10 @@ export async function serve(
       }
       if (deck && req.url === "/__codex_deck") {
         await deck.handle(req, res);
+        return;
+      }
+      if (tweaks && req.url === "/__codex_tweaks") {
+        await tweaks.handle(req, res);
         return;
       }
       if (
@@ -201,6 +209,18 @@ export async function serve(
       if (stat.isDirectory()) file = path.join(file, "index.html");
       file = contained(root, await fs.realpath(file));
       let data = await fs.readFile(file);
+      if (tweaks && file === tweaks.html) {
+        data = Buffer.from(
+          data
+            .toString("utf8")
+            .replace(
+              /<head(?:\s[^>]*)?>/i,
+              (head) =>
+                head +
+                '<meta name="codex-tweaks-source" content="/__codex_tweaks">',
+            ),
+        );
+      }
       if (deck && file === deck.html) {
         data = Buffer.from(
           data
@@ -280,10 +300,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--motion-file": "value",
       "--canvas-file": "value",
       "--deck-file": "value",
+      "--tweaks-file": "value",
     });
     if (positional.length !== 1)
       throw new Error(
-        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html]",
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html] [--canvas-file canvas.html] [--deck-file deck.html] [--tweaks-file prototype.html]",
       );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
@@ -292,6 +313,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       motionFile: flags["motion-file"],
       canvasFile: flags["canvas-file"],
       deckFile: flags["deck-file"],
+      tweaksFile: flags["tweaks-file"],
     });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])
