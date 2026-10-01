@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Harbor · Reading room prototype</title>
+    <link rel="stylesheet" href="studio.css" />
+    <style>
+      .app {
+        max-width: 1100px;
+        margin: 42px auto;
+        padding: 0 24px;
+      }
+      .app-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .app h1 {
+        font-size: 48px;
+        margin: 24px 0;
+      }
+      .topics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 24px 0;
+      }
+      .topics button,
+      .filter {
+        padding: 12px 18px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        background: white;
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .topics button[aria-pressed="true"] {
+        background: var(--ink);
+        color: white;
+        border-color: var(--ink);
+      }
+      .step {
+        max-width: 600px;
+        padding: 32px;
+        background: #fffdf8;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin: 28px 0;
+      }
+      .step p {
+        line-height: 1.7;
+        color: var(--muted);
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      input {
+        padding: 12px;
+        border: 1px solid #bac4d0;
+        border-radius: 6px;
+        background: white;
+        min-width: 0;
+      }
+      .toolbar input {
+        flex: 1;
+        min-width: 180px;
+      }
+      .items {
+        display: grid;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+      .item h2 {
+        font:
+          24px Georgia,
+          serif;
+        margin: 0 0 8px;
+      }
+      .item p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .item div {
+        flex: 1;
+      }
+      .item button {
+        border: 1px solid var(--border);
+        background: white;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      dialog {
+        width: min(520px, 90vw);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        color: var(--ink);
+        background: var(--paper);
+      }
+      dialog::backdrop {
+        background: #18233177;
+      }
+      dialog form {
+        display: grid;
+        gap: 12px;
+      }
+      dialog label {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+      }
+      .error {
+        color: #a32438;
+        font-size: 13px;
+        min-height: 20px;
+      }
+      .close {
+        float: right;
+        background: transparent;
+        border: 0;
+        padding: 8px;
+        cursor: pointer;
+      }
+      .status {
+        font-size: 13px;
+        color: var(--accent);
+        min-height: 24px;
+      }
+      .empty {
+        padding: 32px;
+        text-align: center;
+        color: var(--muted);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 500px) {
+        .step {
+          padding: 24px;
+        }
+        .app h1 {
+          font-size: 38px;
+        }
+        .item {
+          padding: 16px;
+        }
+        .item h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="index.html"><span class="mark">H</span> HARBOR</a
+      ><span class="local">Local demo · sample articles</span
+      ><a href="index.html">Back to studio ↗</a>
+    </header>
+    <main class="app">
+      <section id="onboarding">
+        <p class="eyebrow">YOUR READING ROOM / STEP 1 OF 1</p>
+        <h1>Make room<br />for your curiosity.</h1>
+        <div class="step">
+          <h2>What stays with you?</h2>
+          <p>
+            Choose at least two interests. We will use them to shape this local
+            sample collection.
+          </p>
+          <div class="topics" aria-label="Reading interests">
+            <button aria-pressed="false">Design</button
+            ><button aria-pressed="false">Technology</button
+            ><button aria-pressed="false">Culture</button
+            ><button aria-pressed="false">Science</button
+            ><button aria-pressed="false">Writing</button>
+          </div>
+          <button id="continue" class="primary" disabled>
+            Enter reading room →
+          </button>
+        </div>
+      </section>
+      <section id="library" hidden>
+        <div class="app-head">
+          <div>
+            <p class="eyebrow">COLLECT / READ / RETURN</p>
+            <h1>Your reading room.</h1>
+          </div>
+          <button id="add" class="primary">Save an article +</button>
+        </div>
+        <div class="toolbar">
+          <input
+            id="search"
+            type="search"
+            aria-label="Search articles"
+            placeholder="Search your collection"
+          /><button class="filter" id="favorites" aria-pressed="false">
+            Favorites only</button
+          ><button class="filter" id="restart">Reset demo</button>
+        </div>
+        <p class="status" role="status" id="status"></p>
+        <div class="items" id="items"></div>
+      </section>
+    </main>
+    <dialog aria-labelledby="dialog-title">
+      <button class="close" aria-label="Close dialog">×</button>
+      <h2 id="dialog-title">Save an article</h2>
+      <form novalidate>
+        <label
+          >Article title<input
+            name="title"
+            required
+            autocomplete="off" /></label
+        ><label
+          >URL<input
+            name="url"
+            type="url"
+            required
+            placeholder="https://example.com/article"
+        /></label>
+        <p class="error" id="form-error" role="alert"></p>
+        <button class="primary" type="submit">Save to collection</button>
+      </form>
+    </dialog>
+    <script>
+      const selected = new Set();
+      let articles = [],
+        onlyFavorites = false;
+      const q = (s) => document.querySelector(s);
+      const status = (text) => (q("#status").textContent = text);
+      q(".topics").addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
+        const name = e.target.textContent;
+        selected.has(name) ? selected.delete(name) : selected.add(name);
+        e.target.setAttribute("aria-pressed", String(selected.has(name)));
+        q("#continue").disabled = selected.size < 2;
+      });
+      q("#continue").onclick = () => {
+        articles = [
+          {
+            title: "Attention is a design material",
+            topic: [...selected][0],
+            favorite: false,
+          },
+          {
+            title: "Small systems, lasting ideas",
+            topic: [...selected][1],
+            favorite: false,
+          },
+        ];
+        q("#onboarding").hidden = true;
+        q("#library").hidden = false;
+        render();
+        q("#search").focus();
+      };
+      function render() {
+        const items = q("#items");
+        items.replaceChildren();
+        const visible = articles.filter(
+          (a) =>
+            (!onlyFavorites || a.favorite) &&
+            a.title.toLowerCase().includes(q("#search").value.toLowerCase()),
+        );
+        if (!visible.length) {
+          const p = document.createElement("p");
+          p.className = "empty";
+          p.textContent =
+            "No articles match this view. Save an article or clear the filters.";
+          items.append(p);
+        }
+        for (const a of visible) {
+          const row = document.createElement("article");
+          row.className = "item";
+          const content = document.createElement("div"),
+            h = document.createElement("h2"),
+            p = document.createElement("p");
+          h.textContent = a.title;
+          p.textContent = (a.topic || "Collection") + " · sample content";
+          content.append(h, p);
+          const b = document.createElement("button");
+          b.setAttribute(
+            "aria-label",
+            (a.favorite ? "Unfavorite " : "Favorite ") + a.title,
+          );
+          b.setAttribute("aria-pressed", String(a.favorite));
+          b.textContent = a.favorite ? "★" : "☆";
+          b.onclick = () => {
+            a.favorite = !a.favorite;
+            render();
+            status(
+              a.favorite ? "Added to favorites." : "Removed from favorites.",
+            );
+          };
+          row.append(content, b);
+          items.append(row);
+        }
+      }
+      q("#search").oninput = render;
+      q("#favorites").onclick = () => {
+        onlyFavorites = !onlyFavorites;
+        q("#favorites").setAttribute("aria-pressed", String(onlyFavorites));
+        render();
+      };
+      q("#add").onclick = () => {
+        q("form").reset();
+        q("#form-error").textContent = "";
+        q("dialog").showModal();
+        q("input[name=title]").focus();
+      };
+      q(".close").onclick = () => q("dialog").close();
+      q("dialog").addEventListener("close", () => q("#add").focus());
+      q("form").onsubmit = (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target),
+          title = String(data.get("title")).trim(),
+          url = String(data.get("url")).trim();
+        if (!title) {
+          q("#form-error").textContent = "Enter an article title.";
+          return;
+        }
+        try {
+          if (!["http:", "https:"].includes(new URL(url).protocol))
+            throw new Error();
+        } catch {
+          q("#form-error").textContent = "Enter a complete HTTP or HTTPS URL.";
+          return;
+        }
+        articles.push({ title, url, topic: "Collection", favorite: false });
+        onlyFavorites = false;
+        q("#favorites").setAttribute("aria-pressed", "false");
+        q("#search").value = "";
+        render();
+        q("dialog").close();
+        status("Article saved locally in this demo session.");
+      };
+      q("#restart").onclick = () => {
+        selected.clear();
+        articles = [];
+        onlyFavorites = false;
+        q("#search").value = "";
+        q("#favorites").setAttribute("aria-pressed", "false");
+        q(".topics")
+          .querySelectorAll("button")
+          .forEach((b) => b.setAttribute("aria-pressed", "false"));
+        q("#continue").disabled = true;
+        q("#library").hidden = true;
+        q("#onboarding").hidden = false;
+        q(".topics button").focus();
+      };
+    </script>
+  </body>
+</html>

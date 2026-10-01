@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "projectTypes": [
+    {
+      "id": "slides",
+      "name": "HTML presentations",
+      "reference": "references/slides.md",
+      "starters": ["assets/starters/deck.js"]
+    },
+    {
+      "id": "mobile-app-design",
+      "name": "Mobile app design",
+      "reference": "references/mobile.md",
+      "starters": ["assets/starters/frames.js"]
+    },
+    {
+      "id": "wireframe",
+      "name": "Wireframe",
+      "reference": "references/wireframe.md",
+      "starters": ["assets/starters/canvas.js"]
+    },
+    {
+      "id": "document",
+      "name": "Document",
+      "reference": "references/documents.md",
+      "starters": ["assets/starters/document.js"]
+    },
+    {
+      "id": "animation",
+      "name": "Animation",
+      "reference": "references/motion.md",
+      "starters": ["assets/starters/timeline.js"]
+    },
+    {
+      "id": "ui-mockups",
+      "name": "UI mockups",
+      "reference": "references/interface.md",
+      "starters": ["assets/starters/canvas.js", "assets/starters/image-slot.js"]
+    },
+    {
+      "id": "resume",
+      "name": "Resume",
+      "reference": "references/documents.md",
+      "starters": ["assets/starters/document.js"]
+    },
+    {
+      "id": "3d-object",
+      "name": "3D object",
+      "reference": "references/three-dimensional.md",
+      "starters": ["assets/starters/three-stage.js"]
+    },
+    {
+      "id": "research",
+      "name": "Research",
+      "reference": "references/research.md",
+      "starters": ["assets/starters/sources.js"]
+    },
+    {
+      "id": "html-email",
+      "name": "HTML email",
+      "reference": "references/email.md",
+      "starters": ["assets/starters/email.html"]
+    },
+    {
+      "id": "color-type-system",
+      "name": "Color and type system",
+      "reference": "references/design-systems.md",
+      "starters": ["assets/starters/controls.js"]
+    },
+    {
+      "id": "diagram",
+      "name": "Diagram",
+      "reference": "references/data.md",
+      "starters": ["assets/starters/chart.js"]
+    },
+    {
+      "id": "flier",
+      "name": "Flier",
+      "reference": "references/documents.md",
+      "starters": ["assets/starters/document.js"]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Design directions</title>
+    <link rel="stylesheet" href="studio.css" />
+    <style>
+      .option {
+        padding: 30px;
+        min-height: 400px;
+      }
+      .option h2 {
+        font:
+          38px Georgia,
+          serif;
+        line-height: 1.1;
+      }
+      .option p {
+        line-height: 1.7;
+        color: #5b6873;
+      }
+      .dense {
+        background: #202c39;
+        color: #f6f4ee;
+      }
+      .dense p {
+        color: #abb8c4;
+      }
+      .option ul {
+        padding-left: 20px;
+        line-height: 2.2;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <a class="back" href="index.html">← Studio</a>
+      <h1>Two ways to make room.</h1>
+      <p>
+        Compare density and visual language. Rename, reorder, focus, or restore
+        an option.
+      </p>
+      <design-canvas
+        ><design-board label="Editorial calm" width="400px"
+          ><div class="option">
+            <span class="tag">READING ROOM / OPTION A</span>
+            <h2>Keep what<br />stays with you.</h2>
+            <p>One clear collection with space for the next idea.</p>
+            <button
+              class="primary"
+              onclick="this.textContent = 'Collection opened'"
+            >
+              Open collection →
+            </button>
+          </div></design-board
+        ><design-board label="Focused utility" width="400px"
+          ><div class="option dense">
+            <span>READING ROOM / OPTION B</span>
+            <h2>Everything,<br />within reach.</h2>
+            <ul>
+              <li>Recent articles</li>
+              <li>Saved references</li>
+              <li>Favorite ideas</li>
+            </ul>
+            <button
+              class="primary"
+              onclick="this.textContent = 'Articles opened'"
+            >
+              View all articles →
+            </button>
+          </div></design-board
+        ></design-canvas
+      >
+    </main>
+    <script src="starters/canvas.js"></script>
+  </body>
+</html>

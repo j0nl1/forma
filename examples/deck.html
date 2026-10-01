@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>A local design story</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      section {
+        padding: 100px;
+        background: #f6f4ee;
+        color: #202c39;
+        font: 32px/1.5 system-ui;
+      }
+      h1 {
+        font:
+          140px/1.05 Georgia,
+          serif;
+        margin: 100px 0 60px;
+        letter-spacing: -5px;
+      }
+      h2 {
+        font:
+          110px/1.1 Georgia,
+          serif;
+        margin: 70px 0 60px;
+      }
+      li {
+        margin: 30px 0;
+        font-size: 44px;
+      }
+      .label {
+        font:
+          20px ui-monospace,
+          monospace;
+        letter-spacing: 4px;
+      }
+      section:nth-child(2) {
+        background: #dfe8db;
+      }
+      section:nth-child(3) {
+        background: #202c39;
+        color: #f6f4ee;
+      }
+      .big {
+        font-size: 220px;
+        color: #275dad;
+      }
+    </style>
+  </head>
+  <body>
+    <deck-stage
+      ><section>
+        <p class="label">CODEX DESIGN / LOCAL FIRST</p>
+        <h1>From a brief<br />to something real.</h1>
+        <p>Original source. Useful controls. Inspectable output.</p>
+      </section>
+      <section>
+        <p class="label">THREE SIMPLE PRINCIPLES</p>
+        <h2>Make the work visible.</h2>
+        <ul>
+          <li data-anim="fade-in" data-trigger="click">
+            Understand the user and the task.
+          </li>
+          <li data-anim="fly-in" data-trigger="click">
+            Build the actual interaction.
+          </li>
+          <li data-anim="zoom-in" data-trigger="click">
+            Verify what you deliver.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <p class="label">READY TO REVIEW</p>
+        <h2>Your files.<br />Your next step.</h2>
+        <p>Export a PDF or return to the source and keep refining.</p>
+      </section></deck-stage
+    >
+    <script src="starters/deck.js"></script>
+  </body>
+</html>

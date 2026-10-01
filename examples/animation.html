@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>A deterministic motion study</title>
+    <style>
+      body {
+        margin: 0;
+        background: #17202d;
+      }
+      motion-stage {
+        height: 100vh;
+      }
+      [data-art] {
+        background: #f6f4ee;
+        position: relative;
+        overflow: hidden;
+        color: #202c39;
+        font-family: system-ui;
+      }
+      .title {
+        position: absolute;
+        left: 90px;
+        top: 90px;
+        font:
+          80px/1.1 Georgia,
+          serif;
+        letter-spacing: -3px;
+        width: 900px;
+      }
+      .subtitle {
+        position: absolute;
+        left: 94px;
+        top: 300px;
+        font-size: 24px;
+        color: #68717a;
+      }
+      .card {
+        position: absolute;
+        left: 100px;
+        top: 430px;
+        width: 340px;
+        height: 160px;
+        padding: 30px;
+        border-radius: 10px;
+        background: #275dad;
+        color: white;
+        font-size: 26px;
+      }
+      .circle {
+        position: absolute;
+        left: 850px;
+        top: 410px;
+        width: 140px;
+        height: 140px;
+        border: 1px solid #a6bba1;
+        background: #dce6d7;
+        border-radius: 50%;
+      }
+      .label {
+        position: absolute;
+        bottom: 50px;
+        left: 94px;
+        font:
+          14px ui-monospace,
+          monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <motion-stage
+      ><div data-art>
+        <div class="title">An idea finds<br />its place.</div>
+        <div class="subtitle">One clock. A continuous composition.</div>
+        <div class="card">Save what matters.<br />Return with curiosity.</div>
+        <div class="circle"></div>
+        <div class="label">CODEX DESIGN / MOTION STUDY</div>
+      </div></motion-stage
+    >
+    <script src="starters/timeline.js"></script>
+    <script>
+      const stage = document.querySelector("motion-stage"),
+        card = document.querySelector(".card"),
+        circle = document.querySelector(".circle"),
+        title = document.querySelector(".title");
+      const tween = CodexMotion.interpolate;
+      stage.configure({
+        width: 1280,
+        height: 720,
+        scenes: [
+          { id: "opening", title: "Opening", duration: 2 },
+          { id: "collect", title: "Collect", duration: 2 },
+          { id: "return", title: "Return", duration: 2 },
+        ],
+        render(t, cues) {
+          title.style.opacity = tween(t, cues.opening, cues.opening + 1, 0, 1);
+          card.style.transform = `translateX(${tween(t, cues.collect, cues.return, -480, 0)}px)`;
+          circle.style.transform = `translateY(${tween(t, cues.opening, cues.return + 2, 40, -20)}px) scale(${tween(t, cues.collect, cues.return + 2, 0.7, 1.2)})`;
+        },
+      });
+    </script>
+  </body>
+</html>

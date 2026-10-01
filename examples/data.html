@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Data with context</title>
+    <link rel="stylesheet" href="studio.css" />
+  </head>
+  <body>
+    <main class="page">
+      <a class="back" href="index.html">← Studio</a>
+      <h1>Reading, over time.</h1>
+      <p>Synthetic sample data. Articles saved per week; not measured usage.</p>
+      <data-chart label="Articles saved each week" unit=" articles"></data-chart
+      ><source-list
+        ><a href="https://example.com"
+          >Illustrative source placeholder — replace with real provenance</a
+        ><span
+          >Dataset: local synthetic example, four weekly observations.</span
+        ></source-list
+      >
+    </main>
+    <script src="starters/chart.js"></script>
+    <script src="starters/sources.js"></script>
+    <script>
+      document.querySelector("data-chart").data = [
+        { label: "Week 1", value: 12 },
+        { label: "Week 2", value: 19 },
+        { label: "Week 3", value: 16 },
+        { label: "Week 4", value: 28 },
+      ];
+    </script>
+  </body>
+</html>
