@@ -397,6 +397,31 @@ test("nested video seeks exact source frames and actual encoded export waits for
         (await page.locator("video").evaluate((v) => v.currentTime)) - 0.4,
       ) < 0.001,
     );
+    await tick(page, 0.2, true);
+    await page.waitForFunction(() => {
+      const video = document.querySelector("video");
+      return !video.seeking && Math.abs(video.currentTime - 0.6) < 0.001;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    assert.equal(await page.evaluate(() => codexTimeline.time), 0.2);
+    assert.equal(await page.locator("video").evaluate((v) => v.paused), true);
+    assert.ok(
+      Math.abs(
+        (await page.locator("video").evaluate((v) => v.currentTime)) - 0.6,
+      ) < 0.001,
+    );
+    await tick(page, 0.4, true);
+    await page.waitForFunction(
+      () =>
+        !document.querySelector("video").seeking &&
+        Math.abs(document.querySelector("video").currentTime - 0.4) < 0.001,
+    );
+    await seek(page, 0);
+    await page.waitForFunction(
+      () =>
+        !document.querySelector("video").seeking &&
+        Math.abs(document.querySelector("video").currentTime - 0.2) < 0.001,
+    );
   });
   const output = path.join(dir, "nested.mp4");
   const result = await exportArtifact("video", url + "?mode=video", output, {

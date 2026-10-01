@@ -78,7 +78,7 @@ const css = `
 .cd-viewport{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .cd-canvas{display:block;flex-shrink:0;transform-origin:center;box-shadow:0 20px 60px #0006}
 .cd-transport{display:flex;align-items:center;gap:10px;padding:8px 12px;flex-wrap:wrap;flex-shrink:0}
-.cd-transport input[type=range]{flex:1;width:100px;min-width:80px;padding:0;border:0;background:transparent}.cd-time{font:12px ui-monospace,monospace;min-width:65px;font-variant-numeric:tabular-nums}
+.cd-transport input[type=range]{flex:1;width:100px;min-width:80px;padding:0;border:0;background:transparent;touch-action:none}.cd-time{font:12px ui-monospace,monospace;min-width:65px;font-variant-numeric:tabular-nums}
 .cd-editor{border-top:1px solid #30343d;padding:12px;flex-shrink:0;max-height:42vh;overflow:auto}
 .cd-editor-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}.cd-editor-header label{display:flex;gap:6px;align-items:center}.cd-editor-header input{width:60px}
 .cd-segments{display:flex;height:42px;min-width:250px;border:1px solid #454953;border-radius:5px;overflow:hidden;margin:12px 0}
@@ -394,9 +394,30 @@ export function PlaybackBar({
   editor,
   onEditor,
 }) {
+  const pointer = React.useRef(null);
+  const position = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return bounds.width > 0
+      ? clamp((event.clientX - bounds.left) / bounds.width) * duration
+      : 0;
+  };
+  const finish = (event) => {
+    if (
+      pointer.current !== null &&
+      event &&
+      pointer.current !== event.pointerId
+    )
+      return;
+    pointer.current = null;
+    onHover?.(null);
+  };
   return (
     <div className="cd-transport cd-chrome">
-      <button onClick={onPlayPause} aria-label={playing ? "Pause" : "Play"}>
+      <button
+        style={{ minWidth: 64 }}
+        onClick={onPlayPause}
+        aria-label={playing ? "Pause" : "Play"}
+      >
         {playing ? "Pause" : "Play"}
       </button>
       <button onClick={onReset}>Reset</button>
@@ -408,14 +429,40 @@ export function PlaybackBar({
         max={duration}
         step="0.01"
         value={time}
-        onChange={(event) => onSeek(+event.target.value)}
+        onChange={(event) => {
+          if (pointer.current !== null) return;
+          onHover?.(null);
+          onSeek(+event.target.value);
+        }}
+        onPointerDown={(event) => {
+          if (event.button !== 0 || pointer.current !== null) return;
+          // Keep one proportional seek contract for mouse, pen and touch.
+          event.preventDefault();
+          event.currentTarget.focus();
+          event.currentTarget.setPointerCapture(event.pointerId);
+          pointer.current = event.pointerId;
+          onHover?.(null);
+          onSeek(position(event));
+        }}
         onPointerMove={(event) => {
-          if (!event.buttons && !playing) {
-            const r = event.currentTarget.getBoundingClientRect();
-            onHover?.(clamp((event.clientX - r.left) / r.width) * duration);
-          }
+          if (pointer.current === event.pointerId) onSeek(position(event));
+          else if (
+            pointer.current === null &&
+            !event.buttons &&
+            event.pointerType !== "touch"
+          )
+            onHover?.(position(event));
         }}
         onPointerLeave={() => onHover?.(null)}
+        onPointerUp={(event) => {
+          if (pointer.current !== event.pointerId) return;
+          onSeek(position(event));
+          finish();
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={finish}
+        onLostPointerCapture={finish}
+        onBlur={() => onHover?.(null)}
       />
       <span className="cd-time">{format(duration)}</span>
       {onEditor && (
@@ -440,6 +487,9 @@ function TimelineEditor({
   const [selected, setSelected] = React.useState(0);
   const [error, setError] = React.useState("");
   const drag = React.useRef(null);
+  const finishDrag = (event) => {
+    if (drag.current?.pointerId === event.pointerId) drag.current = null;
+  };
   const index = Math.min(selected, derived.scenes.length - 1);
   const scene = derived.sections[index];
   const change = (duration) => {
@@ -529,9 +579,11 @@ function TimelineEditor({
               aria-label={`Stretch ${section.name}`}
               title="Drag to change playback length; authored motion stays complete"
               onPointerDown={(event) => {
+                if (event.button !== 0 || drag.current) return;
                 setSelected(i);
                 event.currentTarget.setPointerCapture(event.pointerId);
                 drag.current = {
+                  pointerId: event.pointerId,
                   x: event.clientX,
                   duration: section.dur,
                   index: i,
@@ -542,7 +594,7 @@ function TimelineEditor({
                 };
               }}
               onPointerMove={(event) => {
-                if (!drag.current) return;
+                if (drag.current?.pointerId !== event.pointerId) return;
                 const start = drag.current;
                 try {
                   onScenes(
@@ -564,12 +616,9 @@ function TimelineEditor({
                   setError(e.message);
                 }
               }}
-              onPointerUp={() => {
-                drag.current = null;
-              }}
-              onLostPointerCapture={() => {
-                drag.current = null;
-              }}
+              onPointerUp={finishDrag}
+              onPointerCancel={finishDrag}
+              onLostPointerCapture={finishDrag}
               onKeyDown={(event) => {
                 if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
                   event.preventDefault();
@@ -718,6 +767,7 @@ export function Stage({
     externalTimer = React.useRef(null);
   const clearExternal = () => {
     clearTimeout(externalTimer.current);
+    externalTimer.current = null;
     setExtPlaying(false);
   };
   const seek = (value, external = false) => {
@@ -729,15 +779,14 @@ export function Stage({
     if (external)
       externalTimer.current = setTimeout(() => setExtPlaying(false), 400);
   };
-  const playPause = () => {
+  const changePlaying = (value) => {
     clearExternal();
     setHover(null);
-    if (!playing) {
-      passes.current = 0;
-      if (time >= duration) setTime(0);
-    }
-    setPlaying(!playing);
+    const next = typeof value === "function" ? value(playing) : !!value;
+    if (next && !playing && time >= duration) setTime(0);
+    setPlaying(next);
   };
+  const playPause = () => changePlaying(!playing);
   live.current = {
     time,
     duration,
@@ -748,6 +797,7 @@ export function Stage({
     capture,
     seek,
     playPause,
+    changePlaying,
     clearExternal,
     policy,
   };
@@ -763,15 +813,14 @@ export function Stage({
     clearExternal();
   }, [duration]);
   React.useLayoutEffect(() => {
-    const measure = () =>
+    const measure = () => {
+      const available = viewport.current.getBoundingClientRect();
       setScale(
         capture
           ? 1
-          : Math.min(
-              viewport.current.clientWidth / width,
-              viewport.current.clientHeight / height,
-            ),
+          : Math.min(available.width / width, available.height / height),
       );
+    };
     const observer = new ResizeObserver(measure);
     observer.observe(viewport.current);
     measure();
@@ -779,6 +828,7 @@ export function Stage({
   }, [width, height, capture, editor, exportPanel]);
   React.useEffect(() => {
     if (!playing) return;
+    passes.current = 0;
     let previous, request;
     const step = (now) => {
       if (previous !== undefined) {
@@ -803,7 +853,7 @@ export function Stage({
     };
     request = requestAnimationFrame(step);
     return () => cancelAnimationFrame(request);
-  }, [playing]);
+  }, [playing, duration, policy.mode, policy.count]);
   React.useLayoutEffect(() => {
     if (window.codexTimeline || window.__animStage)
       throw new Error("Only one animation engine can own the timeline");
@@ -829,15 +879,7 @@ export function Stage({
       root: svg.current,
       seek: (t) => flushSync(() => live.current.seek(t)),
       setTime: (t) => flushSync(() => live.current.seek(t)),
-      setPlaying: (value) =>
-        flushSync(() => {
-          live.current.clearExternal();
-          if (value) {
-            passes.current = 0;
-            if (live.current.time >= live.current.duration) setTime(0);
-          }
-          setPlaying(!!value);
-        }),
+      setPlaying: (value) => flushSync(() => live.current.changePlaying(value)),
     };
     window.codexTimeline = bridge;
     window.__animStage = bridge;
@@ -919,7 +961,7 @@ export function Stage({
                   extPlaying,
                   playback: policy,
                   setTime: (t) => seek(t),
-                  setPlaying,
+                  setPlaying: changePlaying,
                 }}
               >
                 {children}

@@ -403,3 +403,72 @@ test("video ranges, custom bridges, supersampling and diagnostics render real fr
     /interval/,
   );
 });
+
+// Numeric samples independently calculated from the reference's mathematical
+// curve contracts; no reference runtime is imported or evaluated.
+test("all twenty reference easing curves match interior samples and tween output", () => {
+  const samples = [0.1, 0.25, 0.5, 0.75, 0.9];
+  const expected = {
+    linear: [0.1, 0.25, 0.5, 0.75, 0.9],
+    easeInQuad: [0.01, 0.0625, 0.25, 0.5625, 0.81],
+    easeOutQuad: [0.19, 0.4375, 0.75, 0.9375, 0.99],
+    easeInOutQuad: [0.02, 0.125, 0.5, 0.875, 0.98],
+    easeInCubic: [0.001, 0.015625, 0.125, 0.421875, 0.729],
+    easeOutCubic: [0.271, 0.578125, 0.875, 0.984375, 0.999],
+    easeInOutCubic: [0.004, 0.0625, 0.5, 0.9375, 0.996],
+    easeInQuart: [0.0001, 0.00390625, 0.0625, 0.31640625, 0.6561],
+    easeOutQuart: [0.3439, 0.68359375, 0.9375, 0.99609375, 0.9999],
+    easeInOutQuart: [0.0008, 0.03125, 0.5, 0.96875, 0.9992],
+    easeInSine: [
+      0.012311659404862, 0.076120467488713, 0.292893218813452, 0.61731656763491,
+      0.843565534959769,
+    ],
+    easeOutSine: [
+      0.156434465040231, 0.38268343236509, 0.707106781186547, 0.923879532511287,
+      0.987688340595138,
+    ],
+    easeInOutSine: [
+      0.024471741852423, 0.146446609406726, 0.5, 0.853553390593274,
+      0.975528258147577,
+    ],
+    easeInExpo: [
+      0.001953125, 0.00552427172802, 0.03125, 0.176776695296637, 0.5,
+    ],
+    easeOutExpo: [
+      0.5, 0.823223304703363, 0.96875, 0.99447572827198, 0.998046875,
+    ],
+    easeInOutExpo: [0.001953125, 0.015625, 0.5, 0.984375, 0.998046875],
+    easeInBack: [
+      -0.01431422, -0.0641365625, -0.0876975, 0.1825903125, 0.59117202,
+    ],
+    easeOutBack: [
+      0.40882798, 0.8174096875, 1.0876975, 1.0641365625, 1.01431422,
+    ],
+    easeInOutBack: [
+      -0.037518552, -0.09968184375, 0.5, 1.09968184375, 1.037518552,
+    ],
+    easeOutElastic: [
+      1.25, 0.911611652351682, 1.015625, 1.00552427172802, 0.998046875,
+    ],
+  };
+  assert.deepEqual(Object.keys(Easing).sort(), Object.keys(expected).sort());
+  for (const [name, values] of Object.entries(expected)) {
+    const tween = animate({
+      from: -20,
+      to: 80,
+      start: 2,
+      end: 6,
+      ease: Easing[name],
+    });
+    for (const [index, progress] of samples.entries()) {
+      assert.ok(
+        Math.abs(Easing[name](progress) - values[index]) < 1e-12,
+        `${name} at ${progress}`,
+      );
+      assert.ok(
+        Math.abs(tween(2 + progress * 4) - (-20 + values[index] * 100)) < 1e-10,
+        `${name} tween at ${progress}`,
+      );
+    }
+  }
+});
