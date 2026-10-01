@@ -7,6 +7,8 @@ description: "Create and refine local HTML design artifacts in Codex: product mo
 
 Produce local, inspectable design artifacts with Codex. Read [methodology](references/methodology.md) and [Codex workflow](references/codex.md) once, then load only the relevant recipes below. Use the user's existing project and authorized scope. PowerPoint export is outside this skill.
 
+The complete reference port is still in progress. Read [porting status](references/porting-status.md) before claiming a faithful port or replacing an existing reference component. Preserve its functions and state; a smaller starter covering the same category is not an equivalent replacement. Disclose unresolved behavior and implement it within the user's requested scope rather than silently dropping it.
+
 ## Begin and resume
 
 Read the user's brief, applicable project instructions, existing source, and supplied references. For an existing design, read `design.json` (or an existing `_d_meta.json`) before changing it. Reuse the established direction and design systems unless the user changes them.
@@ -33,7 +35,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Social content and campaign layouts | [campaigns](references/campaigns.md) | `social.js` |
 | Chart, data analysis, diagram, map | [data](references/data.md) | `chart.js`, `sources.js` |
 | Current-source research | [research](references/research.md) | `sources.js` |
-| Animation, video, sound, watercolor | [motion](references/motion.md) | `timeline.js`, `watercolor.js` |
+| Animation, video, sound, watercolor | [motion](references/motion.md) | `animations.jsx`, `motion-model.js`; smaller starters are not parity replacements |
 | 3D object or scene | [three-dimensional](references/three-dimensional.md) | `three-stage.js` |
 | Create, import, or consume a design system | [design systems](references/design-systems.md) | `controls.js` |
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |
@@ -45,7 +47,7 @@ If the request is simply to be surprised, choose an appropriate concept from the
 
 ## Build
 
-Copy only needed starters from `assets/starters/` to the deliverable. They use native custom elements and local controls, with no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment. Use vanilla HTML/CSS/JS by default. React/TSX is supported through the local build helper when a real project or component library warrants it.
+Copy only needed starters from `assets/starters/` to the deliverable. Most use native custom elements and local controls; continuous animation uses the React `CompositionStage` engine. There are no injected host messages, React CDN, Babel runtime, telemetry, or model API keys. Read each starter's usage comment. Use vanilla HTML/CSS/JS for ordinary artifacts, and bundle React/TSX locally for animation and component systems. Do not replace the continuous animation engine with the smaller DOM timeline to reduce dependencies.
 
 Create real interactions, readable content, empty/loading/error states where relevant, keyboard access, and a responsive layout. Avoid adding unsupported claims, fake sources, or nonfunctional controls. Give comparison pages a clear way to select, inspect, and reset variants. Keep chrome and controls outside fixed-size artwork.
 

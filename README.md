@@ -2,6 +2,8 @@
 
 A local design skill built specifically for Codex. Create editable HTML mockups, working prototypes, wireframes, mobile screens, presentations, documents, campaigns, design systems, charts, and motion pieces, then inspect and export them with local tools.
 
+The complete functional port is in progress. The initial rewrite simplified several reference components; those reductions are being corrected. Only PowerPoint is excluded from the target scope. See [porting status](docs/porting-status.md) for remaining work; thirteen routed project types do not establish full parity.
+
 This is an independent rewrite using [baoyu-design](https://github.com/JimLiu/baoyu-design) as a behavioral reference. The instructions, helpers, and starters were written anew. There is no harness detection, copied hosted prompt, opaque vendored runtime, provider-specific brand default, or PowerPoint exporter. HTML presentations remain supported.
 
 ## Quick start

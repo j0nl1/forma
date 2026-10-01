@@ -14,11 +14,11 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | System browser runtime | `window.CodexDesignSystem` with `React`, `createRoot`, `Components` |
 | Canvas | `design-canvas` containing named `design-board` elements |
 | Slides | `deck-stage` with direct child `section` elements and finished base styles |
-| Motion | One `motion-stage` and `window.codexTimeline`: duration, dimensions, synchronous seek |
+| Motion | One React `CompositionStage` and `window.codexTimeline`: continuous authored clock, duration, dimensions, synchronous seek; the simple `motion-stage` remains for existing examples |
 | 3D | Bundled `three-stage` with local Three.js and exporters |
 | Component gallery | Ordinary local `.dc.html`, without hosted import protocol |
 
-Native starters are classic scripts except the explicitly bundled 3D module. They need no React or remote service. React systems use a build step. Browser edits are local; Codex applies source changes.
+Native DOM starters are classic scripts except the explicitly bundled 3D module. React systems and the continuous-composition animation engine use a local build step. Browser edits persist locally where supported. The motion preview service can write scene/playback literals to one explicitly selected HTML document, with same-origin tokens and content-version checks. It also renders video from that document; no caller-selected URL or output path is accepted by the browser endpoint.
 
 ## Tools
 

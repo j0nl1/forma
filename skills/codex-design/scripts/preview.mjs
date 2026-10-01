@@ -2,8 +2,11 @@
 import http from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { randomBytes } from "node:crypto";
+import os from "node:os";
 import { pathToFileURL } from "node:url";
 import { args, contained, main } from "./lib/files.mjs";
+import { readMotionSource, saveMotionSource } from "./lib/motion-source.mjs";
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css",
@@ -19,17 +22,149 @@ const MIME = {
   ".mp4": "video/mp4",
   ".pdf": "application/pdf",
 };
-export async function serve(root, port = 4311) {
+export async function serve(root, port = 4311, { motionFile } = {}) {
   root = await fs.realpath(root);
+  const token = randomBytes(32).toString("hex");
+  let pendingSave = Promise.resolve();
+  let exporting = false;
+  if (motionFile) {
+    motionFile = contained(
+      root,
+      await fs.realpath(path.resolve(root, motionFile)),
+    );
+    if (path.extname(motionFile) !== ".html")
+      throw new Error(
+        "Motion source must be an HTML document inside the preview root",
+      );
+    await readMotionSource(motionFile);
+  }
   const server = http.createServer(async (req, res) => {
     try {
-      if (!["GET", "HEAD"].includes(req.method)) {
-        res.writeHead(405);
+      if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(req.headers.host ?? "")) {
+        res.writeHead(403);
         res.end();
         return;
       }
-      if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(req.headers.host ?? "")) {
-        res.writeHead(403);
+      if (
+        motionFile &&
+        ["/__codex_motion", "/__codex_motion/export"].includes(req.url)
+      ) {
+        const reply = (code, data) => {
+          res.writeHead(code, {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+          });
+          res.end(JSON.stringify(data));
+        };
+        if (req.method === "GET" && req.url === "/__codex_motion") {
+          if (
+            req.headers.origin &&
+            req.headers.origin !== `http://${req.headers.host}`
+          ) {
+            reply(403, { error: "Origin is not allowed" });
+            return;
+          }
+          reply(200, { ...(await readMotionSource(motionFile)), token });
+          return;
+        }
+        if (req.method !== "POST") {
+          reply(405, { error: "Method is not allowed" });
+          return;
+        }
+        if (
+          req.headers.origin !== `http://${req.headers.host}` ||
+          req.headers["x-codex-motion-token"] !== token ||
+          req.headers["content-type"] !== "application/json"
+        ) {
+          reply(403, {
+            error: "Source edits require this preview's origin and token",
+          });
+          return;
+        }
+        let body = "";
+        try {
+          for await (const chunk of req) {
+            body += chunk;
+            if (Buffer.byteLength(body) > 32768)
+              throw new Error("Timing request is too large");
+          }
+          const value = JSON.parse(body);
+          if (req.url === "/__codex_motion/export") {
+            if (exporting) {
+              reply(409, { error: "A video export is already running" });
+              return;
+            }
+            if (!["mp4", "webm", "gif"].includes(value.format))
+              throw new Error("Choose MP4, WebM, or GIF");
+            const allowed = new Set([
+              "format",
+              "fps",
+              "crf",
+              "deviceScaleFactor",
+              "startMs",
+              "endMs",
+            ]);
+            if (Object.keys(value).some((key) => !allowed.has(key)))
+              throw new Error("Unexpected export option");
+            exporting = true;
+            let directory;
+            try {
+              directory = await fs.mkdtemp(
+                path.join(os.tmpdir(), "codex-motion-export-"),
+              );
+              await pendingSave;
+              const { exportArtifact } = await import("./export.mjs");
+              const relative = path
+                .relative(root, motionFile)
+                .split(path.sep)
+                .map(encodeURIComponent)
+                .join("/");
+              const output = path.join(directory, `animation.${value.format}`);
+              const result = await exportArtifact(
+                "video",
+                `http://127.0.0.1:${server.address().port}/${relative}`,
+                output,
+                value,
+              );
+              const video = await fs.readFile(output);
+              res.writeHead(200, {
+                "Content-Type": {
+                  mp4: "video/mp4",
+                  webm: "video/webm",
+                  gif: "image/gif",
+                }[value.format],
+                "Content-Disposition": `attachment; filename="animation.${value.format}"`,
+                "Cache-Control": "no-store",
+                "Content-Length": video.length,
+                "X-Codex-Export-Warnings": result.flags
+                  .map((flag) => flag.message)
+                  .join("; "),
+              });
+              res.end(video);
+            } finally {
+              exporting = false;
+              if (directory)
+                await fs.rm(directory, { recursive: true, force: true });
+            }
+            return;
+          }
+          const save = pendingSave.then(async () => {
+            // Re-resolve on every write; symlink replacement cannot redirect it.
+            const resolved = contained(root, await fs.realpath(motionFile));
+            if (resolved !== motionFile)
+              throw new Error("Motion source path changed");
+            return saveMotionSource(resolved, value);
+          });
+          pendingSave = save.catch(() => {});
+          reply(200, await save);
+        } catch (error) {
+          reply(error.status ?? 400, { error: error.message });
+        }
+        return;
+      }
+      if (!["GET", "HEAD"].includes(req.method)) {
+        res.writeHead(405);
         res.end();
         return;
       }
@@ -66,13 +201,18 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
   main(async () => {
     const { positional, flags } = args(process.argv.slice(2), {
       "--port": "value",
+      "--motion-file": "value",
     });
     if (positional.length !== 1)
-      throw new Error("Usage: node preview.mjs <folder> [--port 4311]");
+      throw new Error(
+        "Usage: node preview.mjs <folder> [--port 4311] [--motion-file animation.html]",
+      );
     const port = Number(flags.port ?? 4311);
     if (!Number.isInteger(port) || port < 0 || port > 65535)
       throw new Error("Invalid port");
-    const { server, url } = await serve(path.resolve(positional[0]), port);
+    const { server, url } = await serve(path.resolve(positional[0]), port, {
+      motionFile: flags["motion-file"],
+    });
     console.log(JSON.stringify({ url, root: path.resolve(positional[0]) }));
     for (const signal of ["SIGINT", "SIGTERM"])
       process.on(signal, () => server.close());

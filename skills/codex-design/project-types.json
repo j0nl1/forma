@@ -29,7 +29,10 @@
       "id": "animation",
       "name": "Animation",
       "reference": "references/motion.md",
-      "starters": ["assets/starters/timeline.js"]
+      "starters": [
+        "assets/starters/animations.jsx",
+        "assets/starters/motion-model.js"
+      ]
     },
     {
       "id": "ui-mockups",

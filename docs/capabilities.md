@@ -1,6 +1,6 @@
 # Capabilities and migration
 
-This implementation retains the reference's design workflows with original Codex instructions, components, and helpers. It uses a new API and schema; it does not promise source compatibility or identical rendering.
+This implementation is being corrected toward a full functional Codex port. Its first version covered workflow categories but simplified several components. The table describes available resources, not completed parity. [Porting status](porting-status.md) records the remaining required work. It uses a new API and schema; source compatibility and identical rendering remain unverified.
 
 | Reference workflow | New resources | Behavior |
 | --- | --- | --- |
@@ -13,7 +13,7 @@ This implementation retains the reference's design workflows with original Codex
 | Social media and platform shells | `campaigns.md`, `social.js` | All named platform contexts through one generic API |
 | Data science, charts, diagrams, maps | `data.md`, `chart.js`, `sources.js` | Source-driven analysis, local SVG charts and tables; supplied/configured geography |
 | Research and sourced overlays | `research.md`, `sources.js` | Live sources through Codex, local citations |
-| Animation and video | `motion.md`, `timeline.js` | Deterministic clock, scrubber, time-stretch, timing edits and JSON download |
+| Animation and video | `motion.md`, `animations.jsx` | Continuous React composition, authored cues, persistent shots, captions, local editor, source timing write-back, deterministic seek and video export; watercolor/older APIs remain pending |
 | Sound | `motion.md` | Web Audio guidance and explicit post-export audio mixing |
 | Watercolor | `watercolor.js` | Seeded washes, lines, splatter and stroke reveal |
 | 3D | `three-stage.js` | Orbit, framing, lighting, GLB loading, GLB/OBJ download |
@@ -30,7 +30,7 @@ This implementation retains the reference's design workflows with original Codex
 
 ## Exclusions and fidelity
 
-PowerPoint editable/screenshot export, native PowerPoint animation XML, PptxGenJS, and Google Slides conversion are excluded. HTML decks remain. Multi-harness references, provider-specific APIs/handoffs, hosted protocols, copied palettes, and legacy animation engines are replaced.
+PowerPoint editable/screenshot export, native PowerPoint animation XML, and PptxGenJS are excluded. HTML decks remain in scope. Multi-harness references, provider-specific APIs/handoffs, and hosted protocols need Codex-native equivalents that preserve their user-visible behavior; they are not grounds for dropping functionality. Older animation APIs and Google Slides workflows remain in the port review rather than being silently excluded.
 
 Figma rendering supports saved geometry, common solid/image fills, text, transforms, and vector path blobs. Effects, masks, instance overrides, constraints, variable modes, and some fonts need manual reconciliation. Raw mount preserves those properties. System extraction creates HTML examples rather than inferred React prop models.
 

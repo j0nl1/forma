@@ -1,13 +1,40 @@
 # Animation, video, sound, and watercolor
 
-Use `timeline.js` for a deterministic single-clock composition. Define scenes before choreography. Call `stage.configure({scenes, render, width, height})`; each scene has a unique id, title, authored duration, optional playback duration, and speed. `render(t, cues)` updates a persistent artwork tree at authored time. The starter handles playback, scrubbing, timing edits, reduced motion, and a deterministic export bridge.
+Use `assets/starters/animations.jsx` for animation projects. It independently restores the continuous-composition model of the reference's v3 engine. Bundle it with local React using `scripts/build.mjs`; do not load a second timeline engine. `timeline.js` remains available for existing simple DOM compositions, but it is not the full animation authoring surface.
 
-Key motion to authored scene cues, not wall-clock time. Keep elements crossing boundaries mounted. `interpolate` clamps ranges and supports easing. Allow time-stretch without cutting choreography. Show useful play/pause and reset controls, and give timing edits a downloadable JSON representation so they can be applied to source. Browser edits do not silently modify disk.
+## Continuous composition
 
-Verify the beginning, ending, and every scene boundary at +/-0.15 seconds, plus full playback. Use refs or element bounds for cursor movement. Avoid flashing and unreadable text. Keep the final frame complete and the loop seam intentional.
+Import `CompositionStage`, `useComposition`, `Shot`, `Captions`, `Easing`, `interpolate`, and `animate`. Render one persistent element tree inside `CompositionStage`. `useComposition()` supplies `{T, CUES, time, duration, authoredTotal, playing}`. All visible choreography must derive from authored time `T` and `CUES.SectionName`. Elements crossing a boundary remain mounted. `Shot` changes visibility without unmounting its children. `Captions` displays at most one caption, with `at`, optional `until`, and `text`.
 
-For sound, use Web Audio after a user gesture, with mute and gain controls. Do not autoplay audio. The local video exporter produces silent video; audio can be explicitly mixed with FFmpeg after export, with source attribution and timing documented.
+Declare scene and playback JSON strings in a dedicated plain inline script in the main HTML document:
 
-`watercolor.js` supplies seeded canvas washes, lines, and splatter that reveal by stroke. Choose it only for a painterly brief. Build the still composition first, then drive reveal with the same timeline clock. For generated raster images, use the available image generation skill instead.
+```html
+<script>
+  window.CODEX_SCENES = "[{\"name\":\"Opening\",\"dur\":3,\"desc\":\"The title settles into place.\"},{\"name\":\"Build\",\"dur\":5,\"desc\":\"The diagram assembles around the title.\"}]";
+  window.CODEX_PLAYBACK = "{\"mode\":\"loop\"}";
+</script>
+```
 
-Export MP4, WebM, or GIF through [exports](exports.md). Do not claim a rendered video exists when only an HTML animation was delivered.
+Pass these values to `CompositionStage` as `scenes` and `playback`. Use `{mode: "times", count: N}` for finite repetition. Give each scene a short, accurate description. The optional `nat` anchor is stamped on its first timing edit; it retains the authored length while `dur` changes. Cue names bind to the first occurrence when names repeat. Unknown cues produce a preview diagnostic.
+
+The editor supports section selection, dragging a right edge to stretch playback, numeric duration and speed, descriptions, repeat count, timing download, and a persistent visibility toggle. Changing speed or duration replays the same authored slice over the new interval. It does not cut choreography. Timing, editor visibility, and playhead persist in browser storage; changing the authored input invalidates old timing state. Use a distinct `persistKey` for each composition.
+
+Space toggles playback; arrows seek by 0.1 seconds, Shift+arrow by one second, and Home/0 resets. Hovering over the scrubber previews a frame without moving the stored playhead. Reduced motion starts on the completed frame without autoplay. `?capture` hides all editor chrome and restores the authored dimensions.
+
+## Local source editing and video export
+
+Start `scripts/preview.mjs <project-folder> --motion-file animation.html`. Only that explicit HTML document can be edited. Set `source={true}` on the composition to connect it to the local preview service. In the demo, open `animation.html?edit-source` after enabling the server option. Timing and repetition edits then save automatically into the declarative HTML literals. A content version check refuses to overwrite intervening source changes; reload to reconcile. The source service requires its same-origin token and is absent from ordinary static previews and the public showcase.
+
+The connected editor includes **Export video**, with MP4/WebM/GIF, frame rate, quality, capture scale, and a start/end interval. It saves current timing before rendering and downloads the actual locally encoded file. Chromium and FFmpeg must be installed. CLI export is also available through [exports](exports.md). Both routes use the same deterministic bridge.
+
+`window.codexTimeline` exposes synchronous `seek(seconds)`, `setTime(seconds)`, `setPlaying(boolean)`, live `duration`, dimensions, time, and the single export root. `codex-seek-to-time` on that root supports `{time, playing}`. Marked external playback pauses the internal clock and expires after 400 ms without a successor. Validated `codex-timeline-scenes-update` and `codex-timeline-playback-update` events update timing; malformed updates are ignored. These are local equivalents of the original transport, without its proprietary parent-window messages.
+
+The stage uses SVG/foreignObject and embeds accessible local font-face rules for portable serialization. Keep fonts in the project; remote or inaccessible fonts produce export warnings. The existing module bundler and standalone HTML exporter make React compositions portable without a CDN.
+
+## Verification and remaining port work
+
+Check deterministic seek, continuous motion at every boundary +/-0.15 seconds, complete playback, finite repetition, a slower and faster section, DOM identity across cuts, editor persistence, and real encoded output. A new implementation test is not proof of whole-project parity. Follow [porting status](porting-status.md) before claiming equivalence.
+
+The watercolor integration components, complete paint kit, older sprite/scene APIs, and hosted audio-mixing behavior still require independent ports. Do not silently replace them with the smaller `watercolor.js` starter or call the animation module fully equivalent yet.
+
+For sound, use Web Audio after a user gesture, with mute and gain controls. Local video export is silent, matching the reference's local FFmpeg route; the separate hosted audio-mixing contract remains pending. Explicit audio mixing can be performed after export with source attribution and timing documented.

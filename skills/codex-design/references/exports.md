@@ -10,7 +10,11 @@ Serve the artifact and run `scripts/export.mjs pdf <loopback-url> <output.pdf>` 
 
 ## Video
 
-Run `scripts/export.mjs video <loopback-url> <output.mp4|webm|gif> --fps 30`. Requires Chromium and FFmpeg. The page must expose `window.codexTimeline` with `duration`, `width`, `height`, and a synchronous `seek(seconds)` that renders a deterministic frame. The timeline starter supplies this bridge. The exporter captures each requested frame, encodes locally, and fails on page errors, invalid duration, or encoding failure. Output is silent; do not imply audio was preserved. Recording does not upload the design.
+Run `scripts/export.mjs video <loopback-url> <output.mp4|webm|gif> --fps 30`. Requires Chromium and FFmpeg. `CompositionStage` exposes `window.codexTimeline` with `duration`, dimensions, and synchronous `seek(seconds)`. An existing simple `motion-stage` supplies the same basic bridge. A custom bridge may use `setTime` and `setPlaying(false)` instead; select it through configuration and provide dimensions if absent from the bridge.
+
+Use `--start-ms`, `--end-ms`, `--crf`, `--scale`, and `--bridge` for intervals, quality, supersampled capture, and custom bridges. Defaults are 30 fps, quality 18, and 2x capture followed by Lanczos downscaling. A `--config video.json` file accepts `width`, `height`, `duration`, `fps`, `crf`, `deviceScaleFactor`, `startMs`, `endMs`, `bridgeGlobal`, `captureParam`, `hideSelectors`, and `resetTransformSelector`. CLI flags override corresponding file values. Dimensions must be even integers from 2 to 4096. GIF encoding uses an adaptive palette.
+
+The exporter captures each requested frame, encodes locally, and fails on page errors, invalid timing, or encoding failure. Results include warnings for repeated frames, unfinished fonts, and unrecognized capture framing. Review those warnings against the actual animation before reporting success. A connected local motion editor can invoke the same exporter and download the result; see [motion](motion.md). Output is silent, matching the reference's local encoder. Its separate hosted audio-mixing behavior remains pending; do not imply audio was preserved. Recording does not upload the design.
 
 ## Figma, Canva, and implementation
 

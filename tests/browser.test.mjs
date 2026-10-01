@@ -160,7 +160,7 @@ test("timeline deterministic seek, time-stretch and reduced motion keep complete
   await prepareDemo(dir);
   const { server, url } = await serve(dir, 0);
   t.after(() => new Promise((r) => server.close(r)));
-  await withPage(url + "animation.html", async (page) => {
+  await withPage(url + "animation-basic.html", async (page) => {
     const sample = () =>
       page.locator(".card").evaluate((e) => e.style.transform);
     await page.evaluate(() => codexTimeline.seek(3));

@@ -11,7 +11,7 @@
 | Blank multi-file page | Serve over HTTP and check console/path errors. Bundle module source as needed. |
 | Standalone dependency rejected | Copy permitted assets, fix paths, bundle modules, and explicitly embed dynamically fetched data. |
 | PDF clips | Set paper dimensions and print rules, then inspect all exported pages. |
-| Video bridge missing | Configure one `motion-stage` exposing `window.codexTimeline`. |
+| Video bridge missing | Mount one `CompositionStage`, or configure an existing `motion-stage`, exposing `window.codexTimeline`; custom bridges can be selected through export configuration. |
 | Video fails | Check Chromium, FFmpeg, runtime errors, even dimensions, duration <=300 seconds, fps 1..60. |
 | Video silent | This is the documented export behavior. Mix audio explicitly afterward when requested. |
 | Figma name ambiguous | Use the stable node id from `outline`. |

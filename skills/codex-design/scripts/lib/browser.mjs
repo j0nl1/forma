@@ -1,11 +1,16 @@
 import { chromium } from "playwright";
 import { localUrl } from "./files.mjs";
-export async function withPage(url, fn, { width = 1440, height = 1000 } = {}) {
+export async function withPage(
+  url,
+  fn,
+  { width = 1440, height = 1000, deviceScaleFactor = 1 } = {},
+) {
   url = localUrl(url);
   const browser = await chromium.launch({ headless: true });
   try {
     const context = await browser.newContext({
       viewport: { width, height },
+      deviceScaleFactor,
       serviceWorkers: "block",
     });
     await context.route("**/*", async (route) => {
@@ -30,7 +35,10 @@ export async function withPage(url, fn, { width = 1440, height = 1000 } = {}) {
     });
     await page.goto(url, { waitUntil: "load", timeout: 30000 });
     await page.evaluate(async () => {
-      await document.fonts.ready;
+      await Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => setTimeout(resolve, 8000)),
+      ]);
       await Promise.all(
         [...document.images]
           .filter((i) => i.getAttribute("src"))

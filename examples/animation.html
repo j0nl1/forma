@@ -3,21 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>A deterministic motion study</title>
+    <title>A continuous motion composition</title>
     <style>
       body {
         margin: 0;
-        background: #17202d;
-      }
-      motion-stage {
-        height: 100vh;
-      }
-      [data-art] {
-        background: #f6f4ee;
-        position: relative;
-        overflow: hidden;
-        color: #202c39;
-        font-family: system-ui;
+        background: #0a0a0a;
       }
       .title {
         position: absolute;
@@ -28,6 +18,7 @@
           serif;
         letter-spacing: -3px;
         width: 900px;
+        color: #202c39;
       }
       .subtitle {
         position: absolute;
@@ -39,9 +30,9 @@
       .card {
         position: absolute;
         left: 100px;
-        top: 430px;
-        width: 340px;
-        height: 160px;
+        top: 400px;
+        width: 400px;
+        height: 190px;
         padding: 30px;
         border-radius: 10px;
         background: #275dad;
@@ -60,45 +51,31 @@
       }
       .label {
         position: absolute;
-        bottom: 50px;
+        top: 36px;
         left: 94px;
+        color: #68717a;
         font:
           14px ui-monospace,
           monospace;
       }
+      .final-note {
+        position: absolute;
+        left: 680px;
+        top: 590px;
+        font:
+          italic 24px Georgia,
+          serif;
+        color: #202c39;
+      }
     </style>
   </head>
   <body>
-    <motion-stage
-      ><div data-art>
-        <div class="title">An idea finds<br />its place.</div>
-        <div class="subtitle">One clock. A continuous composition.</div>
-        <div class="card">Save what matters.<br />Return with curiosity.</div>
-        <div class="circle"></div>
-        <div class="label">CODEX DESIGN / MOTION STUDY</div>
-      </div></motion-stage
-    >
-    <script src="starters/timeline.js"></script>
+    <div id="root"></div>
     <script>
-      const stage = document.querySelector("motion-stage"),
-        card = document.querySelector(".card"),
-        circle = document.querySelector(".circle"),
-        title = document.querySelector(".title");
-      const tween = CodexMotion.interpolate;
-      stage.configure({
-        width: 1280,
-        height: 720,
-        scenes: [
-          { id: "opening", title: "Opening", duration: 2 },
-          { id: "collect", title: "Collect", duration: 2 },
-          { id: "return", title: "Return", duration: 2 },
-        ],
-        render(t, cues) {
-          title.style.opacity = tween(t, cues.opening, cues.opening + 1, 0, 1);
-          card.style.transform = `translateX(${tween(t, cues.collect, cues.return, -480, 0)}px)`;
-          circle.style.transform = `translateY(${tween(t, cues.opening, cues.return + 2, 40, -20)}px) scale(${tween(t, cues.collect, cues.return + 2, 0.7, 1.2)})`;
-        },
-      });
+      window.CODEX_SCENES =
+        '[{"name":"Opening","dur":2,"desc":"The title appears and the circle begins to move."},{"name":"Collect","dur":2,"desc":"A saved idea glides into the composition."},{"name":"Return","dur":2,"desc":"The shared card settles and the closing caption appears."}]';
+      window.CODEX_PLAYBACK = '{"mode":"times","count":1}';
     </script>
+    <script src="animation.bundle.js"></script>
   </body>
 </html>

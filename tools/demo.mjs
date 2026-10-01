@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { args, main } from "../skills/codex-design/scripts/lib/files.mjs";
 import { serve } from "../skills/codex-design/scripts/preview.mjs";
+import { bundle } from "../skills/codex-design/scripts/build.mjs";
 export async function prepareDemo(destination) {
   const root = fileURLToPath(new URL("..", import.meta.url));
   await fs.cp(path.join(root, "examples"), destination, { recursive: true });
@@ -12,6 +13,11 @@ export async function prepareDemo(destination) {
     path.join(root, "skills/codex-design/assets/starters"),
     path.join(destination, "starters"),
     { recursive: true },
+  );
+  await bundle(
+    path.join(root, "examples/motion/main.jsx"),
+    path.join(destination, "animation.bundle.js"),
+    { overwrite: true },
   );
   return destination;
 }

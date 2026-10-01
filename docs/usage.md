@@ -69,11 +69,14 @@ Use exact names or node ids. Ambiguous names and existing destinations fail. Inv
 
 ## Exports
 
+For full continuous animation authoring, use the [motion recipe](../skills/codex-design/references/motion.md) and the React `CompositionStage` example. The basic DOM timeline is retained for existing artifacts. To try local source editing and the video export panel, prepare the demo, then start `preview.mjs <demo-folder> --motion-file animation.html` and open `animation.html?edit-source`. Timing edits save automatically to the selected HTML file. Static/public previews save timing only in the browser.
+
 ```sh
 node skills/codex-design/scripts/export.mjs html designs/reader/index.html /tmp/reader.html
 node skills/codex-design/scripts/export.mjs pdf http://127.0.0.1:4311/ /tmp/reader.pdf
 node skills/codex-design/scripts/export.mjs png http://127.0.0.1:4311/ /tmp/reader.png
 node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/walkthrough.mp4 --fps 30
+node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animation.html /tmp/section.mp4 --start-ms 2000 --end-ms 4000 --scale 2 --crf 18
 ```
 
 Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports block remote subresources. Existing outputs are refused. Video is silent. Inspect PDF pages for print fidelity.
