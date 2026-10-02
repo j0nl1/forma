@@ -120,8 +120,9 @@ export async function capturePptxImage(page, slideLocator, object) {
   } finally {
     await transaction.evaluate((state) => {
       for (const { element, style } of state) {
+        // Synchronize pending CSSOM edits before removing an absent attribute.
+        element.setAttribute("style", style ?? "");
         if (style === null) element.removeAttribute("style");
-        else element.setAttribute("style", style);
       }
     });
     await transaction.dispose();

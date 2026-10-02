@@ -319,6 +319,41 @@ test("PowerPoint paint captures retain editable text, transparent shadows and ex
   });
 });
 
+test("PowerPoint paint captures restore absent, empty and authored styles without a deck runtime", async (t) => {
+  const dir = await temporary(t);
+  await fs.writeFile(
+    path.join(dir, "index.html"),
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Isolated paint</title>
+    <style>body{margin:0}section{width:400px;height:300px;background:linear-gradient(#fff,#def)}.card{margin:35px;background:#f80;border-radius:18px;width:240px;height:90px;box-shadow:12px 12px 8px #0008}</style></head>
+    <body><section><h1>Editable heading</h1><div class="card" data-codex-pptx-source="card">Editable card</div><p style="">Empty inline style</p><p style="color : #123456;  font-weight : bold">Authored inline style</p></section></body></html>`,
+  );
+  const { server, url } = await serve(dir, 0);
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  await withPage(url, async (page) => {
+    const locator = page.locator("section");
+    const original = await locator.screenshot();
+    const styles = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("*")].map((element) =>
+          element.getAttribute("style"),
+        ),
+      );
+    const before = await styles();
+    // No runtime observes or clones these nodes, so Chromium can keep the
+    // temporary CSSOM styles unsynchronized with their absent attributes.
+    await capturePptxImage(page, locator, {
+      sourceId: "card",
+      layer: "paint",
+      x: 0,
+      y: 0,
+      w: 400,
+      h: 300,
+    });
+    assert.deepEqual(await styles(), before);
+    assert.deepEqual(await locator.screenshot(), original);
+  });
+});
+
 test("PowerPoint keeps uniformly scaled, translated and safely rounded foreground editable", async (t) => {
   const { dir, url } = await fixture(
     t,
@@ -416,7 +451,8 @@ test("PowerPoint keeps uniformly scaled, translated and safely rounded foregroun
 test("PowerPoint preserves composed rotation, custom pivots and safe inset foreground with exact style restoration", async (t) => {
   const { dir, url } = await fixture(
     t,
-    `<section style="padding:0;background:white">
+    `<style>.stylesheet-transform{position:absolute;left:10px;top:5px;transform:translate(10px,5px)}</style><section style="padding:0;background:white">
+    <p class="stylesheet-transform">Stylesheet transformed copy</p>
     <div id="parent" style="position:absolute;left:95px;top:75px;width:240px;height:180px;background:#ed3029;transform:translate(20px,15px) rotate(30deg) scale(1.15);transform-origin:35px 25px"><p style="position:absolute;left:25px;top:20px;margin:0">Parent native</p><div id="child" style="position:absolute;left:60px;top:75px;width:155px;height:65px;background:#29ab47;transform:rotate(-45deg) scale(.8);transform-origin:15px 20px"><p style="margin:10px;font-size:18px">Child native</p></div></div>
     <div id="paint" style="position:absolute;left:440px;top:110px;width:250px;height:220px;padding:45px;box-sizing:border-box;border-radius:24px;overflow:hidden;background:linear-gradient(#359bd6,#776bc7);rotate:-18deg;transform-origin:20% 80%"><p style="margin:0">Paint native</p></div>
     <div id="inset" style="position:absolute;left:60px;top:350px;width:240px;height:100px;background:#f5bb16;clip-path:inset(12px 20px)"><p style="margin:24px">Inset native</p></div>
@@ -444,6 +480,7 @@ test("PowerPoint preserves composed rotation, custom pivots and safe inset foreg
       "Measurement restores exact source attributes",
     );
     for (const text of [
+      "Stylesheet transformed copy",
       "Parent native",
       "Child native",
       "Paint native",
