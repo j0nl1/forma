@@ -4,6 +4,7 @@ import { unzipSync } from "fflate";
 import { Decompress } from "fzstd";
 import { ByteBuffer, decodeBinarySchema } from "kiwi-schema";
 import { html } from "./files.mjs";
+import { nodeEffects } from "./figma-effects.mjs";
 const LIMIT = 128 * 1024 * 1024;
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
@@ -245,11 +246,12 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   if (node.clipsContent) css.push("overflow:hidden");
   const fills = (node.fillPaints ?? []).filter((f) => f.visible !== false);
   const fill = fills[0];
+  const vector = !!node.fillGeometry?.length;
   let textColor = "inherit";
   if (fill?.type === "SOLID") {
     const c = color(fill.color, finite(fill.opacity, 1));
     if (node.type === "TEXT") textColor = c;
-    else css.push(`background:${c}`);
+    else if (!vector) css.push(`background:${c}`);
   }
   if (fill?.type === "IMAGE") {
     const key = Buffer.from(fill.image?.hash ?? []).toString("hex");
@@ -265,18 +267,19 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   for (const paint of fills)
     if (!["SOLID", "IMAGE"].includes(paint.type))
       warnings.push(`${id}: unsupported fill ${paint.type}`);
-  for (const key of [
-    "effects",
-    "mask",
-    "isMask",
-    "derivedSymbolData",
-    "symbolData",
-  ])
+  for (const key of ["mask", "isMask", "derivedSymbolData", "symbolData"])
     if (
       node[key] &&
       (typeof node[key] !== "object" || Object.keys(node[key]).length)
     )
       warnings.push(`${id}: ${key} needs visual review`);
+  const effects = nodeEffects(node, {
+    id,
+    color,
+    alpha: node.type === "TEXT" || vector,
+    warnings,
+  });
+  css.push(...effects.declarations);
   let content = "";
   if (node.type === "TEXT") {
     css.push(
@@ -297,7 +300,7 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
         const blob = doc.blobs[g.commandsBlob]?.bytes;
         if (blob)
           paths.push(
-            `<path d="${html(pathData(blob))}" fill="${html(fill?.color ? color(fill.color) : "currentColor")}"/>`,
+            `<path d="${html(pathData(blob))}" fill="${html(fill?.color ? color(fill.color, finite(fill.opacity, 1)) : "currentColor")}"/>`,
           );
       } catch (e) {
         warnings.push(`${id}: ${e.message}`);
@@ -308,6 +311,7 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   if (node.stackMode) {
     warnings.push(`${id}: auto-layout rendered from saved geometry`);
   }
+  content = effects.defs + content;
   content += node.children
     .map((c) => renderNode(doc, c, { root: false, warnings }))
     .join("");
@@ -317,7 +321,7 @@ export function renderDocument(doc, node) {
   const warnings = [];
   const content = renderNode(doc, node, { warnings });
   return {
-    html: `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${html(node.name ?? "Figma reference")}</title><style>body{margin:24px;background:#edf0f4;font-family:system-ui}body>div{background:white}*{box-sizing:border-box}</style>${content}</html>`,
+    html: `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${html(node.name ?? "Figma reference")}</title><style>body{margin:24px;background:#edf0f4;font-family:system-ui}*{box-sizing:border-box}</style>${content}</html>`,
     warnings: [...new Set(warnings)],
   };
 }
