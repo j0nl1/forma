@@ -28,11 +28,11 @@ export function captureSlide(index) {
         .map((node) => sourceIds.get(node)),
     };
   };
-  const rect = (r) => ({
-    x: r.x - origin.x,
-    y: r.y - origin.y,
-    w: r.width,
-    h: r.height,
+  const rect = (r, inset = 0) => ({
+    x: r.x - origin.x + inset,
+    y: r.y - origin.y + inset,
+    w: r.width - inset * 2,
+    h: r.height - inset * 2,
   });
   const color = (value) => {
     const parts = value
@@ -47,6 +47,132 @@ export function captureSlide(index) {
         .join(""),
       transparency: (1 - (parts[3] ?? 1)) * 100,
     };
+  };
+  const uniformScale = (style) => {
+    const matrix = new DOMMatrixReadOnly(
+      style.transform === "none" ? undefined : style.transform,
+    );
+    const scale =
+      style.scale === "none" ? [1] : style.scale.split(/\s+/).map(Number);
+    const rotation =
+      style.rotate === "none" ? 0 : Number.parseFloat(style.rotate);
+    if (
+      !matrix.is2D ||
+      Math.abs(matrix.b) > 1e-7 ||
+      Math.abs(matrix.c) > 1e-7 ||
+      matrix.a <= 0 ||
+      Math.abs(matrix.a - matrix.d) > 1e-7 ||
+      scale.length > 2 ||
+      !scale.every((value) => Number.isFinite(value) && value > 0) ||
+      Math.abs(scale[0] - (scale[1] ?? scale[0])) > 1e-7 ||
+      rotation !== 0 ||
+      style.translate.split(/\s+/).length > 2 ||
+      style.perspective !== "none" ||
+      (style.zoom && style.zoom !== "normal" && Number(style.zoom) !== 1)
+    )
+      return null;
+    return matrix.a * scale[0];
+  };
+  const hasPseudo = (element) =>
+    ["::before", "::after"].some((name) => {
+      const style = getComputedStyle(element, name);
+      return (
+        !["none", "normal"].includes(style.content) && style.display !== "none"
+      );
+    });
+  const foregroundInsideRoundedClip = (element, style, box, radii, scale) => {
+    // Use the conservative central rectangle inside all four corner ellipses.
+    // This permits inset cards without approximating native clipping of glyphs.
+    const corners = radii.map((radius) => {
+      const values = radius.split(/\s+/);
+      return [box.width, box.height].map((length, axis) => {
+        const value = values[axis] ?? values[0];
+        return parseFloat(value) * (value.endsWith("%") ? length / 100 : scale);
+      });
+    });
+    if (!corners.flat().every(Number.isFinite)) return false;
+    const safe = {
+      left:
+        box.left +
+        Math.max(
+          corners[0][0],
+          corners[3][0],
+          parseFloat(style.borderLeftWidth) * scale,
+        ),
+      right:
+        box.right -
+        Math.max(
+          corners[1][0],
+          corners[2][0],
+          parseFloat(style.borderRightWidth) * scale,
+        ),
+      top:
+        box.top +
+        Math.max(
+          corners[0][1],
+          corners[1][1],
+          parseFloat(style.borderTopWidth) * scale,
+        ),
+      bottom:
+        box.bottom -
+        Math.max(
+          corners[2][1],
+          corners[3][1],
+          parseFloat(style.borderBottomWidth) * scale,
+        ),
+    };
+    const inside = (rect) =>
+      rect.left >= safe.left &&
+      rect.right <= safe.right &&
+      rect.top >= safe.top &&
+      rect.bottom <= safe.bottom;
+    const inspect = (node) => {
+      const computed = getComputedStyle(node);
+      if (
+        computed.display === "none" ||
+        computed.visibility === "hidden" ||
+        Number(computed.opacity) === 0
+      )
+        return true;
+      if (node !== element) {
+        if (
+          node.shadowRoot ||
+          (node.tagName === "LI" && computed.listStyleType !== "none") ||
+          hasPseudo(node) ||
+          computed.boxShadow !== "none" ||
+          computed.textShadow !== "none" ||
+          computed.filter !== "none" ||
+          (parseFloat(computed.outlineWidth) > 0 &&
+            computed.outlineStyle !== "none") ||
+          parseFloat(computed.webkitTextStrokeWidth) > 0
+        )
+          return false;
+        const fill = color(computed.backgroundColor);
+        const painted =
+          !fill ||
+          fill.transparency < 100 ||
+          computed.backgroundImage !== "none" ||
+          ["Top", "Right", "Bottom", "Left"].some(
+            (side) => parseFloat(computed[`border${side}Width`]) > 0,
+          ) ||
+          ["IMG", "SVG", "CANVAS", "VIDEO", "AUDIO", "IFRAME"].includes(
+            node.tagName,
+          );
+        if (painted && !inside(node.getBoundingClientRect())) return false;
+      }
+      for (const child of node.childNodes) {
+        if (child.nodeType === Node.ELEMENT_NODE && !inspect(child))
+          return false;
+        if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+          const range = document.createRange();
+          range.selectNodeContents(child);
+          if ([...range.getClientRects()].some((rect) => !inside(rect)))
+            return false;
+        }
+      }
+      return true;
+    };
+    return inspect(element);
   };
   const raster = (element, reason, layer = "subtree") => {
     const id = `${index}-${rasterIndex++}`;
@@ -91,7 +217,7 @@ export function captureSlide(index) {
     });
     if (reason !== "Image") warnings.push(reason);
   };
-  const text = (node, style, opacity) => {
+  const text = (node, style, opacity, scale) => {
     const range = document.createRange();
     const lines = [];
     let offset = 0;
@@ -137,12 +263,12 @@ export function captureSlide(index) {
           .split(",")[0]
           .trim()
           .replace(/^['"]|['"]$/g, ""),
-        fontSize: parseFloat(style.fontSize),
+        fontSize: parseFloat(style.fontSize) * scale,
         bold: Number(style.fontWeight) >= 600 || style.fontWeight === "bold",
         italic: style.fontStyle === "italic",
         underline: style.textDecorationLine.includes("underline"),
         strike: style.textDecorationLine.includes("line-through"),
-        charSpacing: parseFloat(style.letterSpacing) || 0,
+        charSpacing: (parseFloat(style.letterSpacing) || 0) * scale,
         color: paint.color,
         transparency: 100 - (100 - paint.transparency) * opacity,
         hyperlink: /^(https?:|mailto:)/i.test(
@@ -153,7 +279,7 @@ export function captureSlide(index) {
       });
     }
   };
-  const visit = (element, inheritedOpacity = 1) => {
+  const visit = (element, inheritedOpacity = 1, inheritedScale = 1) => {
     const style = getComputedStyle(element),
       box = element.getBoundingClientRect();
     if (
@@ -164,10 +290,9 @@ export function captureSlide(index) {
     if (style.visibility === "hidden" || !box.width || !box.height) return;
     const opacity = inheritedOpacity * Number(style.opacity);
     if (!opacity) return;
-    const pseudo = ["::before", "::after"].some((name) => {
-      const s = getComputedStyle(element, name);
-      return !["none", "normal"].includes(s.content) && s.display !== "none";
-    });
+    const pseudo = hasPseudo(element);
+    const localScale = uniformScale(style),
+      scale = inheritedScale * (localScale ?? 1);
     const radii = ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].map(
       (corner) => style[`border${corner}Radius`],
     );
@@ -189,16 +314,17 @@ export function captureSlide(index) {
           box.top < origin.top ||
           box.right > origin.right ||
           box.bottom > origin.bottom)) ||
-      [style.transform, style.translate, style.rotate, style.scale].some(
-        (value) => value && value !== "none",
-      ) ||
+      localScale === null ||
       style.filter !== "none" ||
       style.backdropFilter !== "none" ||
       style.clipPath !== "none" ||
       style.maskImage !== "none" ||
       style.mixBlendMode !== "normal" ||
       pseudo ||
-      (clips && hasRadius && element.childNodes.length > 0) ||
+      (clips &&
+        hasRadius &&
+        element.childNodes.length > 0 &&
+        !foregroundInsideRoundedClip(element, style, box, radii, scale)) ||
       (Number(style.opacity) < 1 && element.childNodes.length > 0) ||
       style.backgroundClip === "text" ||
       style.webkitBackgroundClip === "text" ||
@@ -277,15 +403,17 @@ export function captureSlide(index) {
       (side) =>
         `${style[`border${side}Width`]} ${style[`border${side}Style`]} ${style[`border${side}Color`]}`,
     );
+    const fill = color(style.backgroundColor),
+      stroke = color(style.borderTopColor);
+    const borderWidth = parseFloat(style.borderTopWidth) * scale;
     const painted =
       !color(style.backgroundColor) ||
       style.backgroundImage !== "none" ||
       style.boxShadow !== "none" ||
       hasRadius ||
       new Set(borders).size > 1 ||
-      (parseFloat(style.borderTopWidth) && style.borderTopStyle !== "solid");
-    const fill = color(style.backgroundColor),
-      stroke = color(style.borderTopColor);
+      (borderWidth && style.borderTopStyle !== "solid") ||
+      (borderWidth && stroke?.transparency > 0 && stroke.transparency < 100);
     if (painted) {
       raster(
         element,
@@ -299,7 +427,8 @@ export function captureSlide(index) {
       objects.push({
         kind: "shape",
         ...membership(element),
-        ...rect(box),
+        // CSS borders sit inside the border box; native strokes are centered.
+        ...rect(box, stroke?.transparency === 0 ? borderWidth / 2 : 0),
         fill: fill && {
           ...fill,
           transparency: 100 - (100 - fill.transparency) * opacity,
@@ -310,7 +439,7 @@ export function captureSlide(index) {
             stroke && parseFloat(style.borderTopWidth)
               ? 100 - (100 - stroke.transparency) * opacity
               : 100,
-          width: parseFloat(style.borderTopWidth),
+          width: borderWidth,
         },
       });
     }
@@ -336,7 +465,7 @@ export function captureSlide(index) {
           element,
           "List retained as an image to preserve its marker.",
         );
-      const fontSize = parseFloat(style.fontSize);
+      const fontSize = parseFloat(style.fontSize) * scale;
       objects.push({
         kind: "text",
         ...membership(element),
@@ -346,7 +475,7 @@ export function captureSlide(index) {
         x: box.x - origin.x - fontSize * 1.2,
         y: box.y - origin.y,
         w: fontSize * 1.1,
-        h: parseFloat(style.lineHeight) || fontSize * 1.2,
+        h: parseFloat(style.lineHeight) * scale || fontSize * 1.2,
         fontFace: style.fontFamily.split(",")[0].replace(/['"]/g, "").trim(),
         fontSize,
         color: color(style.color)?.color || "000000",
@@ -354,8 +483,9 @@ export function captureSlide(index) {
       });
     }
     for (const child of element.childNodes) {
-      if (child.nodeType === Node.TEXT_NODE) text(child, style, opacity);
-      else if (child.nodeType === Node.ELEMENT_NODE) visit(child, opacity);
+      if (child.nodeType === Node.TEXT_NODE) text(child, style, opacity, scale);
+      else if (child.nodeType === Node.ELEMENT_NODE)
+        visit(child, opacity, scale);
     }
   };
   const composited = elements.some((element) => {

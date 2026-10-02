@@ -243,15 +243,15 @@ export function applyPptxMotion(buffer, slides, options = {}) {
         xml = grouped.xml;
         targets = grouped.targets;
       }
-      const { tracks, sampled, filter } = tracksFor(entry, slide);
+      const { tracks, sampled, filter, clipRotation } = tracksFor(entry, slide);
       Object.assign(entry, { targets, tracks, filter });
       if (filter)
         warnings.add(
           `Native PowerPoint ${entry.family} builds use the application's own filter geometry and pattern, which can differ from the HTML mask.`,
         );
-      if (entry.effect === "box-out")
+      if (clipRotation)
         warnings.add(
-          "Native box-out can hold until completion and leave a one-pixel outline in LibreOffice Impress; inspect playback in the target presentation application.",
+          "Native box-out uses a 1/60000-degree group rotation during playback to work around LibreOffice's shrinking-rectangle redraw defect.",
         );
       if (sampled)
         warnings.add(

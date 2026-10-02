@@ -78,9 +78,7 @@ test("PowerPoint maps all 44 build names to resolved native shape targets and pr
   );
   assert.ok(
     result.warnings.some((warning) =>
-      warning.includes(
-        "box-out can hold until completion and leave a one-pixel outline",
-      ),
+      warning.includes("box-out uses a 1/60000-degree group rotation"),
     ),
   );
   for (const [index, name] of names.entries()) {
@@ -109,6 +107,14 @@ test("PowerPoint maps all 44 build names to resolved native shape targets and pr
     /filter="wipe\(up\)"/,
   );
   assert.match(xml(result.buffer, "ppt/slides/slide5.xml"), /<p:grpSp>/);
+  assert.match(
+    xml(result.buffer, "ppt/slides/slide26.xml"),
+    /<p:animRot from="1" to="1">/,
+  );
+  assert.doesNotMatch(
+    xml(result.buffer, "ppt/slides/slide25.xml"),
+    /<p:animRot/,
+  );
 });
 
 test("PowerPoint preserves automatic, click, with and after timing even when an earlier target stays static", async () => {
@@ -359,8 +365,11 @@ test(
       ]).buffer,
     );
     const all = await generated(Object.keys(effects), { split: true });
-    for (const captured of all.captures)
+    for (const captured of all.captures) {
       captured.animations[0].attributes["data-anim-duration"] = "400";
+      if (captured.animations[0].attributes["data-anim"] === "box-out")
+        captured.animations[0].attributes["data-anim-repeat"] = "2";
+    }
     const allFile = path.join(dir, "all-effects.pptx");
     await fs.writeFile(
       allFile,
@@ -403,47 +412,43 @@ test(
         assert.equal(result.before.pixels, 0, `${result.effect} starts hidden`);
         assert.ok(
           result.after.pixels > 75000,
-          `${result.effect} finishes visible`,
+          `${result.effect} finishes visible: ${JSON.stringify(result)}`,
         );
       } else if (spec.kind === "exit") {
         assert.ok(
           result.before.pixels > 75000,
           `${result.effect} starts visible`,
         );
-        if (result.effect === "box-out" && result.after.pixels) {
-          // Impress 24.2 can leave a one-pixel edge after this native filter.
-          // The export warns about it; no colored interior may remain.
-          const [left, top, right, bottom] = result.before.bounds;
-          assert.equal(
-            result.after.interiorPixels,
-            0,
-            "box-out clears its interior",
-          );
-          assert.ok(result.after.pixels <= 2 * (right - left + bottom - top));
-          const [afterLeft, afterTop, afterRight, afterBottom] =
-            result.after.bounds;
-          assert.ok(
-            afterLeft >= left &&
-              afterTop >= top &&
-              afterRight <= right &&
-              afterBottom <= bottom,
-          );
-        } else {
-          assert.equal(
-            result.after.pixels,
-            0,
-            `${result.effect} finishes hidden`,
-          );
-        }
+        assert.equal(
+          result.after.pixels,
+          0,
+          `${result.effect} finishes hidden`,
+        );
       } else {
         assert.ok(
           result.before.pixels > 75000 && result.after.pixels > 30000,
           `${result.effect} retains its artwork`,
         );
       }
-      // Impress imports box-out but can hold the full box until completion.
-      // Its specific export warning covers this client behavior as well.
-      if (!["appear", "disappear", "box-out"].includes(result.effect)) {
+      if (result.effect === "box-out") {
+        assert.ok(
+          result.repeatMiddle.pixels > 0 &&
+            result.repeatMiddle.pixels < result.before.pixels,
+          "box-out resets and progressively clips during its second iteration",
+        );
+        const [left, top, right, bottom] = result.before.bounds;
+        for (const frame of result.middle) {
+          assert.ok(frame.pixels > 0 && frame.pixels < result.before.pixels);
+          const [x1, y1, x2, y2] = frame.bounds;
+          assert.ok(
+            x1 > left && y1 > top && x2 < right && y2 < bottom,
+            "box-out closes toward its center instead of opening a hole",
+          );
+          assert.ok(Math.abs(x1 + x2 - left - right) <= 4);
+          assert.ok(Math.abs(y1 + y2 - top - bottom) <= 4);
+        }
+      }
+      if (!["appear", "disappear"].includes(result.effect)) {
         assert.ok(
           result.middle.some(
             (frame) =>

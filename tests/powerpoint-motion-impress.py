@@ -5,9 +5,56 @@ import os
 import subprocess
 import sys
 import time
+from threading import Event
 
 import uno
+from unohelper import Base
+from com.sun.star.presentation import XSlideShowListener
 from PIL import ImageChops, ImageGrab
+
+
+class AnimationCompletion(Base, XSlideShowListener):
+    """Observe the actual end of a slide's main animation sequence."""
+
+    def __init__(self):
+        self.ended = Event()
+
+    def slideAnimationsEnded(self):
+        self.ended.set()
+
+    def await_end(self, label):
+        if not self.ended.wait(3):
+            raise RuntimeError("Impress did not finish the animation: " + label)
+
+    def disposing(self, event):
+        pass
+
+    def beginEvent(self, node):
+        pass
+
+    def endEvent(self, node):
+        pass
+
+    def repeat(self, node, iteration):
+        pass
+
+    def paused(self):
+        pass
+
+    def resumed(self):
+        pass
+
+    def slideTransitionStarted(self):
+        pass
+
+    def slideTransitionEnded(self):
+        pass
+
+    def slideEnded(self, reverse):
+        pass
+
+    def hyperLinkClicked(self, link):
+        pass
 
 
 source, folder, all_source, names_json = sys.argv[1:]
@@ -60,6 +107,8 @@ try:
     presentation.start()
     time.sleep(2)
     controller = presentation.getController()
+    completion = AnimationCompletion()
+    controller.addSlideShowListener(completion)
 
     def capture(name):
         image = ImageGrab.grab(xdisplay=display)
@@ -73,7 +122,9 @@ try:
     time.sleep(0.3)
     samples["middle"] = capture("middle")
     time.sleep(0.5)
+    completion.await_end("click/with/after sequence")
     samples["finished"] = capture("finished")
+    completion.ended.clear()
     controller.gotoSlideIndex(1)
     time.sleep(0.8)
     repeated = ImageGrab.grab(xdisplay=display)
@@ -84,6 +135,7 @@ try:
         "marker": list(pixels[1050, 150]),
     }
     time.sleep(0.65)
+    completion.await_end("repeated reverse path")
     samples["repeat-finished"] = capture("repeat-finished")
     presentation.end()
     document.close(True)
@@ -95,6 +147,8 @@ try:
     presentation.start()
     time.sleep(2)
     controller = presentation.getController()
+    completion = AnimationCompletion()
+    controller.addSlideShowListener(completion)
 
     def geometry(interior_bounds=None):
         image = ImageGrab.grab(xdisplay=display).convert("RGB")
@@ -115,15 +169,21 @@ try:
         controller.gotoSlideIndex(index)
         time.sleep(0.12)
         before = geometry()
+        completion.ended.clear()
         controller.gotoNextEffect()
         time.sleep(0.14)
         first = geometry()
         time.sleep(0.14)
         second = geometry()
         time.sleep(0.25)
+        repeat_middle = geometry() if name == "box-out" else None
+        if repeat_middle is not None:
+            time.sleep(0.4)
+        completion.await_end(name)
         after = geometry(before["bounds"])
         samples["effects"].append(
-            {"effect": name, "before": before, "middle": [first, second], "after": after}
+            {"effect": name, "before": before, "middle": [first, second],
+             "repeatMiddle": repeat_middle, "after": after}
         )
     presentation.end()
     document.close(True)

@@ -4,7 +4,7 @@ Author and preview a discrete HTML deck using the [slides recipe](slides.md), th
 
 ## Install and export
 
-Run `npm ci --ignore-scripts` in the checkout or installed skill, then `npx playwright install chromium`. PowerPoint generation uses pinned PptxGenJS 4.0.1 and Chromium on Linux, macOS and Windows. It does not require Office, a connector, a model key or an upload. Install local fonts used by the deck. PowerPoint recipients need the corresponding fonts for editable text.
+Run `npm ci --ignore-scripts` in the checkout or installed skill, then `npx playwright install chromium`. PowerPoint generation uses pinned PptxGenJS 4.0.1 and Chromium on Linux, macOS and Windows. It does not require Office, a connector, a model key or an upload. Install local fonts used by the deck or provide their exact files with `pptxFonts` as described below. Unembedded text needs the corresponding fonts in the receiving application.
 
 Keep the preview server running while exporting:
 
@@ -13,7 +13,7 @@ node <skill>/scripts/preview.mjs /absolute/path/to/design --port 4311
 node <skill>/scripts/export.mjs pptx http://127.0.0.1:4311/deck.html /absolute/path/to/deck.pptx
 ```
 
-The default `editable` mode converts visible text into native PowerPoint text boxes, solid backgrounds and uniform borders into native shapes, and images into individual PowerPoint pictures. Measured text lines retain the browser's authored line breaks; inline formatting and HTTP(S)/mailto text links are preserved. Gradient backgrounds, rounded corners, complex borders and ordinary box shadows use isolated picture layers while foreground text and children remain editable. SVG, canvas, custom elements, transforms, masks, clipping and inseparable stacking can still require a whole-subtree picture. The result reports editable, raster and media object counts and identifies those fallbacks. Tables retain editable cell text and simple cell shapes rather than becoming native PowerPoint tables; charts remain rendered artwork rather than editable data series.
+The default `editable` mode converts visible text into native PowerPoint text boxes, solid backgrounds and uniform borders into native shapes, and images into individual PowerPoint pictures. Measured text lines retain the browser's authored line breaks; inline formatting and HTTP(S)/mailto text links are preserved. Gradient backgrounds, rounded corners, complex borders and ordinary box shadows use isolated picture layers while foreground text and children remain editable. Positive uniform 2D scaling and translation retain native foreground geometry, including scaled text and borders. Rounded overflow containers retain editable foreground when its painted bounds fit safely inside the clip. Rotations, skew, nonuniform/3D transforms, masks, boundary-crossing clipping, SVG, canvas, custom elements and inseparable stacking can still require a whole-subtree picture. The result reports editable, raster and media object counts and identifies those fallbacks. Tables retain editable cell text and simple cell shapes rather than becoming native PowerPoint tables; charts remain rendered artwork rather than editable data series.
 
 Choose `screenshots` when the required handoff is the rendered appearance rather than editing individual objects:
 
@@ -41,7 +41,27 @@ Use local fonts by default. For an explicit font substitution, pass an export co
 node <skill>/scripts/export.mjs pptx http://127.0.0.1:4311/deck.html /absolute/path/to/deck.pptx --config export.json
 ```
 
-Substitution happens before capture so the source layout reflows with the chosen font. Ensure that replacement font is installed and inspect the result; substitution does not embed fonts into PowerPoint. The existing `fontOrigins` configuration permits explicitly reviewed read-only font providers. It grants no remote scripts or transfers. The browser exporter retains its loopback-input and local-asset rules.
+Substitution happens before capture so the source layout reflows with the chosen font. Ensure that replacement font is installed or supplied below and inspect the result; substitution alone does not embed fonts into PowerPoint. The existing `fontOrigins` configuration permits explicitly reviewed read-only font providers. It grants no remote scripts or transfers. The browser exporter retains its loopback-input and local-asset rules.
+
+## Portable editable fonts
+
+Supply explicit local static TTF or OTF files to load the exact source bytes in Chromium and embed the used font families in the PPTX:
+
+```json
+{
+  "pptxFonts": [
+    { "path": "/absolute/path/to/fonts/LiberationSans-Regular.ttf" },
+    { "path": "/absolute/path/to/fonts/LiberationSans-Bold.ttf" }
+  ],
+  "fontSwaps": [{ "from": "BrandSans", "to": "Liberation Sans" }]
+}
+```
+
+Run the existing export command with `--config export.json`. File paths must be absolute local filesystem paths; the exporter does not discover or download fonts. Supply at most 64 files, with a maximum of 32 MiB per file and 128 MiB in total. Use the files' actual family names in the source; use `fontSwaps` for explicit source aliases. Files load before layout capture, and the embedded full EOT payload contains those same font bytes. Regular, bold, italic and bold-italic variants are matched from font metadata. Include the variants used by the slide text; duplicate faces for the same family/style are rejected. `embeddedFonts` reports the families and faces included; warnings identify unembedded families, missing variants and unavailable glyphs. Unused supplied families are omitted with a warning.
+
+Embedding validates the font's actual embedding flags. Restricted, preview/print-only and bitmap-only fonts are rejected for editable embedding. Variable fonts, collections and WOFF/WOFF2 are not supported by this embedding path; supply static TTF/OTF faces. No Office, Python or font-conversion service is required. Screenshot mode can use supplied fonts to render its images but contains no editable text or embedded-font list.
+
+Applications must support PowerPoint embedded fonts to use them. Check the receiving application; this feature packages the fonts without installing them on that system. The HTML source and all font files stay unchanged.
 
 ## Verify and deliver
 
@@ -49,7 +69,7 @@ Read the export result's `warnings`. Identical adjacent artwork can be intention
 
 ## Native builds and local media
 
-Editable exports provide native counterparts for all 44 `data-anim` effect names on eligible targets. Scalar effects use the shared browser keyframes; mask families use native presentation filters and therefore can differ in geometry or pattern. The exporter reuses the HTML effect parser and click/with/after schedule, including authored order, delays, duration, repeat and eligible auto-reversal. Read the result's `nativeAnimations`, `staticAnimations` and `warnings`; an unsupported target remains static with a specific reason. Flattened or interleaved artwork, nested animated targets, custom transform origins, authored base transforms and targets containing playable media can require this fallback. The HTML's 44 effects remain available in the browser. Native presentation applications can render easing, masks and trajectories differently, so inspect actual slideshow playback. In Impress, `box-out` can hold the full box until completion and leave a one-pixel outline after the interior disappears; the exporter reports this client-specific rendering caveat. Use static artwork or a different exit effect when that edge is unacceptable.
+Editable exports provide native counterparts for all 44 `data-anim` effect names on eligible targets. Scalar effects use the shared browser keyframes; mask families use native presentation filters and therefore can differ in geometry or pattern. The exporter reuses the HTML effect parser and click/with/after schedule, including authored order, delays, duration, repeat and eligible auto-reversal. Read the result's `nativeAnimations`, `staticAnimations` and `warnings`; an unsupported target remains static with a specific reason. Flattened or interleaved artwork, nested animated targets, custom transform origins, authored base transforms and targets containing playable media can require this fallback. The HTML's 44 effects remain available in the browser. Native presentation applications can render easing, masks and trajectories differently, so inspect actual slideshow playback. The rectangular `box-out` exit includes a constant native rotation of one OOXML angular unit (1/60000 degree) to bypass an Impress repaint defect for shrinking rectangular clips. The adjustment is reported in the export diagnostics. Playback checks verify progressive center clipping, clean completion and repeat reset without changing the HTML source.
 
 Use `--pptx-animations static` to export the finished artwork without native builds. The equivalent configuration is `"pptxAnimations": "static"`. Screenshot mode always captures finished artwork; it does not animate independent objects.
 

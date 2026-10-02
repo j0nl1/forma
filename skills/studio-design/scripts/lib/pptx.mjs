@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import path from "node:path";
 import PptxGenJS from "pptxgenjs";
 import { captureSlide } from "./pptx-capture.mjs";
 import { capturePptxImage } from "./pptx-layers.mjs";
@@ -8,6 +9,11 @@ import {
   normalizePptxMedia,
 } from "./pptx-media.mjs";
 import { applyPptxMotion } from "./pptx-motion.mjs";
+import {
+  loadPptxFonts,
+  preparePptxFonts,
+  embedPptxFonts,
+} from "./pptx-fonts.mjs";
 
 export function pptxOptions(options = {}) {
   const mode = options.pptxMode ?? "editable";
@@ -32,43 +38,59 @@ export function pptxOptions(options = {}) {
     )
   )
     throw new Error("fontSwaps must contain nonempty from/to font names.");
-  return { mode, animations, deviceScaleFactor: scale, fontSwaps };
+  const fonts = options.pptxFonts ?? [];
+  if (
+    !Array.isArray(fonts) ||
+    fonts.some(
+      (entry) =>
+        !entry ||
+        typeof entry.path !== "string" ||
+        !path.isAbsolute(entry.path),
+    )
+  )
+    throw new Error("pptxFonts must contain absolute local font paths.");
+  return { mode, animations, deviceScaleFactor: scale, fontSwaps, fonts };
 }
 
 export async function renderPptx(page, output, options = {}) {
   const config = pptxOptions(options);
-  const metadata = await page.evaluate(async ({ fontSwaps }) => {
-    const stages = document.querySelectorAll("deck-stage");
-    if (stages.length !== 1 || !stages[0].ready)
-      throw new Error(
-        "PowerPoint export requires one initialized deck-stage with discrete slides.",
-      );
-    const stage = stages[0];
-    for (const element of stage.querySelectorAll("*")) {
-      const families = getComputedStyle(element)
-        .fontFamily.split(",")
-        .map((s) => s.trim().replace(/^['"]|['"]$/g, ""));
-      const swap = fontSwaps.find((s) => families.includes(s.from));
-      if (swap) element.style.fontFamily = JSON.stringify(swap.to);
-    }
-    await document.fonts.ready;
-    const slides = stage.slides
-      .map((slide, index) =>
-        slide.hasAttribute("data-deck-skip") ? null : index,
-      )
-      .filter((n) => n !== null);
-    if (!slides.length)
-      throw new Error(
-        "PowerPoint export requires at least one non-skipped slide.",
-      );
-    stage.preparePrint();
-    return {
-      width: stage.width,
-      height: stage.height,
-      slides,
-      title: document.title || "Studio Design presentation",
-    };
-  }, config);
+  const fontPlan = await loadPptxFonts(config.fonts);
+  await preparePptxFonts(page, fontPlan);
+  const metadata = await page.evaluate(
+    async ({ fontSwaps }) => {
+      const stages = document.querySelectorAll("deck-stage");
+      if (stages.length !== 1 || !stages[0].ready)
+        throw new Error(
+          "PowerPoint export requires one initialized deck-stage with discrete slides.",
+        );
+      const stage = stages[0];
+      for (const element of stage.querySelectorAll("*")) {
+        const families = getComputedStyle(element)
+          .fontFamily.split(",")
+          .map((s) => s.trim().replace(/^['"]|['"]$/g, ""));
+        const swap = fontSwaps.find((s) => families.includes(s.from));
+        if (swap) element.style.fontFamily = JSON.stringify(swap.to);
+      }
+      await document.fonts.ready;
+      const slides = stage.slides
+        .map((slide, index) =>
+          slide.hasAttribute("data-deck-skip") ? null : index,
+        )
+        .filter((n) => n !== null);
+      if (!slides.length)
+        throw new Error(
+          "PowerPoint export requires at least one non-skipped slide.",
+        );
+      stage.preparePrint();
+      return {
+        width: stage.width,
+        height: stage.height,
+        slides,
+        title: document.title || "Studio Design presentation",
+      };
+    },
+    { fontSwaps: config.fontSwaps },
+  );
   // Keep dimensions within PowerPoint's 56-inch limit, preserving the source ratio.
   const unit = 1 / Math.max(96, metadata.width / 56, metadata.height / 56);
   const deck = new PptxGenJS();
@@ -256,10 +278,13 @@ export async function renderPptx(page, output, options = {}) {
       warnings.add(
         "Adjacent slides have identical artwork. Check whether the repetition is intentional.",
       );
-    if (config.mode === "editable")
-      warnings.add(
-        "PowerPoint text uses the recipient's installed fonts; inspect wrapping in the target application.",
-      );
+    let embeddedFonts = [];
+    if (config.mode === "editable") {
+      const fonts = embedPptxFonts(buffer, fontPlan, capturedSlides);
+      buffer = fonts.buffer;
+      embeddedFonts = fonts.embeddedFonts;
+      for (const warning of fonts.warnings) warnings.add(warning);
+    }
     await fs.writeFile(output, buffer);
     return {
       mode: config.mode,
@@ -269,6 +294,7 @@ export async function renderPptx(page, output, options = {}) {
       editableObjects,
       rasterObjects,
       mediaObjects,
+      embeddedFonts,
       nativeAnimations,
       staticAnimations: animationCount - nativeAnimations,
       warnings: [...warnings],

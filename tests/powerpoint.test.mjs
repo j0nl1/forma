@@ -227,23 +227,22 @@ test("PowerPoint fails on malformed notes and browser resource errors and cleans
   );
 });
 
-test("PowerPoint retains decorative pseudo-elements, wide-gamut color, RTL, individual transforms and explicit stacking as pictures", async (t) => {
+test("PowerPoint keeps inseparable graphics, rotation and stacking as pictures but scales and translates native text", async (t) => {
   const { dir, url } = await fixture(
     t,
     `<style>.decorated{position:relative}.decorated::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff8,#def8)}</style><section><h1>Editable heading</h1><p class="decorated">Decorative layer</p><p style="color:color(display-p3 1 0 0)">Wide-gamut color</p><p style="direction:rtl">Right-to-left layout</p><p style="rotate:8deg">Authored rotation</p><p style="scale:0.8">Authored scale</p><p style="translate:12px 0">Authored translation</p></section><section><p style="position:relative;z-index:2">Explicit stacking</p></section>`,
   );
   const out = path.join(dir, "complex.pptx");
   const result = await exportArtifact("pptx", url, out);
-  assert.equal(result.rasterObjects, 7);
+  assert.equal(result.rasterObjects, 5);
   const zip = unzipSync(await fs.readFile(out));
   assert.match(xml(zip, "ppt/slides/slide1.xml"), /Editable heading/);
-  assert.doesNotMatch(
-    xml(zip, "ppt/slides/slide1.xml"),
-    /Authored rotation|Authored scale|Authored translation/,
-  );
+  assert.doesNotMatch(xml(zip, "ppt/slides/slide1.xml"), /Authored rotation/);
+  assert.match(xml(zip, "ppt/slides/slide1.xml"), /Authored scale/);
+  assert.match(xml(zip, "ppt/slides/slide1.xml"), /Authored translation/);
   assert.equal(
     (xml(zip, "ppt/slides/slide1.xml").match(/<p:pic>/g) || []).length,
-    6,
+    4,
   );
   assert.equal(
     (xml(zip, "ppt/slides/slide2.xml").match(/<p:pic>/g) || []).length,
@@ -317,6 +316,136 @@ test("PowerPoint paint captures retain editable text, transparent shadows and ex
     assert.equal(sample.outside[3], 0);
     assert.equal(sample.center[3], 255);
     assert.ok(sample.shadow[3] > 0 && sample.shadow[3] < 255);
+  });
+});
+
+test("PowerPoint keeps uniformly scaled, translated and safely rounded foreground editable", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section style="padding:0;background:white">
+    <div id="scaled" style="position:absolute;left:40px;top:40px;transform:translate(18px,10px) scale(1.25);transform-origin:0 0;width:260px;height:130px;background:#efe6d2;border:4px solid #123456">
+      <p style="margin:12px;font-size:20px">Native scaled copy</p>
+      <div style="margin:12px;translate:8px 6px;scale:.8;transform-origin:0 0;width:200px;height:35px;background:#d4ebd8"><span style="font-size:20px">Nested native</span></div>
+    </div>
+    <div id="rounded" style="position:absolute;left:420px;top:60px;width:300px;height:180px;box-sizing:border-box;padding:40px;border-radius:30px;overflow:hidden;background:linear-gradient(#daf0ff,#abd4ef)">
+      <p style="margin:0;font-size:24px">Rounded native</p><div style="margin-top:18px;width:80px;height:30px;background:#207548"></div>
+    </div>
+    <div id="crossing" style="position:absolute;left:420px;top:280px;width:200px;height:80px;border-radius:30px;overflow:hidden;background:#dca"><p style="margin:0;font-size:24px">Clipped corner</p></div>
+    <div id="alpha-border" style="position:absolute;left:50px;top:290px;width:250px;height:60px;padding:12px;background:#bcd;border:8px solid #3458"><p style="margin:0">Translucent border</p></div>
+  </section>`,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const captured = await page.evaluate(captureSlide, 0);
+    const scaled = captured.objects.find(
+      (object) => object.text === "Native scaled copy",
+    );
+    const nested = captured.objects.find(
+      (object) => object.text === "Nested native",
+    );
+    assert.ok(scaled, "Scaled text must remain a native text object");
+    assert.equal(scaled.fontSize, 25);
+    assert.equal(nested.fontSize, 20);
+    const border = captured.objects.find(
+      (object) => object.kind === "shape" && object.line.color === "123456",
+    );
+    assert.equal(border.line.width, 5);
+    assert.deepEqual(
+      { x: border.x, y: border.y, w: border.w, h: border.h },
+      { x: 60.5, y: 52.5, w: 330, h: 167.5 },
+      "The centered native stroke must retain the CSS outer border box",
+    );
+    assert.ok(
+      captured.objects.some((object) => object.text === "Rounded native"),
+    );
+    assert.ok(
+      !captured.objects.some((object) => object.text === "Clipped corner"),
+    );
+    assert.ok(
+      captured.objects.some((object) => object.text === "Translucent border"),
+    );
+    const roundedId = await page
+      .locator("#rounded")
+      .getAttribute("data-codex-pptx-source");
+    const paint = captured.objects.find(
+      (object) => object.sourceId === roundedId && object.layer === "paint",
+    );
+    assert.ok(
+      paint,
+      "Rounded clipping must retain only its background as a picture",
+    );
+    const alphaId = await page
+      .locator("#alpha-border")
+      .getAttribute("data-codex-pptx-source");
+    assert.ok(
+      captured.objects.some(
+        (object) => object.sourceId === alphaId && object.layer === "paint",
+      ),
+    );
+    const locator = page.locator("deck-stage > [data-deck-slide]").first();
+    const original = await locator.screenshot();
+    const styles = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("*")].map((element) =>
+          element.getAttribute("style"),
+        ),
+      );
+    const before = await styles();
+    await capturePptxImage(page, locator, paint);
+    assert.deepEqual(await styles(), before);
+    assert.deepEqual(await locator.screenshot(), original);
+  });
+  const output = path.join(dir, "css.pptx");
+  await exportArtifact("pptx", url, output);
+  const zip = unzipSync(await fs.readFile(output));
+  const slide = xml(zip, "ppt/slides/slide1.xml");
+  for (const value of [
+    "Native scaled copy",
+    "Nested native",
+    "Rounded native",
+    "Translucent border",
+  ])
+    assert.match(slide, new RegExp(`<a:t>${value}</a:t>`));
+  assert.doesNotMatch(slide, /Clipped corner/);
+  assert.match(slide, /sz="1875"/);
+});
+
+test("PowerPoint retains unsupported transform cases as explicit pictures", async (t) => {
+  const cases = [
+    ["Skewed", "transform:skewX(12deg)"],
+    ["Stretched", "scale:1.2 .8"],
+    ["Reflected", "scale:-1"],
+    ["Perspective", "perspective:300px"],
+    ["Zoomed", "zoom:1.2"],
+  ];
+  const { url } = await fixture(
+    t,
+    `<section>${cases
+      .map(
+        ([label, style]) =>
+          `<div style="width:180px;height:40px;margin:12px;background:#234;${style}"><span>${label} content</span></div>`,
+      )
+      .join("")}</section>`,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const captured = await page.evaluate(captureSlide, 0);
+    assert.equal(
+      captured.objects.filter(
+        (object) => object.kind === "image" && object.layer === "subtree",
+      ).length,
+      cases.length,
+    );
+    assert.ok(!captured.objects.some((object) => object.kind === "text"));
+    assert.ok(
+      captured.warnings.every((warning) => warning.includes("preserve CSS")),
+    );
   });
 });
 

@@ -74,7 +74,34 @@ function interpolate(track, progress) {
 }
 export function tracksFor(entry, slide) {
   const filter = nativeFilter(entry);
-  if (filter) return { tracks: new Map(), sampled: false, filter };
+  if (filter) {
+    // Impress's rectangular-clip optimization repaints new minus old bounds,
+    // which is empty for a shrinking rectangle. An animated rotation of one
+    // OOXML angular unit (1/60000 degree) avoids that optimization without
+    // changing the clip direction. Static group rotation does not suffice.
+    // https://github.com/LibreOffice/core/blob/master/canvas/source/tools/canvascustomspritehelper.cxx
+    // https://github.com/LibreOffice/core/blob/master/basegfx/source/range/b2xrange.cxx
+    const clipRotation =
+      filter === "box(out)" && entry.kind === "exit" ? 1 / 60000 : 0;
+    return {
+      tracks: new Map(
+        clipRotation
+          ? [
+              [
+                "rotation",
+                [
+                  [0, clipRotation],
+                  [1, clipRotation],
+                ],
+              ],
+            ]
+          : [],
+      ),
+      sampled: false,
+      filter,
+      clipRotation,
+    };
+  }
   const rect = entry.geometry;
   const geometry = {
     width: slide.width,
