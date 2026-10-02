@@ -677,10 +677,6 @@ test("all three phone editors save actual independent uploaded images in the sou
         mimeType: "image/png",
         buffer: Buffer.from(png, "base64"),
       });
-      await page.locator(tag).evaluate(async (shell) => {
-        await shell.image.settled();
-        await shell.image.store.settled();
-      });
       await page.waitForFunction(
         (tag) =>
           document
@@ -689,6 +685,12 @@ test("all three phone editors save actual independent uploaded images in the sou
             .u?.startsWith("data:image/"),
         tag,
       );
+      // File ingestion is asynchronous: wait for the uploaded record before
+      // awaiting its queued source write, rather than the previous idle state.
+      await page.locator(tag).evaluate(async (shell) => {
+        await shell.image.settled();
+        await shell.image.store.settled();
+      });
     }
     const saved = JSON.parse(
       await fs.readFile(path.join(dir, "image-slots.state.json"), "utf8"),

@@ -10,7 +10,17 @@ npm run format:check
 npm test
 ```
 
-Tests use OS temporary directories for generated files. Browser tests exercise native components, a real prototype flow, responsive rendering, design-system preview, PDF, and deterministic video. The installed copy is also tested with an independent lockfile. FFmpeg is required for video tests. Missing Chromium is a test failure so it cannot silently claim browser verification.
+Tests use OS temporary directories for generated files. Browser tests exercise native components, a real prototype flow, responsive rendering, design-system preview, PDF, and deterministic video. The installed copy is also tested with an independent lockfile. FFmpeg is required for video tests. Poppler's `pdfinfo` and `pdftotext` are required for PDF verification; install them with the OS package manager before running the suite (for example, `sudo apt-get install -y ffmpeg poppler-utils` on Debian/Ubuntu). Missing Chromium is a test failure so it cannot silently claim browser verification.
+
+CI also exercises native PowerPoint animations and embedded video in a real LibreOffice Impress slideshow. On Linux, install `libreoffice-impress`, `python3-uno`, `python3-pil`, `xvfb`, `libxtst6`, `gstreamer1.0-libav` and `gstreamer1.0-plugins-good`. The playback probes use `/usr/bin/python3` so they can load the distribution's UNO bridge and give each application an isolated profile and virtual display. Media playback isolates X11 settings from the host's display session, checks automatic playback beside an editable heading build, and uses an actual XTest click to verify manual activation, the resting cover and printed artwork. Nested-build probes count real repeat resets and verify opacity, masks, later clicks and mixed native/picture scheduling.
+
+The embedded-font consumer test requires LibreOffice 25.8 or newer with EOT support; older versions do not import PPTX embedded fonts. Set `STUDIO_TEST_FONT_SOFFICE` to the compatible binary when the distribution's default is older:
+
+```sh
+STUDIO_TEST_IMPRESS=1 STUDIO_TEST_FONT_SOFFICE=/absolute/path/to/libreoffice/program/soffice npm test
+```
+
+The test logs the consumer version, fails on unsupported versions, and verifies every embedded style against a control deck using separate application processes/profiles. CI extracts the checksum-pinned official LibreOffice 25.8.7.3 package into its temporary directory for this check, while retaining the distribution's Impress/UNO pair for playback. The archive's release signature was verified against The Document Foundation's build key (`C2839ECAD9408FBE9531C3E9F434A1EFAFEEAEA3`) before pinning its checksum. These are verification dependencies; exporting a PowerPoint file does not require LibreOffice or Python.
 
 For optional macOS verification in the maintained environment, transfer a source checkout to `sirius` and run cross-platform checks there through SSH. Do not run macOS-specific commands on the Linux host.
 

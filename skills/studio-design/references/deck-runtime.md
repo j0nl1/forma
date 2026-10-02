@@ -1,6 +1,6 @@
 # HTML deck runtime contract
 
-The independent HTML stage preserves slide content in the DOM, plays declarative builds, scales authored geometry, exposes local navigation events, and prints the finished base layout. PowerPoint export is excluded; HTML build effects remain required.
+The independent HTML stage preserves slide content in the DOM, plays declarative builds, scales authored geometry, exposes local navigation events, and prints the finished base layout. PowerPoint export supports editable objects or full-slide screenshots with speaker notes; see [PowerPoint](powerpoint.md). HTML build effects remain required.
 
 ## Files and readiness
 
@@ -61,7 +61,7 @@ The earlier native aliases remain supported: `data-trigger`, `data-order`, `data
 | `teeter` | 1000 ms | Alternating tilts with an initial hold, then settle |
 | `path` | 2000 ms | L/C offsets, cubics sampled 16 times, at most 32 points |
 
-Zero-degree spin/teeter, scale-1 grow/shrink/pulse, and unusable paths remain static and do not consume a build step. Mask effects use a registered numeric CSS property and stylesheet gradients, with a fade fallback when registration is unavailable. Box/diamond outward clip paths still work without property registration. PowerPoint rendering is outside the supported output formats.
+Zero-degree spin/teeter, scale-1 grow/shrink/pulse, and unusable paths remain static and do not consume a build step. Mask effects use a registered numeric CSS property and stylesheet gradients, with a fade fallback when registration is unavailable. Box/diamond outward clip paths still work without property registration. Editable PowerPoint exports translate supported builds using the same effect parser and timing groups; unsupported targets report static fallback. Screenshot exports retain finished artwork and notes. The HTML effects remain intact. See [PowerPoint](powerpoint.md).
 
 ## Step and navigation rules
 

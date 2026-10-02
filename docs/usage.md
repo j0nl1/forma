@@ -15,7 +15,7 @@ tracker. Compare them in one canvas and include a working add-expense flow.
 
 ```text
 Use $studio-design to build an eight-slide HTML presentation from this PRD for
-engineering. Include a staged chart reveal and print-to-PDF. No speaker notes.
+engineering. Include a staged chart reveal, print-to-PDF, and an editable PowerPoint handoff. No speaker notes.
 ```
 
 ```text
@@ -66,6 +66,17 @@ node skills/studio-design/scripts/preview.mjs /path/to/design --deck-file deck.h
 This connects the first literal HTML deck to actual source writes. Actions preserve metadata and speaker notes, reject stale versions and use the server's undo history. Reload retains saved structural edits; restarting the server clears undo history. Renderer-generated slides and richer presenter workflows remain required work. See the runtime guide for duplicate image state and portability limitations.
 
 Copy all companion deck modules or bundle `deck.js` before full-page standalone export. The demo helper produces a bundled deck runtime automatically.
+
+## PowerPoint export
+
+Follow the [PowerPoint guide](../skills/studio-design/references/powerpoint.md). Author a discrete HTML deck, keep its preview server running, then export locally:
+
+```sh
+node skills/studio-design/scripts/export.mjs pptx http://127.0.0.1:4311/deck.html /absolute/path/to/deck.pptx
+node skills/studio-design/scripts/export.mjs pptx http://127.0.0.1:4311/deck.html /absolute/path/to/deck-images.pptx --pptx-mode screenshots --scale 2
+```
+
+Editable mode retains native text and simple shapes, uses separate picture layers for eligible complex backgrounds, retains composed uniform 2D scaling/translation/rotation and safely inset rounded foreground, translates supported builds into native PowerPoint timing, and embeds local video/audio. Source trims, speed and volume/mute can use a bounded local FFmpeg/FFprobe playback copy; inspect `mediaPlayback` for the applied settings and original/derived hashes. Eligible nested repeats, disjoint opacity and leaf masks retain native builds; overlapping fade/wipe composition can use bounded transparent pictures while surrounding objects remain editable. Inspect `nativeAnimations`, `rasterAnimations` and `staticAnimations`. Eligible visible videos retain their cover until a click starts playback, verified in Impress 24.2 and 25.8. Native looping and other manual-media variants retain explicit receiver warnings. Supply absolute local static TTF/OTF paths in `pptxFonts` to use the same font bytes in browser measurement and the embedded PowerPoint font payload; inspect variant/glyph coverage warnings. Screenshot mode retains the finished composition as one image per slide. Both preserve notes and omit skipped slides. Use `--pptx-animations static` for finished artwork without native builds. Inspect the result and media playback in the target application; fonts, CSS and animation rendering can vary. Read fallback warnings and keep the original source folder.
 
 ## Typed design controls
 

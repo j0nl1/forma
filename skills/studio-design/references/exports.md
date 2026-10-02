@@ -8,6 +8,10 @@ Run `scripts/export.mjs html <input.html> <output.html>`. The helper parses HTML
 
 Serve the artifact and run `scripts/export.mjs pdf <loopback-url> <output.pdf>` or `png <loopback-url> <output.png>`. Playwright waits for fonts and images and reports runtime errors. PDFs use print CSS and preserve authored page sizes. Inspect the exported PDF for clipping and page count. For HTML decks, `deck.js` exposes all finished slides during print.
 
+## PowerPoint
+
+Run `scripts/export.mjs pptx <loopback-deck-url> <output.pptx>`. The default mode creates native editable text and simple shapes, isolated CSS paint layers, supported native builds and embedded local media, with explicit fallback warnings. `--pptx-mode screenshots` creates one finished full-slide image per slide; `--pptx-animations static` disables native builds in editable mode. Both modes preserve source order, skip flags, dimensions and speaker notes. Read the [PowerPoint guide](powerpoint.md) for font substitution, media/playback constraints and verification.
+
 ## Video
 
 Run `scripts/export.mjs video <loopback-url> <output.mp4|webm|gif> --fps 30`. Requires Chromium and FFmpeg. `CompositionStage` exposes `window.codexTimeline` with `duration`, dimensions, and synchronous `seek(seconds)`. An existing simple `motion-stage` supplies the same basic bridge. A custom bridge may use `setTime` and `setPlaying(false)` instead; select it through configuration and provide dimensions if absent from the bridge.
@@ -43,4 +47,4 @@ The result reports `audio`, `audioTracks` (distinct source range/speed stems), a
 
 Use an available, authorized connector for a requested send-to-Figma or Canva action. Read that connector's skill and verify destination and result. Without one, provide editable HTML, local assets, tokens, dimensions, and interaction notes as a handoff package and clearly say transfer did not occur. Do not invent upload URLs or claim native editability after a raster export.
 
-A Codex implementation handoff stays in the current repository or a user-requested new chat. Explain the state model, component boundaries, tokens, dependencies, and verified flow. Do not message other chats or publish without authorization. PowerPoint export is excluded.
+A Codex implementation handoff stays in the current repository or a user-requested new chat. Explain the state model, component boundaries, tokens, dependencies, and verified flow. Do not message other chats or publish without authorization. PowerPoint handoff uses the local editable or screenshot exporter described above.

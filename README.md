@@ -2,7 +2,7 @@
 
 A local design skill built specifically for Codex. Create editable HTML mockups, working prototypes, wireframes, mobile screens, presentations, documents, campaigns, design systems, charts, and motion pieces, then inspect and export them with local tools.
 
-Studio Design runs inside Codex and keeps generated files local. HTML presentations are supported; PowerPoint export is not included. See [known limitations](docs/limitations.md) for concrete constraints and the current nested-video export issue.
+Studio Design runs inside Codex and keeps generated files local. HTML presentations export to PowerPoint as editable objects with supported native builds, embedded local media and explicitly supplied fonts, or as full-slide images, with speaker notes. See [known limitations](docs/limitations.md) for concrete fidelity and integration constraints.
 
 ## Watch the tutorial
 
@@ -42,11 +42,11 @@ The installer copies inspected local files. It does not fetch a remote project, 
 ## What is included
 
 - A concise Codex entry point, UI metadata, and focused task references.
-- Thirteen routed project types, including HTML slides, mobile, documents, research, email, diagrams, and 3D.
+- Thirteen routed project types, including HTML/PowerPoint presentations, mobile, documents, research, email, diagrams, and 3D.
 - Independently written starters with native local controls, continuous composition, scene/sprite authoring, and deterministic watercolor painting.
 - Read-only design-system inspection, compilation, portable imports, and review pages.
 - Offline Figma inventory, materialization and editable React variant generation with explicit fidelity warnings.
-- A loopback preview server, browser verification, standalone HTML, PDF, PNG, and MP4/WebM/GIF export with optional marked-media audio.
+- A loopback preview server, browser verification, standalone HTML, PowerPoint, PDF, PNG, and MP4/WebM/GIF export with optional marked-media audio.
 - Pinned package versions and lockfiles, meaningful tests, and runnable examples.
 
 See the [capability map](docs/capabilities.md) for supported workflows and output formats.

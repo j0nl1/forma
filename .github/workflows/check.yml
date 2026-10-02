@@ -15,6 +15,25 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install export verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg poppler-utils libreoffice-impress python3-uno python3-pil xvfb libxtst6 gstreamer1.0-libav gstreamer1.0-plugins-good
+      - name: Prepare pinned embedded-font consumer
+        run: |
+          font_consumer="$RUNNER_TEMP/font-consumer"
+          mkdir -p "$font_consumer/archive" "$font_consumer/root"
+          curl --fail --location --retry 2 --connect-timeout 15 --max-time 180 \
+            https://ftp.fau.de/tdf/libreoffice/stable/25.8.7/deb/x86_64/LibreOffice_25.8.7_Linux_x86-64_deb.tar.gz \
+            --output "$font_consumer/consumer.tar.gz"
+          echo "7f4d7b2e36921eec5122c655249a24cc88935ee357e8261fd3bccd15aa1f7b9f  $font_consumer/consumer.tar.gz" | sha256sum --check
+          tar -xzf "$font_consumer/consumer.tar.gz" -C "$font_consumer/archive"
+          for package in "$font_consumer"/archive/LibreOffice_*/DEBS/*.deb; do
+            dpkg-deb --extract "$package" "$font_consumer/root"
+          done
+          "$font_consumer/root/opt/libreoffice25.8/program/soffice" --version
+          echo "STUDIO_TEST_FONT_SOFFICE=$font_consumer/root/opt/libreoffice25.8/program/soffice" >> "$GITHUB_ENV"
       - run: npm run check
       - run: npm test
+        env:
+          STUDIO_TEST_IMPRESS: '1'
