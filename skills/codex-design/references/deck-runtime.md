@@ -79,6 +79,8 @@ A `data-deck-skip` slide remains reachable by direct navigation but is skipped b
 
 `F` and Present toggle native fullscreen; fullscreen changes hide the rail and refit the slide. Presentation chrome appears on pointer movement and remains available on hover/focus. Typing, modified shortcuts and claimed keyboard events keep their normal behavior. On touch devices, stage-half taps navigate while links, controls and open-shadow interactive content retain their taps. `no-rail` suppresses the rail; narrow layouts also hide it.
 
+Controls start hidden in normal editing as well as presentation. Global pointer movement reveals them for 1800 ms; hover or keyboard focus pins them until release. Normal navigation, click builds, repeated jumps and navigation at a boundary also reveal controls. Presentation navigation keeps the audience view quiet.
+
 A real local presentation or fullscreen transition clears controls carried over from editing, their idle timer and hover/focus pins. Repeated delivery of the same state preserves controls the user has revealed. Pointer hover and keyboard focus keep the controls available; mouse button focus alone does not pin them indefinitely. Keyboard slide navigation leaves audience chrome hidden until interaction reveals it.
 
 ## Thumbnail editor and source editing
@@ -108,6 +110,6 @@ The local endpoint uses a same-origin token, exact content version and slide-cou
 
 ## Remaining stage work
 
-The complete deck family remains under port review. Source-renderer bindings beyond literal HTML, semantic slide validation integration, outside-presentation idle chrome, richer notes/presenter workflows, multi-stage behavior and broader print/font checks remain pending. See the [functional inventory](porting-status.md); do not describe these missing actions as completed.
+The complete deck family remains under port review. Source-renderer bindings beyond literal HTML, semantic slide validation integration, richer notes/presenter workflows, multi-stage behavior and broader print/font checks remain pending. See the [functional inventory](porting-status.md); do not describe these missing actions as completed.
 
 Tests cover all 44 effect models, browser keyframes, all mask-family pixel changes, click grouping, complete repeat/reverse timing, held states, authored transforms, leaving/reconnecting, reduced-motion/fallback behavior, notes, skipped slides, real native fullscreen, capture and actual two-page PDF output. Editor tests exercise actual mouse/keyboard selection, native drag, confirmation/cancellation, undo after reload, inert styled lazy previews, live theme/shadow updates, real HTML writes, independent duplicated image state, streaming gates and stale/foreign/concurrent write rejection. Reference visual comparisons and hardware/browser coverage still require further evidence. The effect gallery provides a local review surface for every family and representative direction/reversal variants.

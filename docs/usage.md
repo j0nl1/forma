@@ -189,3 +189,7 @@ The [document guide](../skills/codex-design/references/documents.md) distinguish
 ## Geographic maps
 
 Follow the [geography guide](../skills/codex-design/references/geography.md) to bundle real country topology, choose world/regional projections, export SVG/2× PNG, and author interactive Leaflet street maps. `maps.html` is an ordinary HTML example with named selection and an opt-in street section. The demo helper builds both local library entries and the required `street.bundle.css`; tile requests start only on button activation. Vector standalone HTML retains its data after source deletion. Configure tile URL/attribution for your actual provider; synthetic fixture tests cover behavior, and live delivery remains a separate check.
+
+## Generated sound assets
+
+The [sound workflow](../skills/codex-design/references/sound-effects.md) describes `scripts/sound-effects.mjs`: descriptive prompts, optional duration, prompt influence, MP3 output and project provenance. Its default invocation prints an offline request plan. Add `--generate` only when making the configured provider request, with `ELEVENLABS_API_KEY` in the process environment. Use the resulting local MP3 with the existing animation audio markers. No native sound-generation tool or live provider result is assumed.

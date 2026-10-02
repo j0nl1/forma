@@ -4,7 +4,7 @@ import { DeckEditor } from "./deck-editor.js";
 const interactive =
   'a[href],button,input,textarea,select,summary,label,video[controls],audio[controls],[role="button"],[onclick],[tabindex]:not([tabindex^="-"]),[contenteditable]:not([contenteditable="false" i])';
 const template = `<style>
-:host{display:block;height:100vh;background:#161c25;color:#fff;font:14px system-ui;--rail-width:180px}.layout{display:flex;height:calc(100% - 58px)}.rail{width:var(--rail-width);flex:none;overflow:auto;padding:10px;box-sizing:border-box}.rail button{display:block;width:100%;text-align:left;margin:6px 0}:host([data-fonts-pending]) .viewport,:host([data-fonts-pending]) .rail{opacity:0;pointer-events:none}.viewport{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}.art{position:relative;transform-origin:center;flex:none}slot{display:block}::slotted([data-deck-slide]){box-sizing:border-box;width:100%;height:100%;overflow:hidden;position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none}::slotted([data-deck-active]){visibility:visible;opacity:1;pointer-events:auto}.toolbar{height:58px;display:flex;align-items:center;gap:9px;padding:0 16px;box-sizing:border-box;flex-wrap:wrap;position:relative;z-index:10}button{font:inherit;border:1px solid #687482;border-radius:6px;background:#252e3a;color:#fff;padding:7px 10px;cursor:pointer}button[aria-current="true"]{border-color:#8bacff;background:#344766}.rail button[data-skipped]{opacity:.45}.notes{position:absolute;right:16px;bottom:70px;max-width:420px;max-height:30vh;overflow:auto;background:#fff;color:#1c2836;padding:18px;border-radius:8px;white-space:pre-wrap;z-index:10}[hidden]{display:none!important}:host([no-rail]) .rail,:host([noscale]) .rail,:host([data-fullscreen]) .rail,:host([data-presenting]) .rail{display:none}:host([noscale]) .art{transform:none!important}:host([noscale]) .toolbar{display:none}:host([data-fullscreen]) .layout,:host([data-presenting]) .layout{height:100%}:host([data-fullscreen]) .toolbar,:host([data-presenting]) .toolbar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);height:auto;flex-wrap:nowrap;background:#161c25e8;padding:8px;border-radius:12px;max-width:calc(100% - 32px);opacity:0;transition:opacity .2s;pointer-events:none}:host([data-chrome-visible]) .toolbar{opacity:1;pointer-events:auto}
+:host{display:block;height:100vh;background:#161c25;color:#fff;font:14px system-ui;--rail-width:180px}.layout{display:flex;height:calc(100% - 58px)}.rail{width:var(--rail-width);flex:none;overflow:auto;padding:10px;box-sizing:border-box}.rail button{display:block;width:100%;text-align:left;margin:6px 0}:host([data-fonts-pending]) .viewport,:host([data-fonts-pending]) .rail{opacity:0;pointer-events:none}.viewport{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}.art{position:relative;transform-origin:center;flex:none}slot{display:block}::slotted([data-deck-slide]){box-sizing:border-box;width:100%;height:100%;overflow:hidden;position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none}::slotted([data-deck-active]){visibility:visible;opacity:1;pointer-events:auto}.toolbar{opacity:0;pointer-events:none;transition:opacity .2s;height:58px;display:flex;align-items:center;gap:9px;padding:0 16px;box-sizing:border-box;flex-wrap:wrap;position:relative;z-index:10}button{font:inherit;border:1px solid #687482;border-radius:6px;background:#252e3a;color:#fff;padding:7px 10px;cursor:pointer}button[aria-current="true"]{border-color:#8bacff;background:#344766}.rail button[data-skipped]{opacity:.45}.notes{position:absolute;right:16px;bottom:70px;max-width:420px;max-height:30vh;overflow:auto;background:#fff;color:#1c2836;padding:18px;border-radius:8px;white-space:pre-wrap;z-index:10}[hidden]{display:none!important}:host([no-rail]) .rail,:host([noscale]) .rail,:host([data-fullscreen]) .rail,:host([data-presenting]) .rail{display:none}:host([noscale]) .art{transform:none!important}:host([noscale]) .toolbar{display:none}:host([data-fullscreen]) .layout,:host([data-presenting]) .layout{height:100%}:host([data-fullscreen]) .toolbar,:host([data-presenting]) .toolbar{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);height:auto;flex-wrap:nowrap;background:#161c25e8;padding:8px;border-radius:12px;max-width:calc(100% - 32px);opacity:0;transition:opacity .2s;pointer-events:none}:host([data-chrome-visible]) .toolbar{opacity:1;pointer-events:auto}
 @media(max-width:640px){.rail{display:none}.toolbar{height:auto;min-height:58px;padding:8px;gap:6px}.layout{height:calc(100% - var(--toolbar-height,58px))}.toolbar button{font-size:12px;padding:5px 7px}}
 @media print{:host{display:block;height:auto;background:#fff}.layout{display:block;height:auto}.rail,.toolbar,.notes{display:none!important}.viewport{display:block;overflow:visible}.art{transform:none!important;width:auto!important;height:auto!important}::slotted([data-deck-slide]){display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;break-after:page;width:var(--deck-w)!important;height:var(--deck-h)!important}::slotted([data-deck-skip]){display:none!important}::slotted([data-deck-last-visible]){break-after:auto}}
 </style><div class="layout"><nav class="rail" aria-label="Slides"></nav><div class="viewport"><div class="art"><slot></slot></div></div></div><div class="toolbar"><button data-prev aria-label="Previous slide">←</button><output aria-label="Slide position"></output><button data-next aria-label="Next slide or build">→</button><button data-reset aria-label="Reset to first slide">Reset · R</button><button data-full aria-label="Enter fullscreen">Present · F</button><button data-notes>Notes</button><button data-remove>Remove slide</button><button data-restore aria-label="Restore slides or undo last edit" title="Restore the previous deck state">Undo</button><button data-print>Print / PDF</button></div><aside class="notes" hidden></aside>`;
@@ -85,7 +85,7 @@ export class DeckStage extends HTMLElement {
       (event) => (event.matches ? this.preparePrint() : this.restorePrint()),
       options,
     );
-    this.addEventListener("pointermove", () => this.revealChrome(), options);
+    window.addEventListener("mousemove", () => this.revealChrome(), options);
     const toolbar = root.querySelector(".toolbar");
     toolbar.addEventListener(
       "pointerenter",
@@ -347,10 +347,12 @@ export class DeckStage extends HTMLElement {
           },
         }),
       );
+    if (reason !== "init") this.revealChrome("auto");
   }
   goTo(index, reason = "api") {
     if (!["click", "mutation"].includes(reason)) this.editor?.clearSelection();
     if (index !== this.index) this.show(index, false, reason);
+    else if (this.slides.length) this.revealChrome("auto");
   }
   next(reason = "api") {
     this.editor?.clearSelection();
@@ -367,6 +369,7 @@ export class DeckStage extends HTMLElement {
       index += direction;
     if (index >= 0 && index < this.slides.length)
       this.show(index, false, reason);
+    else if (this.slides.length) this.revealChrome("auto");
   }
   updateNotes() {
     let fallback = [];
@@ -415,6 +418,7 @@ export class DeckStage extends HTMLElement {
     } else if (key === "f" || key === "F") this.toggleFullscreen();
     else return;
     event.preventDefault();
+    this.revealChrome("auto");
   }
   setPresenting(value) {
     if (this.hasAttribute("data-presenting") === value) return;
@@ -429,7 +433,13 @@ export class DeckStage extends HTMLElement {
     this.chromeFocus = false;
     this.removeAttribute("data-chrome-visible");
   }
-  revealChrome() {
+  revealChrome(source = "pointer") {
+    if (
+      source !== "pointer" &&
+      (this.hasAttribute("data-presenting") ||
+        this.hasAttribute("data-fullscreen"))
+    )
+      return;
     this.setAttribute("data-chrome-visible", "");
     clearTimeout(this.chromeTimer);
     this.chromeTimer = setTimeout(() => {

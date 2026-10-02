@@ -40,10 +40,10 @@
       }
       header {
         padding: 0 48px;
-        max-width: 1100px;
+        max-width: min(1100px, calc(100vw - 48px));
       }
       h1 {
-        font: 46px/1.1 Georgia;
+        font: clamp(32px, 4vw, 46px)/1.1 Georgia;
         font-weight: 400;
         margin: 24px 0 18px;
       }
@@ -120,14 +120,18 @@
         padding: 12px 16px;
         border-left: 3px solid #269d80;
         background: #e3ecdf;
-        max-width: 1000px;
+        max-width: min(1000px, calc(100vw - 144px));
       }
       @media (max-width: 480px) {
         main {
           padding-top: 190px;
         }
         header {
-          padding-left: 24px;
+          padding: 0;
+        }
+        #campaign-result {
+          margin-inline: 0;
+          max-width: calc(100vw - 48px);
         }
       }
     </style>
