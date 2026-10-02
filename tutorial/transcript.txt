@@ -20,7 +20,7 @@ Motion
 Composition Stage keeps a persistent tree. Shots, animations, and captions follow authored time and named cues. Stretch a section or change speed without cutting its choreography. This tutorial uses that same engine.
 
 Verify
-Serve over loopback. Exercise the flow, inspect screenshots, and check the console. Export HTML, PNG, PDF, or MP4 with local helpers. Keep the source folder: the HTML and code remain editable after export.
+Serve over loopback. Exercise the flow, inspect screenshots, and check the console. Export HTML, PNG, PDF, PowerPoint, or MP4 with local helpers. Keep the source folder: the HTML and code remain editable after export.
 
 Limits
-PowerPoint is not included. External generation and transfers need real providers or connectors. An intermittent first-frame export issue with nested video remains unresolved. Give a concrete brief, verify the result, and keep the editable artifact.
+PowerPoint supports editable objects or slide images. HTML animations stay in the source. External generation and transfers need real providers or connectors. An intermittent first-frame export issue with nested video remains unresolved. Give a concrete brief, verify the result, and keep the editable artifact.
