@@ -225,7 +225,16 @@ export async function readSystemSource(root) {
     if (explicitNames.has(explicit.name))
       issues.push(`Duplicate component: ${explicit.name}`);
     explicitNames.add(explicit.name);
-    const existing = components.get(explicit.export ?? explicit.name);
+    const existing =
+      components.get(explicit.export ?? explicit.name) ??
+      (explicit.export === "default"
+        ? [...components.values()].find(
+            (component) =>
+              (component.export === "default" ||
+                component.name === explicit.name) &&
+              component.sourcePath === (explicit.sourcePath ?? spec.entry),
+          )
+        : undefined);
     components.set(explicit.name, {
       ...existing,
       ...explicit,

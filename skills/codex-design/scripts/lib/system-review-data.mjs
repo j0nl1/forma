@@ -275,7 +275,7 @@ export async function buildReviewData(root, manifest, files, sourceFiles = []) {
     );
   const componentHtml = (component) => {
     const json = JSON.stringify(component).replace(/</g, "\\u003c");
-    return `<html><head><style>${files.get(manifest.css).toString()}</style></head><body><div id="sample"></div><script>const ds=window[${JSON.stringify(manifest.namespace ?? "CodexDesignSystem")}],c=${json},value=ds.Components[c.export||c.name];if(c.kind==='constant'){const pre=document.createElement('pre');pre.textContent=JSON.stringify(value,null,2);document.getElementById('sample').append(pre);}else ds.createRoot(document.getElementById('sample')).render(ds.React.createElement(value,c.props||{}));</script></body></html>`;
+    return `<html><head><style>${files.get(manifest.css).toString()}</style></head><body><div id="sample"></div><script>const ds=window[${JSON.stringify(manifest.namespace ?? "CodexDesignSystem")}],c=${json},value=ds.Components[c.name];if(c.kind==='constant'){const pre=document.createElement('pre');pre.textContent=JSON.stringify(value,null,2);document.getElementById('sample').append(pre);}else ds.createRoot(document.getElementById('sample')).render(ds.React.createElement(value,c.props||{}));</script></body></html>`;
   };
   for (const start of manifest.startingPoints ?? []) {
     const file =

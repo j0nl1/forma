@@ -58,11 +58,11 @@ export function description(node) {
 }
 export function namedExports(source) {
   const result = [];
-  const add = (name, local = name) => {
+  const add = (name, local = name, exported = name) => {
     if (/^[A-Z][\w$]*$/.test(name))
       result.push({
         name,
-        export: name,
+        export: exported,
         local,
         kind: /[a-z]/.test(name) ? "component" : "constant",
       });
@@ -83,19 +83,24 @@ export function namedExports(source) {
     } else if (
       node.modifiers?.some(
         (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
-      ) &&
-      !node.modifiers.some(
-        (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
       )
     ) {
+      const isDefault = node.modifiers.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
+      );
       if (
         ts.isFunctionDeclaration(node) ||
         ts.isClassDeclaration(node) ||
         ts.isEnumDeclaration(node)
       ) {
-        if (node.name) add(node.name.text);
+        if (node.name)
+          add(
+            node.name.text,
+            node.name.text,
+            isDefault ? "default" : node.name.text,
+          );
       }
-      if (ts.isVariableStatement(node))
+      if (!isDefault && ts.isVariableStatement(node))
         for (const declaration of node.declarationList.declarations)
           if (ts.isIdentifier(declaration.name)) add(declaration.name.text);
     }
