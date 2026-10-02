@@ -64,7 +64,10 @@ export function authoringPlugin(root, model, authoring) {
               throw new Error(
                 `Unknown browser system export ${name} in ${relative}`,
               );
-            if ((item.sourcePath ?? model.spec.entry) === relative)
+            if (
+              (item.sourcePath ?? model.spec.entry) === relative &&
+              item.local !== null
+            )
               return ts.factory.createIdentifier(
                 item.local ?? item.export ?? item.name,
               );
@@ -85,13 +88,19 @@ export function authoringPlugin(root, model, authoring) {
                   ts.factory.createImportClause(
                     false,
                     undefined,
-                    ts.factory.createNamedImports([
-                      ts.factory.createImportSpecifier(
-                        false,
-                        ts.factory.createIdentifier(item.export ?? item.name),
-                        ts.factory.createIdentifier(local),
-                      ),
-                    ]),
+                    item.moduleNamespace
+                      ? ts.factory.createNamespaceImport(
+                          ts.factory.createIdentifier(local),
+                        )
+                      : ts.factory.createNamedImports([
+                          ts.factory.createImportSpecifier(
+                            false,
+                            ts.factory.createIdentifier(
+                              item.export ?? item.name,
+                            ),
+                            ts.factory.createIdentifier(local),
+                          ),
+                        ]),
                   ),
                   ts.factory.createStringLiteral(
                     target.startsWith(".") ? target : "./" + target,

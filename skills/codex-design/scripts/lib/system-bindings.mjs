@@ -90,7 +90,10 @@ function guide(manifest) {
             `${parameter.name}${parameter.constraint ? " extends " + parameter.constraint : ""}${parameter.default ? " = " + parameter.default : ""}`,
         )
         .join(", ");
-      return `## ${component.name}\n\n${component.usage || ""}\n\n${parameters ? "Type parameters: `" + parameters + "`.\n\n" : ""}${properties}\n\n${alternatives}`;
+      const reexports = (component.reexports ?? [])
+        .map((item) => `\`${item.path}\` as \`${item.export}\``)
+        .join(", ");
+      return `## ${component.name}\n\n${component.usage || ""}\n\n${reexports ? `Runtime source: \`${component.sourcePath}\`${component.moduleNamespace ? " (module namespace)" : " as `" + component.export + "`"}. Public re-exports: ${reexports}.\n\n` : ""}${parameters ? "Type parameters: `" + parameters + "`.\n\n" : ""}${properties}\n\n${alternatives}`;
     })
     .join("\n");
   const tokens =

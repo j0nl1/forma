@@ -158,7 +158,7 @@ export async function compile(root) {
     const imports = spec.components
       .map(
         (component, index) =>
-          `import{${component.export ?? component.name} as __component${index}}from ${JSON.stringify("./" + (component.sourcePath ?? spec.entry))};`,
+          `${component.moduleNamespace ? `import*as __component${index}` : `import{${component.export ?? component.name} as __component${index}}`} from ${JSON.stringify("./" + (component.sourcePath ?? spec.entry))};`,
       )
       .join("\n");
     const base = spec.entry

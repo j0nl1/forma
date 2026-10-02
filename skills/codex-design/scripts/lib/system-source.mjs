@@ -4,6 +4,7 @@ import { parseFragment } from "parse5";
 import { exists, readJson, safeFile, slug } from "./files.mjs";
 import { namedExports, docTag } from "./system-contracts.mjs";
 import { typeGraph } from "./system-type-graph.mjs";
+import { exportGraph } from "./system-export-graph.mjs";
 
 async function sourceFiles(root) {
   const files = [];
@@ -60,6 +61,8 @@ export async function readSystemSource(root) {
     starts = [];
   const types = await typeGraph(root, files);
   issues.push(...types.issues);
+  const exportsGraph = exportGraph(root, types.parsed);
+  issues.push(...exportsGraph.issues);
   let spec;
   if (await exists(path.join(root, "system.json")))
     spec = await readJson(await safeFile(root, "system.json"));
@@ -137,6 +140,11 @@ export async function readSystemSource(root) {
       ? await fs.readFile(path.join(root, usagePath), "utf8")
       : "";
     for (const exported of exports) {
+      if (
+        exportsGraph.forwarded.get(file)?.has(exported.name) ||
+        exportsGraph.suppressed.get(file)?.has(exported.name)
+      )
+        continue;
       const contract =
         getContract(exported.name + "Props") ?? getContract(exported.name);
       discovered.push({
@@ -148,7 +156,12 @@ export async function readSystemSource(root) {
     }
     if (startTag) {
       const stem = path.basename(file).replace(/\.(?:jsx|tsx|js|ts)$/, ""),
-        eligible = exports.filter((item) => item.kind !== "constant");
+        eligible = [
+          ...exports.filter(
+            (item) => !exportsGraph.suppressed.get(file)?.has(item.name),
+          ),
+          ...exportsGraph.aliases.filter((alias) => alias.via === file),
+        ].filter((item) => item.kind !== "constant");
       const primary =
         eligible.find((item) => item.name === stem) ?? eligible[0];
       if (!primary)
@@ -214,6 +227,51 @@ export async function readSystemSource(root) {
       );
     else components.set(item.name, item);
   }
+  for (const alias of exportsGraph.aliases) {
+    const owner = discovered.find(
+      (component) =>
+        !alias.moduleNamespace &&
+        component.sourcePath === alias.sourcePath &&
+        component.export === alias.export,
+    );
+    const { via, ...api } = alias;
+    const existing = components.get(alias.name);
+    if (
+      existing &&
+      (existing.sourcePath !== alias.sourcePath ||
+        existing.export !== alias.export ||
+        !!existing.moduleNamespace !== !!alias.moduleNamespace)
+    ) {
+      issues.push(
+        `Duplicate component export ${alias.name}: ${existing.sourcePath}, ${alias.sourcePath}`,
+      );
+      continue;
+    }
+    const declarationPath = via.replace(/\.(?:jsx|tsx|js|ts)$/, ".d.ts");
+    const contract = files.includes(declarationPath)
+      ? (types.contracts(declarationPath)(alias.name + "Props") ??
+        types.contracts(declarationPath)(alias.name))
+      : null;
+    const usagePath = via.replace(/\.(?:jsx|tsx|js|ts)$/, ".prompt.md");
+    const usage = files.includes(usagePath)
+      ? await fs.readFile(path.join(root, usagePath), "utf8")
+      : null;
+    components.set(alias.name, {
+      ...owner,
+      ...existing,
+      kind:
+        existing?.kind ??
+        owner?.kind ??
+        (/^[A-Z_\d]+$/.test(alias.name) ? "constant" : "component"),
+      ...api,
+      ...(contract ? { contract: { ...contract, path: declarationPath } } : {}),
+      ...(usage != null ? { usage, usagePath } : {}),
+      reexports: [
+        ...(existing?.reexports ?? []),
+        { path: via, export: alias.name },
+      ],
+    });
+  }
   const explicitNames = new Set();
   for (const explicit of Array.isArray(spec.components)
     ? spec.components
@@ -260,6 +318,6 @@ export async function readSystemSource(root) {
     issues,
     sourceFiles: files,
     declarations: types.declarations,
-    warnings: types.warnings,
+    warnings: [...types.warnings, ...exportsGraph.warnings],
   };
 }
