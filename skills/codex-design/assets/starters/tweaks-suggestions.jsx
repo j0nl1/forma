@@ -37,7 +37,8 @@ export function useTwkTypewriter(
     return items.map((text, idx) => {
       const start = time + startMs;
       let letterTime = start;
-      const points = [...text].map((_, index) => {
+      // Timing and slicing share UTF-16 offsets, including surrogate pairs.
+      const points = Array.from({ length: text.length }, (_, index) => {
         if (index) letterTime += typeMs + Math.random() * 20;
         return letterTime;
       });

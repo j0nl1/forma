@@ -1,6 +1,6 @@
 # Installation
 
-Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and basic native HTML starters have no package dependency. Preview, build, verification, export and design-system helpers require the pinned dependencies below, including previewing or exporting plain HTML. General D3 charts, 3D and React runtimes also use those dependencies and the build helper. Use Node.js 22+ for the helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio.
+Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and basic native HTML starters have no package dependency. Preview, build, verification, export and design-system helpers require the pinned dependencies below, including previewing or exporting plain HTML. General D3 charts, geographic maps, 3D and React runtimes also use those dependencies and the build helper. Use Node.js 22+ for the helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio.
 
 The [official skill documentation](https://developers.openai.com/codex/skills) describes `SKILL.md` discovery. The inspected local Codex loader supports project and user `.agents/skills` roots. UI metadata lives in `agents/openai.yaml`.
 
@@ -89,3 +89,5 @@ node tools/install.mjs --global --update
 An update requires a managed install marker and refuses changed, added, or deleted source files. Preserve local customizations separately. Re-run `npm ci --ignore-scripts` after updating; generated dependencies are not retained. Manually copied and symlink installations are not adopted automatically.
 
 To uninstall, inspect and remove only the chosen `codex-design` installation directory with your file manager, then reload Codex. Generated designs stay in their output folders. The installer and removal do not alter Codex configuration.
+
+Geography dependencies are pinned with the other helpers: D3 7.9.0, topojson-client 3.1.0, world-atlas 2.0.2 and Leaflet 1.9.4. Build the vector and street entries as described in the [geography guide](../skills/codex-design/references/geography.md). Copy/link the street bundle's generated CSS alongside its JavaScript. Country geometry is local; an enabled street tile provider uses the page's normal network connection.

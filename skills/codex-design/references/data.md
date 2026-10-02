@@ -6,6 +6,6 @@ Choose a chart by the question: bars for category comparison, lines for time, sc
 
 Use `sources.js` for provenance and clearly mark synthetic data. An experiment needs a hypothesis, primary metric, assignment unit, test duration assumptions, and a decision rule. A visual variant picker is not evidence that an experiment has run.
 
-Maps need real coordinates and projection choice. Use local GeoJSON with SVG for offline work; use a configured mapping library only when tiles and licensing are understood. Include scale, legend, geographic caveats, and attribution. Do not invent boundaries or interpret raw latitude/longitude as screen pixels.
+Follow the [geography guide](geography.md) for locally bundled real Natural Earth topology, full D3/TopoJSON APIs, world and regional SVG views, actual SVG/2× PNG downloads, and opt-in Leaflet street maps with visible provider attribution. Choose the projection and dataset resolution deliberately; keep measurements, caveats and provenance explicit.
 
 Use the [data overlay contract](data-overlay.md) to paint already-computed metrics or qualitative annotations onto live product elements. Record the denominator, reproducible query, as-of date and metric definition; do not substitute arbitrary severity scores for measurements. Build a telemetry map beside the views file with stable IDs, event/property mappings, known instrumentation gaps and refresh instructions. Keep overlays switchable, verify the off state and confirm every painted number against the underlying dataset.

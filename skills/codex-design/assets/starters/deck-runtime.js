@@ -1,4 +1,5 @@
 import { DeckBuilds } from "./deck-builds.js";
+import { slideLabel } from "./deck-labels.js";
 import { DeckEditor } from "./deck-editor.js";
 const interactive =
   'a[href],button,input,textarea,select,summary,label,video[controls],audio[controls],[role="button"],[onclick],[tabindex]:not([tabindex^="-"]),[contenteditable]:not([contenteditable="false" i])';
@@ -275,13 +276,7 @@ export class DeckStage extends HTMLElement {
     );
     this.slides.forEach((slide, index) => {
       slide.setAttribute("data-deck-slide", index);
-      const label =
-        slide.getAttribute("data-label") ??
-        slide
-          .querySelector("h1,h2,h3,[data-title]")
-          ?.textContent.trim()
-          .slice(0, 40) ??
-        "Slide";
+      const label = slideLabel(slide);
       slide.setAttribute(
         "data-screen-label",
         `${String(index + 1).padStart(2, "0")} ${label}`,

@@ -55,6 +55,16 @@ export async function prepareDemo(destination) {
     path.join(destination, "chart-libraries.bundle.js"),
     { overwrite: true },
   );
+  for (const [entry, output] of [
+    ["geography-libraries.js", "geography.bundle.js"],
+    ["street-libraries.js", "street.bundle.js"],
+  ]) {
+    await bundle(
+      path.join(root, "skills/codex-design/assets/starters", entry),
+      path.join(destination, output),
+      { overwrite: true },
+    );
+  }
   await bundle(
     path.join(root, "skills/codex-design/assets/starters/data-overlay.js"),
     path.join(destination, "starters/data-overlay.js"),

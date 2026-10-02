@@ -83,6 +83,8 @@ A real local presentation or fullscreen transition clears controls carried over 
 
 ## Thumbnail editor and source editing
 
+Labels prefer a nonempty `data-label`, then an existing `data-screen-label` with its position prefix removed, then the first `h1`, `h2`, `h3` or `[data-title]` (up to 40 characters), then "Slide". Reordering and skip changes update position numbers while preserving names; duplication and source save/reload/undo retain authored names.
+
 The rail displays lazy, styled, static previews of the finished slide artwork. It reuses thumbnail elements across reorders, shows skipped slides dimmed without a number, and updates materialized previews when authored content, styles, inherited variables or open-shadow content changes. Preview construction does not create custom-element instances or replay builds. Canvas pixels become image snapshots; videos use posters, embedded frames/audio lose their sources, transient dialogs and popovers are omitted, and preview content is inert. Readable local stylesheets are adopted into isolated preview roots. Cross-origin stylesheets cannot be inspected by the browser and require local copies.
 
 Drag the rail separator to resize it between 120 and 360 px. Keyboard Left/Right on the separator adjusts it by 10 px. Width and the Slides visibility toggle persist per document/deck in browser storage when available. Narrow layouts, print, fullscreen, `no-rail` and `noscale` still suppress the rail.
@@ -106,6 +108,6 @@ The local endpoint uses a same-origin token, exact content version and slide-cou
 
 ## Remaining stage work
 
-The complete deck family remains under port review. Source-renderer bindings beyond literal HTML, source label/validation integration, outside-presentation idle chrome, richer notes/presenter workflows, multi-stage behavior and broader print/font checks remain pending. See the [functional inventory](porting-status.md); do not describe these missing actions as completed.
+The complete deck family remains under port review. Source-renderer bindings beyond literal HTML, semantic slide validation integration, outside-presentation idle chrome, richer notes/presenter workflows, multi-stage behavior and broader print/font checks remain pending. See the [functional inventory](porting-status.md); do not describe these missing actions as completed.
 
 Tests cover all 44 effect models, browser keyframes, all mask-family pixel changes, click grouping, complete repeat/reverse timing, held states, authored transforms, leaving/reconnecting, reduced-motion/fallback behavior, notes, skipped slides, real native fullscreen, capture and actual two-page PDF output. Editor tests exercise actual mouse/keyboard selection, native drag, confirmation/cancellation, undo after reload, inert styled lazy previews, live theme/shadow updates, real HTML writes, independent duplicated image state, streaming gates and stale/foreign/concurrent write rejection. Reference visual comparisons and hardware/browser coverage still require further evidence. The effect gallery provides a local review surface for every family and representative direction/reversal variants.

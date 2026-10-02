@@ -311,6 +311,90 @@ test("flowing PDF uses real chosen paper, repeats running content and protects e
   assert.ok(counts[0] >= counts[1]);
 });
 
+test("print-time running slots grow and shrink without overlapping flow or accumulating padding", async (t) => {
+  const running = (prefix, count) =>
+    Array.from({ length: count }, (_, i) => `${prefix}_${i}`).join("<br>");
+  const style = "header,footer{font:20px/24px Arial;margin:0}";
+  const content = (count) =>
+    `<header slot="header">${running("HEADER", count)}</header>${paragraphs}<footer slot="footer">${running("FOOTER", count)}</footer>`;
+  const late = await fixture(t, content(1), "", style);
+  await withPage(late.url, async (page) => {
+    await page.evaluate(() => CodexDocument.preparePrint({ paper: "letter" }));
+    await page.emulateMedia({ media: "print" });
+    for (const [pass, count] of [8, 2, 8].entries()) {
+      const early = await fixture(t, content(count), "", style);
+      const expectedFile = path.join(early.dir, "expected.pdf");
+      await exportArtifact("pdf", early.url, expectedFile, { paper: "letter" });
+      await page.locator("doc-page").evaluate(
+        (d, { header, footer }) => {
+          d.querySelector("header").innerHTML = header;
+          d.querySelector("footer").innerHTML = footer;
+        },
+        { header: running("HEADER", count), footer: running("FOOTER", count) },
+      );
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
+      assert.deepEqual(
+        await page
+          .locator("doc-page")
+          .evaluate((d) => [d.headerHeight, d.footerHeight]),
+        [count * 24, count * 24],
+      );
+      const actualFile = path.join(late.dir, `late-${pass}.pdf`);
+      await page.pdf({
+        path: actualFile,
+        printBackground: true,
+        preferCSSPageSize: true,
+      });
+      const actual = pdfPages(actualFile),
+        expected = pdfPages(expectedFile);
+      assert.equal(actual.length, expected.length);
+      for (let i = 0; i < actual.length; i++) {
+        const words = actual[i].words;
+        const body = words.filter(
+          (word) => !/^(HEADER|FOOTER)_/.test(word.text),
+        );
+        const headerBottom = Math.max(
+          ...words
+            .filter((word) => word.text.startsWith("HEADER_"))
+            .map((word) => word.bottom),
+        );
+        const footerTop = Math.min(
+          ...words
+            .filter((word) => word.text.startsWith("FOOTER_"))
+            .map((word) => word.y),
+        );
+        assert.ok(
+          body.every(
+            (word) => word.y > headerBottom && word.bottom < footerTop,
+          ),
+        );
+        assert.deepEqual(
+          words.map((word) => word.text),
+          expected[i].words.map((word) => word.text),
+        );
+        for (let j = 0; j < words.length; j++) {
+          close(words[j].y, expected[i].words[j].y);
+          close(words[j].bottom, expected[i].words[j].bottom);
+        }
+      }
+      await page.evaluate(() =>
+        CodexDocument.preparePrint({ paper: "letter" }),
+      );
+      assert.deepEqual(
+        await page
+          .locator("doc-page")
+          .evaluate((d) => [d.headerHeight, d.footerHeight]),
+        [count * 24, count * 24],
+      );
+    }
+  });
+});
+
 test("explicit pages print exactly once, obey paper changes and clip overflowing designs", async (t) => {
   const content =
     '<section class="page" style="height:100%;padding:5%;background:#ddcfa4"><h1>OUTSIDE</h1><p>Flap Back Front</p><p style="position:absolute;top:120%">CLIPPED_OUTSIDE</p></section><section class="page" style="height:100%;padding:5%;background:#b9cabd"><h1>INSIDE</h1><p>Left Middle Right</p></section>';

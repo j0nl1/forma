@@ -17,6 +17,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | Motion | One shared React `Stage`, with continuous `CompositionStage` or active-index `SceneStage`; `window.codexTimeline`/`__animStage` share duration, dimensions and synchronous seek; parsed font styles retain imported-sheet bases and conditions, with packaged Inter and configured remote embedding; the simple `motion-stage` remains for existing examples |
 | Tweaks | React `useTweaks` and typed controls, a shared JSON-only store, local draft handoff and versioned root-HTML JSON source writes |
 | Charts | General light-DOM `chart-stage`, full local D3/Sankey bundle, keyed redraw context, view scales, refresh transitions, pointer tooltips and actual SVG/2× PNG downloads; basic `data-chart` retained |
+| Geography | Full local D3/TopoJSON APIs, bundled real Natural Earth topology, projected world/regions and actual SVG/2× PNG downloads; full Leaflet API with emitted CSS and explicit tile activation/provider attribution |
 | Data overlay | Authored `data-overlay` views, independent geometry/layout/paint/control modules, exact sentence navigation, JSON or reviewed JS source reload, local request drafts and scoped opacity restoration |
 | Images | Modular `image-slot.js`, source id / legacy storage-key interfaces, shared directory sidecar, top-layer framing and embedded portable state |
 | Text editor | Literal HTML text-run bindings, response-only identity marks, local source saves, conflict-retained drafts and actual undo/redo |

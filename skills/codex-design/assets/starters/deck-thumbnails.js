@@ -1,3 +1,5 @@
+import { slideLabel } from "./deck-labels.js";
+
 // Build display-only copies without constructing custom elements or loading frames.
 const runtimeAttribute = (name) =>
   [
@@ -13,7 +15,10 @@ const runtimeAttribute = (name) =>
 export function cleanDeckCopy(root) {
   for (const node of [root, ...root.querySelectorAll("*")]) {
     for (const attribute of [...node.attributes])
-      if (runtimeAttribute(attribute.name))
+      if (
+        runtimeAttribute(attribute.name) &&
+        !(node === root && attribute.name === "data-screen-label")
+      )
         node.removeAttribute(attribute.name);
   }
   return root;
@@ -385,7 +390,7 @@ export class DeckThumbnails {
       );
       entry.thumb.setAttribute(
         "aria-label",
-        `${skipped ? "Skipped slide" : "Slide " + entry.number.textContent}: ${entry.slide.getAttribute("data-label") || entry.slide.querySelector("h1,h2,h3")?.textContent || "Untitled"}`,
+        `${skipped ? "Skipped slide" : "Slide " + entry.number.textContent}: ${slideLabel(entry.slide)}`,
       );
     }
   }

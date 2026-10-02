@@ -13,7 +13,8 @@
         "assets/starters/deck-masks.js",
         "assets/starters/deck-editor.js",
         "assets/starters/deck-thumbnails.js",
-        "assets/starters/deck-operations.js"
+        "assets/starters/deck-operations.js",
+        "assets/starters/deck-labels.js"
       ]
     },
     {
@@ -155,7 +156,9 @@
         "assets/starters/data-overlay-paint.js",
         "assets/starters/data-overlay-runtime.js",
         "assets/starters/data-overlay-style.js",
-        "assets/starters/data-overlay.js"
+        "assets/starters/data-overlay.js",
+        "assets/starters/geography-libraries.js",
+        "assets/starters/street-libraries.js"
       ]
     },
     {

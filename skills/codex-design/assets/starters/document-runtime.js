@@ -24,9 +24,8 @@ class DocPage extends HTMLElement {
     this.sheet = this.shadowRoot.querySelector(".sheet");
     this.ready = new Promise((resolve) => (this.resolveReady = resolve));
     this.observer = new MutationObserver(() => this.schedule());
-    this.resizeObserver = new ResizeObserver(() => {
-      if (!this.printing) this.schedule();
-    });
+    this.resizeObserver = new ResizeObserver(() => this.schedule());
+    this.runningPadding = new WeakMap();
     this.headerHeight = 0;
     this.footerHeight = 0;
     this.paginated = false;
@@ -120,16 +119,43 @@ class DocPage extends HTMLElement {
       this.measure();
     });
   }
+  runningHeight(node, edge) {
+    if (!node) return 0;
+    const style = getComputedStyle(node),
+      top = parseFloat(style.paddingTop) || 0,
+      bottom = parseFloat(style.paddingBottom) || 0;
+    if (!this.media?.matches) {
+      this.runningPadding.set(node, top + bottom);
+      return node.offsetHeight;
+    }
+    // Remove the runtime's added print inset, keeping the author's natural padding.
+    const ownPadding = pixels(this.printGeometry.margin) * 0.45,
+      side = edge === "top" ? top : bottom,
+      opposite = edge === "top" ? bottom : top,
+      added =
+        Math.abs(side - ownPadding) < 0.01 && opposite === 0
+          ? Math.max(0, top + bottom - (this.runningPadding.get(node) || 0))
+          : 0;
+    const height = parseFloat(style.height);
+    const boxHeight = Number.isFinite(height)
+      ? height +
+        (style.boxSizing === "border-box"
+          ? 0
+          : top +
+            bottom +
+            (parseFloat(style.borderTopWidth) || 0) +
+            (parseFloat(style.borderBottomWidth) || 0))
+      : node.offsetHeight;
+    return Math.max(0, Math.round(boxHeight - added));
+  }
   measure() {
     if (!this.isConnected) return;
     this.paginated = !!this.querySelector(":scope > .page");
     this.sheet.classList.toggle("paginated", this.paginated);
     const header = this.querySelector(':scope > [slot="header"]'),
       footer = this.querySelector(':scope > [slot="footer"]');
-    if (!this.printing) {
-      this.headerHeight = header?.offsetHeight || 0;
-      this.footerHeight = footer?.offsetHeight || 0;
-    }
+    this.headerHeight = this.runningHeight(header, "top");
+    this.footerHeight = this.runningHeight(footer, "bottom");
     if (
       !this.targets ||
       header !== this.targets[0] ||
