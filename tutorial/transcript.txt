@@ -22,5 +22,5 @@ Composition Stage keeps a persistent tree. Shots, animations, and captions follo
 Verify
 Serve over loopback. Exercise the flow, inspect screenshots, and check the console. Export HTML, PNG, PDF, PowerPoint, or MP4 with local helpers. Keep the source folder: the HTML and code remain editable after export.
 
-Limits
-PowerPoint supports editable objects or slide images. HTML animations stay in the source. External generation and transfers need real providers or connectors. An intermittent first-frame export issue with nested video remains unresolved. Give a concrete brief, verify the result, and keep the editable artifact.
+Handoff
+PowerPoint supports editable slides with native builds and local media. Complex CSS can need image layers. Check fonts, animation, and media playback in the receiving application. External generation and transfers need configured providers or authorized connectors. Give a concrete brief, verify the result, and keep the editable artifact.

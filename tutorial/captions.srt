@@ -143,21 +143,21 @@ Keep the source folder:
 the HTML and code remain editable after export.
 
 37
-00:01:54,347 --> 00:01:57,240
-PowerPoint supports editable objects or slide images.
+00:01:54,347 --> 00:01:58,501
+PowerPoint supports editable slides with native builds and local media.
 
 38
-00:01:57,240 --> 00:01:59,719
-HTML animations stay in the source.
+00:01:58,501 --> 00:02:00,993
+Complex CSS can need image layers.
 
 39
-00:01:59,719 --> 00:02:03,439
-External generation and transfers need real providers or connectors.
+00:02:00,993 --> 00:02:05,147
+Check fonts, animation, and media playback in the receiving application.
 
 40
-00:02:03,439 --> 00:02:07,572
-An intermittent first-frame export issue with nested video remains unresolved.
+00:02:05,147 --> 00:02:09,301
+External generation and transfers need configured providers or authorized connectors.
 
 41
-00:02:07,572 --> 00:02:12,532
+00:02:09,301 --> 00:02:14,285
 Give a concrete brief, verify the result, and keep the editable artifact.
