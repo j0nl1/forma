@@ -49,6 +49,8 @@ Use the project installation folder instead when applicable. Keep npm workspace 
 
 For macOS-specific operations in the maintained workspace, use `ssh sirius`. Other users should follow their own host instructions.
 
+The design-system compiler, public module entries and read-only `scripts/adherence.mjs` checker use these same installed dependencies. They require no host service, project compiler plugin or model API key. See the [design-system usage](usage.md#design-systems) for compilation, imports and advisory checks.
+
 Animation captions include Inter Medium 4.1 under the SIL Open Font License; no font download or additional setup is required. When copying the animation starter, retain its companion modules and the complete `assets/starters/fonts/` directory, including its license. The build helper embeds the default font in the output bundle. See [portable fonts](../skills/codex-design/references/motion.md#portable-fonts) for authored fonts and optional provider configuration.
 
 ## Update and remove

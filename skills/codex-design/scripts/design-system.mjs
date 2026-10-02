@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { build } from "esbuild";
 import { inspectSystemCSS } from "./lib/system-css.mjs";
+import { adherencePolicy, publicSystemEntry } from "./lib/system-adherence.mjs";
 import { inlineHtml } from "./lib/inline.mjs";
 import { readSystemSource } from "./lib/system-source.mjs";
 import { systemReview } from "./lib/system-review.mjs";
@@ -286,10 +287,15 @@ export async function compile(root) {
       null,
       2,
     ) + "\n";
+  const adherence =
+    JSON.stringify(adherencePolicy(model, namespace), null, 2) + "\n";
+  const entry = bundle ? publicSystemEntry(spec, namespace) : null;
   const artifacts = {
     ...Object.fromEntries(seeds.map((s) => [s.name, hash(s.content)])),
     "_ds_tokens.css": hash(css),
     "_ds_contracts.json": hash(contracts),
+    "_ds_adherence.json": hash(adherence),
+    ...(entry ? { "_ds_entry.js": hash(entry) } : {}),
     ...(bundle ? { "_ds_bundle.js": hash(bundle) } : {}),
   };
   const manifest = {
@@ -313,6 +319,8 @@ export async function compile(root) {
     startingPoints,
     cards,
     contracts: "_ds_contracts.json",
+    adherence: "_ds_adherence.json",
+    moduleEntry: entry ? "_ds_entry.js" : null,
     guidance: spec.guidance ?? "",
     css: "_ds_tokens.css",
     bundle: bundle ? "_ds_bundle.js" : null,
@@ -332,6 +340,9 @@ export async function compile(root) {
     await write(path.join(root, seed.name), seed.content);
   await write(path.join(root, "_ds_tokens.css"), css);
   await write(path.join(root, "_ds_contracts.json"), contracts);
+  await write(path.join(root, "_ds_adherence.json"), adherence);
+  if (entry) await write(path.join(root, "_ds_entry.js"), entry);
+  else await fs.rm(path.join(root, "_ds_entry.js"), { force: true });
   await write(path.join(root, manifest.review), reviewData);
   if (bundle) await write(path.join(root, "_ds_bundle.js"), bundle);
   else await fs.rm(path.join(root, "_ds_bundle.js"), { force: true });

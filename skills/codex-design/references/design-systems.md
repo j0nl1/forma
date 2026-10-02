@@ -25,7 +25,7 @@ An explicit `system.json` remains supported for sample props, aliases, examples 
 
 Named PascalCase exports in JSX/TSX/JS/TS are discovered throughout the source tree. All-capital exports are constants, displayed as data rather than mounted as React components. Lowercase helpers remain implementation details. Re-export barrels do not create duplicate component owners. With no manual entry, the compiler creates the entry in memory; an explicit entry keeps its other existing exports. Explicit sample props and component aliases merge with discovered metadata. Duplicate owners, malformed source syntax and orphan declarations produce read-only issues and prevent compilation.
 
-Place `<Name>.d.ts` and `<Name>.prompt.md` beside `<Name>.jsx` or `<Name>.tsx`. The declaration contract comes from `<ExportName>Props` or `<ExportName>`, independently of the folder name. The TypeScript syntax-tree reader preserves optional/readonly properties, inherited and merged local interfaces, local alias/intersection object members, nested types, methods, literal-union values, descriptions and `@default` annotations. It retains the entire declaration text in `_ds_contracts.json`; imported copies include that hashed artifact. This is metadata inspection, not complete TypeScript semantic type checking. Imported/external types and generic utilities remain readable type text rather than inferred schemas. Usage prose is retained in the manifest and generated local guide.
+Place `<Name>.d.ts` and `<Name>.prompt.md` beside `<Name>.jsx` or `<Name>.tsx`. The declaration contract comes from `<ExportName>Props` or `<ExportName>`, independently of the folder name. The contained TypeScript checker preserves optional/readonly properties, inherited and merged interfaces, local imports/re-exports, instantiated generic/mapped properties, conditional alternatives, nested types, methods, literal-union values, descriptions and `@default` annotations. It retains the declaration closure in `_ds_contracts.json`; imported copies include that hashed artifact. Unresolved external types retain authored text and explicit advisories. See [imported property contracts](#imported-and-generic-property-contracts) for the resolution boundary. Usage prose is retained in the manifest and generated local guide.
 
 Tag a card near the start of its HTML:
 
@@ -101,6 +101,21 @@ Union contracts show common properties plus separate alternatives with their own
 
 The analysis host only reads selected system sources and standard libraries from the pinned TypeScript package. Bare third-party type packages and unknown namespaces produce visible inspection advisories; no global package lookup or remote fetch fills them in. Their authored type text remains available instead of presenting an unresolved expansion as `any`. Localize the declarations and use relative imports when full resolution is required. This is property-contract inventory, not a full application type check or adherence lint. External/ambient package mappings, additional language/library cases and comprehensive adherence remain required acceptance work.
 
+## Advisory adherence checks
+
+Compilation writes the hashed `_ds_adherence.json` policy. Run the owned checker against either a compiled system or a project with verified system bindings:
+
+```sh
+node /absolute/path/to/codex-design/scripts/adherence.mjs /path/to/project /path/to/project/main.jsx
+node /absolute/path/to/codex-design/scripts/adherence.mjs /path/to/project /path/to/project/src --strict
+```
+
+The read-only JSON report retains source file, line, column, system, component and property. Four inspected advisory contracts are restored: raw hex color and `Npx` JavaScript literals, imports from system component internals, undeclared JSX props and unsupported finite variants. `key`, `ref`, `className`, `style` and `children` remain allowed. Entry importers named `index.js` retain the internal-import exemption. Empty or missing component contracts fail open. These are warnings; default warnings return exit code 0, `--strict` returns 1 for warnings, and source syntax errors return 2. Invalid inputs, bindings or artifact hashes fail with an error. No input files are rewritten or executed.
+
+Public named/default/namespace imports, registry and native namespace aliases, independent systems, JSX and recognized React `createElement` calls are covered. Known immutable literal/spread values can be checked. Mutated constants, mutable variables, unknown spreads and computed/runtime values remain explicitly unchecked. Unresolved interface bases leave the full prop allowlist unchecked while retaining known finite-variant advisories. Open string index signatures permit extra props. Locally shadowed components/window/React values keep their own meaning; ambiguous unqualified component names require a system-qualified origin.
+
+HTML analysis combines inline classic scripts within one document and keeps module scripts and separate documents independent; inert JSON scripts are ignored. A single HTML input does not follow external script URLs. Scan the authoring folder to include their local source. Dependency folders, generated `_ds_*` files and copied `_ds/` libraries are skipped. CSS rules, application type semantics, package/path aliases, original-source imports outside a bound copy, complete JavaScript mutation flow, dynamic rendering and visual fidelity still require other checks. A report with no warnings does not prove complete coverage; inspect `skipped` and the stated scope.
+
 ## Discover and consume systems
 
 Run `scripts/design-system.mjs discover <designs-folder>` to inspect compiled systems immediately below that folder. Discovery is read-only, checks artifact hashes, reports damaged entries and excludes nested consumed copies. Choose none, one or several systems according to the user's brief. A selected starting point remains optional; show its actual name and component/screen purpose before using it.
@@ -120,6 +135,17 @@ Each new compilation has a unique namespace recorded in `_ds_manifest.json`. Rec
   );
 </script>
 ```
+
+New compilations with a component bundle also provide the hashed public `_ds_entry.js` module, recorded as `moduleEntry`. It exports the matching `React`, `ReactDOM`, `createRoot`, `hydrateRoot`, `Components`, named exposed components/constants and the system as its default export:
+
+```js
+import {React, createRoot, Button} from './_ds/harbor/_ds_entry.js';
+createRoot(document.getElementById('example')).render(
+  React.createElement(Button, {children: 'Continue'})
+);
+```
+
+Keep `_ds_tokens.css` loaded separately. Use plain JavaScript with `<script type="module" src="main.js">` in a browser. For JSX/TSX or portable single-file HTML, bundle the consuming entry first with `scripts/build.mjs <main.jsx> <bundle.js>`, then reference that classic bundle from the HTML. Imported copies include the entry, policy and bundle, and keep working after source deletion. Lowercase helpers and exports whose names collide with runtime APIs are available through `Components`/the default registry when exposed by the bundle; full authored export-map parity remains pending.
 
 The import merges `design.json`, preserving unrelated project and binding fields. Each binding records `name`, `slug`, `namespace`, `path`, the original `sourcePath` and a hash of the copied manifest. The source path is a provenance hint, not a runtime dependency. The first imported system becomes `primaryDesignSystem`; `--primary` explicitly chooses another. Run `scripts/design-system.mjs wiring <project>` for verified link/script tags and available component/starting-point metadata. It orders the primary system's CSS last so its global tokens win collisions. Component namespaces remain independent; CSS intentionally shares document scope. Compose the actual exported components instead of re-creating lookalikes.
 

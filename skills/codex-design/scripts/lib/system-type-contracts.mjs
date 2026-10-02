@@ -79,6 +79,22 @@ export function typedContracts(checker, source, root, original, dependencies) {
     );
     if (!node) return null;
     const type = checker.getDeclaredTypeOfSymbol(symbol);
+    function unresolvedBase(declaration, seen = new Set()) {
+      if (seen.has(declaration)) return false;
+      seen.add(declaration);
+      for (const clause of declaration.heritageClauses ?? [])
+        for (const base of clause.types) {
+          const baseType = checker.getTypeAtLocation(base);
+          if (baseType.flags & ts.TypeFlags.Any) return true;
+          for (const parent of baseType.symbol?.declarations ?? [])
+            if (
+              ts.isInterfaceDeclaration(parent) &&
+              unresolvedBase(parent, seen)
+            )
+              return true;
+        }
+      return false;
+    }
     function describe(type) {
       const props = checker.getPropertiesOfType(type).map((property) => {
         const member = property.valueDeclaration ?? property.declarations?.[0];
@@ -178,6 +194,12 @@ export function typedContracts(checker, source, root, original, dependencies) {
         : {}),
       declaration: original,
       dependencies,
+      ...(symbol.declarations?.some(
+        (declaration) =>
+          ts.isInterfaceDeclaration(declaration) && unresolvedBase(declaration),
+      )
+        ? { openProps: true }
+        : {}),
       ...(node.typeParameters?.length
         ? {
             typeParameters: node.typeParameters.map((parameter) => ({

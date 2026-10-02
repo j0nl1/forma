@@ -60,6 +60,12 @@ export async function compiledSystem(root) {
   )
     throw new Error("Incomplete artifact manifest");
   const files = new Map();
+  for (const field of ["moduleEntry", "adherence"])
+    if (
+      manifest[field] != null &&
+      !Object.hasOwn(manifest.artifacts, manifest[field])
+    )
+      throw new Error(`Unverified compiled ${field} artifact`);
   for (const [name, expected] of Object.entries(manifest.artifacts)) {
     if (
       path.basename(name) !== name ||

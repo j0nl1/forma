@@ -115,11 +115,17 @@ node skills/codex-design/scripts/design-system.mjs compile /tmp/harbor-system
 node skills/codex-design/scripts/design-system.mjs preview /tmp/harbor-system
 node skills/codex-design/scripts/design-system.mjs import /tmp/harbor-system /tmp/reader-design
 node skills/codex-design/scripts/design-system.mjs wiring /tmp/reader-design
+# After authoring a consumer entry:
+node skills/codex-design/scripts/adherence.mjs /tmp/reader-design /tmp/reader-design/main.jsx
 ```
 
 Use `design-system.mjs check <system> --verbose` for token kinds, aliases, declaration provenance, conditional font faces and brand-font advisories. This is read-only; compilation remains a separate action. Explicit `/* @kind radius|font|other */` comments give ambiguous tokens a role. The portable review contains typed previews and a font inventory, including systems without component cards. Narrow tables support horizontal scrolling and keyboard focus. See the [token/font contract](../skills/codex-design/references/design-systems.md#token-and-font-inventory) for advisory versus structural-error behavior and cascade limits.
 
 Include copied `_ds/harbor/_ds_tokens.css` and the bundle when using React components. Read each compiled namespace or use `window.CodexDesignSystems.harbor`; component namespaces stay independent when several systems are loaded. Systems compiled with the same recorded React version share a React/ReactDOM pair, so their actual components can be combined in one root; different versions require their matching renderer. `check` and `discover <designs-folder>` are read-only. Compilation does not evaluate component code; browser preview executes it normally. The first imported system is primary; `primary <project> <bound-slug>` changes that choice, and `wiring <project>` supplies CSS tags with the primary last. Apply those tags to authored pages. After recompiling a source, use `import <system> <project> --update` to replace its unchanged managed copy. See the [design-system contract](../skills/codex-design/references/design-systems.md) for metadata, conflicts and legacy compatibility. The `systems.html` showcase compares two compiled systems interactively.
+
+New component compilations provide `_ds_entry.js`: import `{React, createRoot, Button}` from `./_ds/harbor/_ds_entry.js` rather than component internals. Keep token CSS loaded. Browser-native module input must be plain JavaScript; bundle JSX/TSX with `build.mjs` before preview, and bundle any module consumer before standalone HTML export. The copied entry and policy stay usable after deleting the original source.
+
+Run `adherence.mjs <compiled-system-or-bound-project> <source-file-or-folder>` to inspect authoring source without executing or rewriting it. Its JSON report warns about raw hex colors, pixel lengths, internal imports, props and finite variants. Default warnings return exit code 0; add `--strict` for exit code 1 on warnings. Syntax errors return 2. Dynamic values and unresolved inherited props are reported as unchecked. HTML input covers inline executable scripts; scan the source folder for external scripts. Read the [adherence scope](../skills/codex-design/references/design-systems.md#advisory-adherence-checks) before interpreting a clean report as coverage.
 
 ## Offline Figma
 
