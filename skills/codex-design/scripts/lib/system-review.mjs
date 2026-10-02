@@ -4,9 +4,19 @@ import { build } from "esbuild";
 
 const scriptText = (value) => value.replace(/<\/script/gi, "<\\/script");
 const jsonText = (value) => JSON.stringify(value).replace(/</g, "\\u003c");
+function propertyTable(props) {
+  return `<div class="table-scroll"><table><thead><tr><th>Property</th><th>Type / variants</th><th>Default / notes</th></tr></thead><tbody>${props.map((property) => `<tr><th>${html(property.name)}${property.optional ? "?" : ""}</th><td>${html(property.values ? property.values.map((value) => JSON.stringify(value)).join(" | ") : property.resolvedType === "any" && property.type !== "any" ? property.type : (property.resolvedType ?? property.type))}</td><td>${html(Object.hasOwn(property, "default") ? JSON.stringify(property.default) : "")} ${property.readonly ? "Read only. " : ""}${html(property.description)}${property.definedIn ? `<small>${html(property.definedIn)}:${property.line}</small>` : ""}</td></tr>`).join("")}</tbody></table></div>`;
+}
 function properties(component) {
   if (!component?.contract) return "";
-  return `<details><summary>Properties · ${component.contract.props.length}</summary><div class="table-scroll"><table><thead><tr><th>Property</th><th>Type / variants</th><th>Default / notes</th></tr></thead><tbody>${component.contract.props.map((property) => `<tr><th>${html(property.name)}${property.optional ? "?" : ""}</th><td>${html(property.values ? property.values.map((value) => JSON.stringify(value)).join(" | ") : property.type)}</td><td>${html(Object.hasOwn(property, "default") ? JSON.stringify(property.default) : "")} ${html(property.description)}</td></tr>`).join("")}</tbody></table></div></details>`;
+  const contract = component.contract;
+  const parameters = (contract.typeParameters ?? [])
+    .map(
+      (parameter) =>
+        `${parameter.name}${parameter.constraint ? " extends " + parameter.constraint : ""}${parameter.default ? " = " + parameter.default : ""}`,
+    )
+    .join(", ");
+  return `<details><summary>Properties · ${contract.props.length}</summary>${parameters ? `<p>Type parameters: <code>${html(parameters)}</code></p>` : ""}${propertyTable(contract.props)}${(contract.alternatives ?? []).map((alternative, index) => `<details><summary>Alternative ${index + 1} · ${alternative.props.length} properties</summary><pre>${html(alternative.type)}</pre>${propertyTable(alternative.props)}</details>`).join("")}${contract.signatures?.length ? `<pre>${html(contract.signatures.join("\n"))}</pre>` : ""}</details>`;
 }
 export async function systemReview(manifest, { files, data }) {
   const runtime = await build({

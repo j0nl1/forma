@@ -44,7 +44,7 @@ export function docTag(node, name) {
       ?.trim() ?? null
   );
 }
-function description(node) {
+export function description(node) {
   const value = (node.jsDoc ?? [])
     .map((doc) => comment(doc.comment))
     .filter(Boolean)

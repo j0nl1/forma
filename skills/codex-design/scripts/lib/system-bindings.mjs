@@ -68,15 +68,29 @@ async function pinned(project, binding) {
   return system;
 }
 function guide(manifest) {
+  const propertyNotes = (props) =>
+    props
+      .map(
+        (property) =>
+          `- \`${property.name}${property.optional ? "?" : ""}\`: \`${property.resolvedType === "any" && property.type !== "any" ? property.type : (property.resolvedType ?? property.type)}\`${property.readonly ? " — read only" : ""}${property.values ? " — values " + property.values.map((value) => "`" + JSON.stringify(value) + "`").join(", ") : ""}${Object.hasOwn(property, "default") ? " — default `" + JSON.stringify(property.default) + "`" : ""}. ${property.description || ""}`,
+      )
+      .join("\n");
   const usage = (manifest.components ?? [])
     .map((component) => {
-      const properties = (component.contract?.props ?? [])
+      const properties = propertyNotes(component.contract?.props ?? []);
+      const alternatives = (component.contract?.alternatives ?? [])
         .map(
-          (property) =>
-            `- \`${property.name}${property.optional ? "?" : ""}\`: \`${property.type}\`${property.values ? " — values " + property.values.map((value) => "`" + JSON.stringify(value) + "`").join(", ") : ""}${Object.hasOwn(property, "default") ? " — default `" + JSON.stringify(property.default) + "`" : ""}. ${property.description || ""}`,
+          (alternative, index) =>
+            `### Alternative ${index + 1}\n\n\`${alternative.type}\`\n\n${propertyNotes(alternative.props)}\n`,
         )
         .join("\n");
-      return `## ${component.name}\n\n${component.usage || ""}\n\n${properties}\n`;
+      const parameters = (component.contract?.typeParameters ?? [])
+        .map(
+          (parameter) =>
+            `${parameter.name}${parameter.constraint ? " extends " + parameter.constraint : ""}${parameter.default ? " = " + parameter.default : ""}`,
+        )
+        .join(", ");
+      return `## ${component.name}\n\n${component.usage || ""}\n\n${parameters ? "Type parameters: `" + parameters + "`.\n\n" : ""}${properties}\n\n${alternatives}`;
     })
     .join("\n");
   const tokens =

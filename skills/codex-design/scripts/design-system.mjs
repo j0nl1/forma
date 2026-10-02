@@ -97,7 +97,7 @@ export async function inspect(root) {
     unclassified: css.unclassified,
     fonts: css.fonts,
     brandFonts: css.brandFonts,
-    warnings: css.warnings,
+    warnings: [...css.warnings, ...source.warnings],
     files: css.files,
     issues: [...new Set(issues)],
     cards: source.cards,

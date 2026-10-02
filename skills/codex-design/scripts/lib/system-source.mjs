@@ -2,12 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { parseFragment } from "parse5";
 import { exists, readJson, safeFile, slug } from "./files.mjs";
-import {
-  sourceAST,
-  namedExports,
-  declarationContracts,
-  docTag,
-} from "./system-contracts.mjs";
+import { namedExports, docTag } from "./system-contracts.mjs";
+import { typeGraph } from "./system-type-graph.mjs";
 
 async function sourceFiles(root) {
   const files = [];
@@ -61,8 +57,9 @@ export async function readSystemSource(root) {
     issues = [],
     discovered = [],
     cards = [],
-    starts = [],
-    declarations = new Map();
+    starts = [];
+  const types = await typeGraph(root, files);
+  issues.push(...types.issues);
   let spec;
   if (await exists(path.join(root, "system.json")))
     spec = await readJson(await safeFile(root, "system.json"));
@@ -118,20 +115,14 @@ export async function readSystemSource(root) {
   for (const file of files.filter(
     (file) => /\.(?:jsx|tsx|js|ts)$/.test(file) && !file.endsWith(".d.ts"),
   )) {
-    const text = await fs.readFile(path.join(root, file), "utf8");
-    const { source, issues: syntax } = sourceAST(file, text);
-    issues.push(...syntax);
+    const source = types.parsed.get(file);
     const dtsPath = file.replace(/\.(?:jsx|tsx|js|ts)$/, ".d.ts");
     let getContract = () => null,
       startTag = null;
     if (files.includes(dtsPath)) {
       typedSources.add(dtsPath);
-      const { source: declaration, issues: syntax } = sourceAST(
-        dtsPath,
-        await fs.readFile(path.join(root, dtsPath), "utf8"),
-      );
-      issues.push(...syntax);
-      getContract = declarationContracts(declaration);
+      const declaration = types.parsed.get(dtsPath);
+      getContract = types.contracts(dtsPath);
       for (const node of declaration.statements) {
         const value = docTag(node, "startingPoint");
         if (value != null) {
@@ -139,7 +130,6 @@ export async function readSystemSource(root) {
           break;
         }
       }
-      declarations.set(dtsPath, declaration.text);
     }
     const exports = namedExports(source);
     const usagePath = file.replace(/\.(?:jsx|tsx|js|ts)$/, ".prompt.md");
@@ -178,7 +168,7 @@ export async function readSystemSource(root) {
     }
   }
   for (const declaration of files.filter((file) => file.endsWith(".d.ts")))
-    if (!typedSources.has(declaration))
+    if (!typedSources.has(declaration) && !types.reached.has(declaration))
       issues.push(
         `Orphan declaration without a sibling source: ${declaration}`,
       );
@@ -260,6 +250,7 @@ export async function readSystemSource(root) {
     cards,
     issues,
     sourceFiles: files,
-    declarations: Object.fromEntries(declarations),
+    declarations: types.declarations,
+    warnings: types.warnings,
   };
 }
