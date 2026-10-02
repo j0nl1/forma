@@ -9,7 +9,7 @@ The root contains documentation, tests, examples, and packaging. It is an npm wo
 | Surface | Contract |
 | --- | --- |
 | Project | `design.json`, schemaVersion 1, `assets` and `designSystems` |
-| System source | Optional `system.json`, root CSS entry, named React exports with sibling `.d.ts`/usage files, tagged HTML cards and screen/component starting points; source discovery parses syntax trees without execution |
+| System source | Optional `system.json`, preferred or explicit CSS entry, named React exports with sibling `.d.ts`/usage files, tagged HTML cards and screen/component starting points; source discovery parses syntax trees without execution |
 | Compiled system | `_ds_manifest.json`, `_ds_tokens.css`, `_ds_contracts.json`, `_ds_review.json`, optional `_ds_bundle.js`, portable cards/seeds and SHA-256 hashes |
 | System browser runtime | Stable per-system `window[namespace]` and `window.CodexDesignSystems[slug]`, with `React`, `createRoot`, `Components`; `window.CodexDesignSystem` remains the most recently loaded compatibility alias |
 | Canvas | Native `design-canvas`/`design-section`/`design-board`/`design-note` and React `DesignCanvas`/`DCSection`/`DCArtboard`/`DCPostIt`; source identities scope versioned sidecar state; metadata-only HTML retains direct body nodes with a separate viewport |
@@ -54,3 +54,7 @@ Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaS
 ## Design-system runtime selection
 
 Read-only authoring analysis identifies free browser React globals, safe legacy source namespaces, old DOM calls and recognized CDN declarations. Source imports and namespace references are transformed into module dependencies without evaluating design source. A package-export reader parses pinned CJS export assignments as data. Browser facades select one actual React/DOM/JSX pair per exact version through `window.CodexDesignRuntimes`, allowing several independently compiled systems to compose stateful components in one root. Raw React/DOM package internals resolve within their own matched dependency pair; consuming source imports use the shared facades. React 18 cards replace recognized React/Babel declarations with the locally compiled pair and a first-script bootstrap. Unsupported declarations fail compilation before artifacts are written.
+
+## Design-system CSS inventory
+
+`system-css.mjs` reads the contained PostCSS import closure, declarations, selectors/conditions, asset references and font faces without evaluating source. Shared owned CSS URL/escape parsing preserves source-relative font paths. `system-css-values.mjs` resolves aliases and nested fallbacks while retaining quoted/comment data. Separate token/font metadata modules retain every declaration's provenance and distinguish advisory classification/font gaps from structural errors. The compatibility token map remains the last textual definition, not a complete cascade calculation. Compiled source CSS is preserved. `system-token-review.mjs` renders typed previews and font metadata, with scrollable narrow tables. The review payload always embeds global font rules, including HTML-only/token-only systems. Imported manifests and guides retain the inventory after source deletion.

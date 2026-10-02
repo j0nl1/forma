@@ -262,6 +262,8 @@ export async function buildReviewData(root, manifest, files, sourceFiles = []) {
     fonts = new Set(),
     cards = [],
     consumed = new Set();
+  for (const font of shadowCss(files.get(manifest.css).toString()).fonts)
+    fonts.add(font);
   const add = (meta, content) =>
     cards.push(
       reviewCard(

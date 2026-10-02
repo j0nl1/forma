@@ -67,7 +67,8 @@ export async function readSystemSource(root) {
   if (await exists(path.join(root, "system.json")))
     spec = await readJson(await safeFile(root, "system.json"));
   else {
-    const css = [
+    let css;
+    for (const name of [
       "styles.css",
       "index.css",
       "globals.css",
@@ -76,7 +77,25 @@ export async function readSystemSource(root) {
       "theme.css",
       "app.css",
       "tokens.css",
-    ].find((file) => files.includes(file));
+    ]) {
+      css = files
+        .filter((file) => path.basename(file) === name)
+        .sort(
+          (a, b) =>
+            a.split(path.sep).length - b.split(path.sep).length ||
+            a.localeCompare(b),
+        )[0];
+      if (css) break;
+    }
+    if (!css && (await exists(path.join(root, "_ds_manifest.json")))) {
+      const previous = await readJson(
+        await safeFile(root, "_ds_manifest.json"),
+      );
+      const hint = Array.isArray(previous.globalCssPaths)
+        ? previous.globalCssPaths.at(-1)
+        : null;
+      if (typeof hint === "string" && files.includes(hint)) css = hint;
+    }
     const readme = files.find((file) => /^(?:readme)\.md$/i.test(file));
     const guidance = readme
       ? await fs.readFile(path.join(root, readme), "utf8")

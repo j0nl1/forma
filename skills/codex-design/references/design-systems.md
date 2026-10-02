@@ -21,7 +21,7 @@ Run `scripts/design-system.mjs check <folder>` first, then `compile <folder>`, t
 
 ## Automatic authoring discovery
 
-An explicit `system.json` remains supported for sample props, aliases, examples and custom source paths. Without it, the checker derives the name from the root README heading, the slug from the folder and the CSS entry from the first existing root file in this order: `styles.css`, `index.css`, `globals.css`, `global.css`, `main.css`, `theme.css`, `app.css`, `tokens.css`. Discovery writes nothing. It skips generated `_ds_*` files, consumed `_ds/` copies, dependency folders and Git metadata. Source symlinks are rejected.
+An explicit `system.json` remains supported for sample props, aliases, examples and custom source paths. Without it, the checker derives the name from the root README heading, the slug from the folder and the CSS entry from preferred filenames, choosing the shallowest match for each name in this order: `styles.css`, `index.css`, `globals.css`, `global.css`, `main.css`, `theme.css`, `app.css`, `tokens.css`. If no preferred filename exists, an older manifest can supply its last existing `globalCssPaths` entry as a safe source hint. The current import closure is always reread. Discovery writes nothing. It skips generated `_ds_*` files, consumed `_ds/` copies, dependency folders and Git metadata. Source symlinks are rejected.
 
 Named PascalCase exports in JSX/TSX/JS/TS are discovered throughout the source tree. All-capital exports are constants, displayed as data rather than mounted as React components. Lowercase helpers remain implementation details. Re-export barrels do not create duplicate component owners. With no manual entry, the compiler creates the entry in memory; an explicit entry keeps its other existing exports. Explicit sample props and component aliases merge with discovered metadata. Duplicate owners, malformed source syntax and orphan declarations produce read-only issues and prevent compilation.
 
@@ -46,6 +46,28 @@ export interface ButtonProps {
 ```
 
 Card tags are read in the first four lines and screen tags in the first six; a first-line tag is preferred. Cards retain group, name, subtitle and viewport. Component starting points use the directory's first card as their preview and the matching component export as their runtime API; absent a card, the review mounts the actual component using its declared section and viewport. Screen starting points retain their own HTML. Author classic scripts against the system registry, and bundle ES modules locally before HTML inlining. Inline `text/babel`, `text/jsx` and `text/tsx` scripts are transpiled at compile time using the packaged React runtime; an HTML-only system needs no manual component entry. The generated bundle and CSS can be referenced even on the first compile: cards and seeds embed the newly built in-memory assets, never a stale previous bundle. Local images/fonts are embedded through the standalone inliner. The compiler writes portable `_ds_card_*.html` and `_ds_seed_*.html`, preserving authored interactions. Component source paths are provenance hints; render component seeds from the copied runtime rather than treating a JSX source path as a copied page.
+
+## Token and font inventory
+
+`check <folder>` reports distinct token names, declaration counts, value-first kind counts, font faces, brand families without a face, advisories and the CSS import closure. Add `--verbose` to include every token declaration with its value, resolved value, kind, source file, line/column, selector and conditions. Neither command evaluates component code, writes files or compiles the system. `ok` describes structural errors; review `warnings` separately. Missing CSS entry returns exit code 2 with an actionable message; other structural errors return 1. Advisories alone retain exit code 0 and do not prevent compilation.
+
+CSS imports are inspected before their importer. Duplicate custom-property declarations remain separate `tokenDetails` records, including media/layer/supports conditions and normalized escaped names; `tokens` retains the final textual value for each name as a compatibility map. This map and alias resolution are an inventory, not a complete browser cascade or active-theme model. Selectors, inherited values, specificity, `!important`, inactive conditions and external variables require review in the actual authored page. Compiled CSS keeps its original rules rather than applying the inventory map to components.
+
+Kinds come from resolved values: colors and color functions, lengths/percentages, and lengths combined with colors for shadows. Use a trailing comment on the declaration's line to give an explicit role, particularly a radius, font family or intentionally unclassified value:
+
+```css
+:root {
+  --control-radius: 8px; /* @kind radius */
+  --font-body: "Atlas Sans", sans-serif; /* @kind font */
+  --ease: cubic-bezier(.2, 0, .2, 1); /* @kind other */
+}
+```
+
+Aliases inside expressions and nested fallbacks are resolved without evaluating code. Quoted strings and comments mentioning `var()` stay data. Unclassified tokens produce an annotation advisory. Missing aliases, cycles, malformed CSS, unavailable local assets and remote CSS imports/assets are structural errors; compilation leaves prior generated artifacts intact when inspection fails.
+
+Font-face metadata retains family, source, weight, style, display, Unicode range and conditions. Quoted/escaped family lists and aliases are supported. Unknown families named by font-role/family tokens without a declared face are reported as `brandFonts`; they may still exist on a user's machine, so this is an advisory rather than proof that no font can load. The conventional installed/generic family list is a heuristic matching the inspected source contract. It is not a probe of the user's installed fonts. Missing local `@font-face` URLs are errors.
+
+The compiled manifest and copied local guide retain this inventory. The standalone review shows previews for color, font, spacing, shadow and radius, with provenance, advisories and a separate font-face table. Tables scroll horizontally and support keyboard focus at narrow widths. Font rules from the compiled CSS are embedded even in a system without cards or components, allowing token typography to load after the source folder is removed. Older manifests lacking metadata remain readable; recompile from source to obtain kind/provenance/font details. Full cascade semantics, variable-font/browser coverage and broader reference comparisons remain open acceptance work.
 
 ## Browser-global authoring and shared React runtimes
 

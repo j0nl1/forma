@@ -3,7 +3,7 @@ import { sharedRuntimePlugin } from "./lib/system-shared-runtime.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { build } from "esbuild";
-import postcss from "postcss";
+import { inspectSystemCSS } from "./lib/system-css.mjs";
 import { inlineHtml } from "./lib/inline.mjs";
 import { readSystemSource } from "./lib/system-source.mjs";
 import { systemReview } from "./lib/system-review.mjs";
@@ -53,76 +53,8 @@ export async function inspect(root) {
     issues.push("components must be an array");
   if (!Array.isArray(spec.examples ?? []))
     issues.push("examples must be an array");
-  const files = new Map(),
-    tokens = {};
-  async function cssFile(relative, stack = []) {
-    const file = await safeFile(root, relative);
-    if (stack.includes(file)) {
-      issues.push(`CSS import cycle: ${relative}`);
-      return;
-    }
-    if (files.has(file)) return;
-    const text = await fs.readFile(file, "utf8");
-    files.set(file, text);
-    const parsed = postcss.parse(text);
-    const imports = [];
-    parsed.walkAtRules("import", (r) => imports.push(r));
-    for (const rule of imports) {
-      const match = rule.params.match(/^(?:url\(\s*)?["']?([^"'\s)]+)/);
-      if (!match) {
-        issues.push(`Invalid CSS import: ${rule.params}`);
-        continue;
-      }
-      if (/^(?:https?:|\/\/)/i.test(match[1])) {
-        issues.push(`Remote CSS import: ${match[1]}`);
-        continue;
-      }
-      await cssFile(
-        path.relative(root, path.resolve(path.dirname(file), match[1])),
-        [...stack, file],
-      );
-    }
-    parsed.walkDecls((d) => {
-      if (d.prop.startsWith("--")) tokens[d.prop] = d.value;
-    });
-    for (const m of text.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
-      if (m[1].startsWith("data:") || m[1].startsWith("#")) continue;
-      if (/^(?:https?:|\/\/)/i.test(m[1])) {
-        issues.push(`Remote CSS asset: ${m[1]}`);
-        continue;
-      }
-      const rel = path.relative(
-        root,
-        path.resolve(path.dirname(file), m[1].split(/[?#]/)[0]),
-      );
-      await safeFile(root, rel);
-    }
-  }
-  try {
-    await cssFile(spec.css);
-  } catch (e) {
-    issues.push(e.message);
-  }
-  for (const [name, value] of Object.entries(tokens))
-    for (const m of value.matchAll(/var\(\s*(--[\w-]+)\s*([,)])/g)) {
-      if (!(m[1] in tokens) && m[2] !== ",")
-        issues.push(`${name} references missing token ${m[1]}`);
-    }
-  const visiting = new Set(),
-    visited = new Set();
-  function checkAlias(name) {
-    if (visiting.has(name)) {
-      issues.push(`Token alias cycle: ${name}`);
-      return;
-    }
-    if (visited.has(name)) return;
-    visiting.add(name);
-    for (const m of (tokens[name] ?? "").matchAll(/var\(\s*(--[\w-]+)/g))
-      if (m[1] in tokens) checkAlias(m[1]);
-    visiting.delete(name);
-    visited.add(name);
-  }
-  for (const name of Object.keys(tokens)) checkAlias(name);
+  const css = await inspectSystemCSS(root, spec.css);
+  issues.push(...css.issues);
   const names = new Set();
   for (const c of Array.isArray(spec.components) ? spec.components : []) {
     if (
@@ -159,8 +91,14 @@ export async function inspect(root) {
     }
   const result = {
     spec,
-    tokens,
-    files: [...files.keys()].map((f) => path.relative(root, f)),
+    tokens: css.tokens,
+    tokenDetails: css.tokenDetails,
+    tokenKinds: css.tokenKinds,
+    unclassified: css.unclassified,
+    fonts: css.fonts,
+    brandFonts: css.brandFonts,
+    warnings: css.warnings,
+    files: css.files,
     issues: [...new Set(issues)],
     cards: source.cards,
     declarations: source.declarations,
@@ -363,6 +301,13 @@ export async function compile(root) {
     reactVersion: bundle ? authoring.version : null,
     runtimeDeclarations: authoring.declarations,
     tokens,
+    tokenDetails: model.tokenDetails,
+    tokenKinds: model.tokenKinds,
+    unclassified: model.unclassified,
+    fonts: model.fonts,
+    brandFonts: model.brandFonts,
+    warnings: model.warnings,
+    globalCssPaths: model.files,
     components: spec.components ?? [],
     examples: spec.examples ?? [],
     startingPoints,
@@ -407,6 +352,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
     const { positional: p, flags } = args(process.argv.slice(2), {
       "--primary": "boolean",
       "--update": "boolean",
+      "--verbose": "boolean",
     });
     if (
       ![
@@ -421,10 +367,16 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       p.length !== (["import", "primary"].includes(p[0]) ? 3 : 2)
     )
       throw new Error(
-        "Usage: node design-system.mjs check|compile|preview <folder> | discover <designs-folder> | wiring <project> | primary <project> <slug> | import <system> <project> [--primary] [--update]",
+        "Usage: node design-system.mjs check <folder> [--verbose] | compile|preview <folder> | discover <designs-folder> | wiring <project> | primary <project> <slug> | import <system> <project> [--primary] [--update]",
       );
-    if (Object.keys(flags).length && p[0] !== "import")
-      throw new Error("Import options apply only to import");
+    if (
+      Object.keys(flags).some((flag) =>
+        flag === "verbose" ? p[0] !== "check" : p[0] !== "import",
+      )
+    )
+      throw new Error(
+        "--verbose applies to check; --primary and --update apply to import",
+      );
     const root = path.resolve(p[1]);
     if (p[0] === "check") {
       const m = await inspect(root);
@@ -433,6 +385,14 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
           ok: !m.issues.length,
           issues: m.issues,
           tokens: Object.keys(m.tokens).length,
+          tokenDeclarations: m.tokenDetails.length,
+          tokenKinds: m.tokenKinds,
+          fonts: m.fonts,
+          brandFonts: m.brandFonts,
+          unclassified: m.unclassified,
+          warnings: m.warnings,
+          globalCssPaths: m.files,
+          ...(flags.verbose ? { tokenDetails: m.tokenDetails } : {}),
           components: m.spec.components,
           cards: m.cards,
           startingPoints: m.spec.startingPoints,
@@ -441,7 +401,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
           sourceNamespaces: m.authoring?.sourceNamespaces,
         }),
       );
-      if (m.issues.length) process.exitCode = 1;
+      if (m.issues.length) process.exitCode = m.spec.css ? 1 : 2;
     } else if (p[0] === "primary")
       console.log(JSON.stringify(await setPrimary(root, p[2])));
     else

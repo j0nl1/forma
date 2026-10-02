@@ -394,6 +394,9 @@ test("design-size review pixels match the same authored card rendered as a stand
             .querySelector("[data-review-host]")
             .shadowRoot.querySelector("#mark").naturalWidth > 0,
       );
+      await card(page, "First")
+        .locator("[data-review-host]")
+        .scrollIntoViewIfNeeded();
       const bounds = await card(page, "First")
         .locator("[data-review-host]")
         .boundingBox();

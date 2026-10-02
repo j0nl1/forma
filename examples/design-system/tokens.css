@@ -5,6 +5,6 @@
   --color-on-accent: #ffffff;
   --space-small: 8px;
   --space-medium: 16px;
-  --radius-control: 6px;
-  --font-body: system-ui, sans-serif;
+  --radius-control: 6px; /* @kind radius */
+  --font-body: system-ui, sans-serif; /* @kind font */
 }
