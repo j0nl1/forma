@@ -8,6 +8,7 @@ import {
   tracksFor,
 } from "./pptx-motion-effects.mjs";
 import { timingWriter } from "./pptx-motion-timing.mjs";
+import { composedTargets, composeSteps } from "./pptx-motion-compose.mjs";
 
 // PresentationML property behavior and timing contracts:
 // https://learn.microsoft.com/en-us/office/open-xml/presentation/working-with-animation
@@ -77,7 +78,7 @@ const descendants = (nodes) =>
   nodes.flatMap((node) => [node, ...descendants(node.children)]);
 const child = (node, name) => node?.children.find((item) => item.name === name);
 
-function targetIssue(entry, objects) {
+function targetIssue(entry, objects, composed = false) {
   if (entry.unsupportedReason) return entry.unsupportedReason;
   if (!families.has(entry.family) && !nativeFilter(entry))
     return `the ${entry.effect} effect has no verified native mapping`;
@@ -92,7 +93,7 @@ function targetIssue(entry, objects) {
     return "the target has no independently exported artwork";
   if (targets.some((object) => object.kind === "media"))
     return "the target includes playable media";
-  if (targets.some((object) => (object.animIds?.length ?? 0) > 1))
+  if (!composed && targets.some((object) => (object.animIds?.length ?? 0) > 1))
     return "nested animated targets require composed transforms";
   if (
     (centered.has(entry.family) ||
@@ -107,12 +108,21 @@ function targetIssue(entry, objects) {
   )
     return "the target has no captured motion geometry";
   if (
-    centered.has(entry.family) &&
-    entry.transformOrigin &&
-    (Math.abs(entry.transformOrigin.x - entry.geometry.w / 2) > 1 ||
-      Math.abs(entry.transformOrigin.y - entry.geometry.h / 2) > 1)
+    entry.animationGeometryUnsupported &&
+    (centered.has(entry.family) ||
+      ["fly", "float", "path", "bounce"].includes(entry.family))
   )
-    return "the target uses a custom CSS transform origin";
+    return "the target has a CSS transform outside the supported orientation-preserving 2D animation geometry";
+  if (
+    entry.clippedByAncestor &&
+    (centered.has(entry.family) ||
+      ["fly", "float", "path", "bounce"].includes(entry.family))
+  )
+    return "an ancestor clips the moving artwork outside its native animation group";
+  if (nativeFilter(entry) && entry.baseClip)
+    return "the native effect would replace an authored CSS clip that is baked into its artwork";
+  if (nativeFilter(entry) && entry.baseTransform)
+    return "native filter geometry cannot preserve the target's composed CSS transform";
   return null;
 }
 
@@ -215,14 +225,51 @@ export function applyPptxMotion(buffer, slides, options = {}) {
           (node) =>
             node.name === "p:cTn" && node.attributes.nodeType === "mainSeq",
         ));
+    const components = composedTargets(entries, slide.objects ?? []);
+    const componentById = new Map();
+    for (const component of components) {
+      for (const id of component.ids) componentById.set(id, component);
+      component.issue ||= component.entries
+        .filter(Boolean)
+        .map((entry) => targetIssue(entry, slide.objects ?? [], true))
+        .find(Boolean);
+      if (component.issue || conflict || options.enabled === false) continue;
+      let candidate = xml;
+      for (const cohort of component.cohorts) {
+        const targets = cohort.objects.map((object) =>
+          shapeIds.get(object.objectName),
+        );
+        if (targets.some((id) => !/^\d+$/.test(id ?? ""))) {
+          component.issue =
+            "its emitted shape names cannot be resolved uniquely";
+          break;
+        }
+        const grouped = groupTargets(
+          candidate,
+          cohort,
+          targets,
+          slide,
+          slideSize,
+        );
+        if (grouped.issue) {
+          component.issue = grouped.issue;
+          break;
+        }
+        candidate = grouped.xml;
+        cohort.targets = grouped.targets;
+      }
+      if (!component.issue) xml = candidate;
+    }
     let supported = 0;
     for (const entry of entries) {
+      const component = componentById.get(entry.id);
       const issue =
         options.enabled === false
           ? "native build export is disabled"
           : conflict
             ? "the slide already owns an incompatible main animation sequence"
-            : targetIssue(entry, slide.objects ?? []);
+            : component?.issue ||
+              targetIssue(entry, slide.objects ?? [], !!component);
       if (issue) {
         warn(entry, issue);
         continue;
@@ -234,7 +281,7 @@ export function applyPptxMotion(buffer, slides, options = {}) {
         warn(entry, "its emitted shape names cannot be resolved uniquely");
         continue;
       }
-      if (centered.has(entry.family) || nativeFilter(entry)) {
+      if (!component && (centered.has(entry.family) || nativeFilter(entry))) {
         const grouped = groupTargets(xml, entry, targets, slide, slideSize);
         if (grouped.issue) {
           warn(entry, grouped.issue);
@@ -244,7 +291,15 @@ export function applyPptxMotion(buffer, slides, options = {}) {
         targets = grouped.targets;
       }
       const { tracks, sampled, filter, clipRotation } = tracksFor(entry, slide);
-      Object.assign(entry, { targets, tracks, filter });
+      Object.assign(entry, {
+        targets: component ? [] : targets,
+        tracks,
+        filter,
+      });
+      if (component)
+        warnings.add(
+          "Nested native transform builds use sampled affine composition on separate editable artwork groups; inspect playback in the target application.",
+        );
       if (filter)
         warnings.add(
           `Native PowerPoint ${entry.family} builds use the application's own filter geometry and pattern, which can differ from the HTML mask.`,
@@ -265,7 +320,9 @@ export function applyPptxMotion(buffer, slides, options = {}) {
       .map((node) => Number(node.attributes.id));
     const writer = timingWriter(Math.max(0, ...ids) + 1);
     const rootId = root ? null : writer.id();
-    const sequence = writer.sequence(buildSteps(entries));
+    const sequence = writer.sequence(
+      composeSteps(buildSteps(entries), components, slide),
+    );
     const finalNodes = xmlNodes(xml);
     const finalRoot = descendants(finalNodes).find(
       (node) => node.name === "p:cTn" && node.attributes.nodeType === "tmRoot",

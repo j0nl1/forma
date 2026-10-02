@@ -1,3 +1,4 @@
+import { affineTracks } from "./pptx-motion-affine.mjs";
 import {
   effectFrames,
   effectOptions,
@@ -167,5 +168,5 @@ export function tracksFor(entry, slide) {
           .map(([offset, value]) => [1 - offset / 2, value]),
       ]);
     }
-  return { tracks, sampled };
+  return { tracks: affineTracks(entry, tracks, slide), sampled };
 }

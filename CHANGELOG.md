@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Fixed a separate media poster obscuring native video during slide builds; the native media object now owns the single captured cover.
+
+- Added sampled native pivot compensation and bounded nested transform-only build composition, retaining click/with/after timing and explicit mask/opacity/repeat fallbacks.
+
+- Retained editable foreground through composed uniform 2D rotations, scales and translations, with authored pivots and local paint capture verified against actual Impress rendering.
+
+- Added bounded local PowerPoint media copies for source ranges, initial playback position, speed and volume/mute, with pitch preservation and original/derived byte provenance. Native loop and activation intent retain explicit receiver playback diagnostics.
+
 - Fixed progressive native box-out clipping and stale outlines in Impress through a bounded one-angular-unit animation adjustment, with strict pixel and repeat regression coverage.
 
 - Added explicit static TTF/OTF font snapshots and full PowerPoint font embedding, with actual family/style/glyph coverage diagnostics.

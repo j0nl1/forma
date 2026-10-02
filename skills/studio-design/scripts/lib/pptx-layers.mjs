@@ -10,7 +10,7 @@ export async function capturePptxImage(page, slideLocator, object) {
     return slideLocator.screenshot({ type: "png", animations: "disabled" });
   await slideLocator.scrollIntoViewIfNeeded();
   const transaction = await page.evaluateHandle(
-    ({ sourceId, layer }) => {
+    ({ sourceId, layer, neutralizeTransforms }) => {
       const target = document.querySelector(
         `[data-codex-pptx-source="${sourceId}"]`,
       );
@@ -50,6 +50,20 @@ export async function capturePptxImage(page, slideLocator, object) {
         }));
       for (const item of state) {
         const style = item.element.style;
+        if (
+          neutralizeTransforms &&
+          item.element.hasAttribute("data-codex-pptx-source")
+        ) {
+          const computed = getComputedStyle(item.element);
+          for (const [property, identity] of Object.entries({
+            transform: "matrix(1,0,0,1,0,0)",
+            translate: "0px 0px",
+            rotate: "0deg",
+            scale: "1",
+          }))
+            if (computed[property] !== "none")
+              style.setProperty(property, identity, "important");
+        }
         style.setProperty(
           "visibility",
           item.keep ? item.visibility : "hidden",
@@ -77,22 +91,27 @@ export async function capturePptxImage(page, slideLocator, object) {
       }
       return state;
     },
-    { sourceId: object.sourceId, layer: object.layer ?? "subtree" },
+    {
+      sourceId: object.sourceId,
+      layer: object.layer ?? "subtree",
+      neutralizeTransforms: object.neutralizeTransforms,
+    },
   );
   try {
     const origin = await slideLocator.boundingBox();
     if (!origin)
       throw new Error("PowerPoint slide is not visible during capture.");
     const scroll = await page.evaluate(() => ({ x: scrollX, y: scrollY }));
+    const geometry = object.captureGeometry ?? object;
     return await page.screenshot({
       type: "png",
       animations: "disabled",
       omitBackground: true,
       clip: {
-        x: origin.x + scroll.x + object.x,
-        y: origin.y + scroll.y + object.y,
-        width: object.w,
-        height: object.h,
+        x: origin.x + scroll.x + geometry.x,
+        y: origin.y + scroll.y + geometry.y,
+        width: geometry.w,
+        height: geometry.h,
       },
     });
   } finally {

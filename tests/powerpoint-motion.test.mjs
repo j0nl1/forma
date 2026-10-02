@@ -8,6 +8,7 @@ import PptxGenJS from "pptxgenjs";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
 import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 import { applyPptxMotion } from "../skills/studio-design/scripts/lib/pptx-motion.mjs";
 import { effects } from "../skills/studio-design/assets/starters/deck-effects.js";
@@ -237,6 +238,142 @@ test("actual HTML export resolves grouped builds and static opt-out", async (t) 
   assert.doesNotMatch(xml(await fs.readFile(staticOut)), /<p:timing>/);
 });
 
+async function affineFixture(t) {
+  const dir = await temporary(t);
+  await fs.cp(
+    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(dir, "starters"),
+    { recursive: true },
+  );
+  const simple = [
+    ["spin", "transform-origin:0 0", "data-anim-rotate=90"],
+    ["grow", "transform-origin:0 0", "data-anim-scale=1.5"],
+    [
+      "spin",
+      "transform:rotate(25deg) scale(.8);translate:20px 15px;rotate:15deg;transform-origin:25px 20px",
+      "data-anim-rotate=90",
+    ],
+  ];
+  const nested = [
+    ["path", "spin", "with"],
+    ["grow", "path", "with"],
+    ["path", "spin", "after"],
+    ["path", "spin", "click"],
+  ];
+  const sections = [
+    ...simple.map(
+      ([effect, style, attributes]) =>
+        `<section><div class="blue" style="left:250px;top:170px;width:200px;height:100px;${style}" data-anim="${effect}" data-anim-trigger="click" data-anim-duration="600" ${attributes}></div></section>`,
+    ),
+    ...nested.map(
+      ([parent, child, trigger]) =>
+        `<section><div class="red" style="left:200px;top:120px;width:300px;height:220px" data-anim="${parent}" data-anim-trigger="click" data-anim-duration="600" data-anim-scale="1.5" data-anim-path="M0 0 L120 0"><div class="blue" style="left:45px;top:55px;width:100px;height:65px" data-anim="${child}" data-anim-trigger="${trigger}" data-anim-duration="600" data-anim-rotate="90" data-anim-path="M0 0 L80 0"></div></div></section>`,
+    ),
+  ];
+  await fs.writeFile(
+    path.join(dir, "index.html"),
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Composed affine playback fixture</title><style>body{margin:0}section{background:white}.blue,.red{position:absolute}.blue{background:#295acb}.red{background:#ed3029}</style></head><body><deck-stage width="1280" height="720">${sections.join("")}</deck-stage><script src="starters/deck.js"></script></body></html>`,
+  );
+  const { server, url } = await serve(dir, 0);
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const expected = await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    return page.evaluate(async () => {
+      const { parseEffect, effectFrames, effectOptions, buildSteps } =
+        await import("./starters/deck-effects.js");
+      return [...document.querySelector("deck-stage").slides].map((slide) => {
+        const entries = [...slide.querySelectorAll("[data-anim]")].map(
+          (element, documentIndex) => ({
+            ...parseEffect(element),
+            element,
+            documentIndex,
+            opacity: 1,
+          }),
+        );
+        const steps = buildSteps(entries),
+          root = slide.getBoundingClientRect();
+        const bounds = () => {
+          const r = slide.querySelector(".blue").getBoundingClientRect();
+          return [
+            r.left - root.left,
+            r.top - root.top,
+            r.right - root.left,
+            r.bottom - root.top,
+          ];
+        };
+        const result = { before: bounds(), steps: [] };
+        for (const step of steps.slice(1)) {
+          for (const { entry, start } of step.items) {
+            const animation = entry.element.animate(
+              effectFrames(entry, { width: 1280, height: 720 }),
+              effectOptions(entry, start, false),
+            );
+            animation.pause();
+            animation.currentTime = step.duration;
+          }
+          result.steps.push(bounds());
+        }
+        return result;
+      });
+    });
+  });
+  const file = path.join(dir, "affine.pptx");
+  const result = await exportArtifact("pptx", url, file);
+  return { file, result, expected };
+}
+
+test("actual HTML export preserves custom pivots, CSS base transforms and composed click steps", async (t) => {
+  const { file, result, expected } = await affineFixture(t);
+  assert.equal(result.nativeAnimations, 11);
+  assert.equal(result.staticAnimations, 0);
+  assert.deepEqual(expected[0].steps[0], [150, 170, 250, 370]);
+  assert.deepEqual(expected[1].steps[0], [250, 170, 550, 320]);
+  assert.deepEqual(expected[6].steps[0], [365, 175, 465, 240]);
+  assert.deepEqual(expected[6].steps[1], [382.5, 157.5, 447.5, 257.5]);
+  const buffer = await fs.readFile(file);
+  assert.match(xml(buffer), /<p:attrName>ppt_x<\/p:attrName>/);
+  assert.match(
+    xml(buffer, "ppt/slides/slide4.xml"),
+    /Studio animation composed-/,
+  );
+  assert.equal(
+    (xml(buffer, "ppt/slides/slide7.xml").match(/delay="indefinite"/g) ?? [])
+      .length,
+    2,
+  );
+});
+
+test("nested opacity, repeated builds and moving ancestor clips retain explicit static diagnostics", async () => {
+  for (const [effect, attributes, reason] of [
+    ["fade-in", {}, "compositing"],
+    ["spin", { "data-anim-repeat": "2" }, "repeated"],
+    ["spin", {}, "ancestor clips"],
+  ]) {
+    const { buffer, captures } = await generated(["path"]),
+      capture = captures[0],
+      base = capture.animations[0];
+    capture.objects[0].animIds = ["child", base.id];
+    capture.animations.push({
+      ...base,
+      id: "child",
+      documentIndex: 1,
+      clippedByAncestor: reason === "ancestor clips",
+      attributes: {
+        "data-anim": effect,
+        "data-anim-trigger": "with",
+        ...attributes,
+      },
+    });
+    const result = applyPptxMotion(buffer, captures);
+    assert.equal(result.animationCount, 0);
+    assert.equal(result.staticAnimationCount, 2);
+    assert.ok(result.warnings.some((warning) => warning.includes(reason)));
+  }
+});
+
 test("Impress imports and round-trips all native build families when installed", async (t) => {
   try {
     await execute("libreoffice", ["--version"]);
@@ -375,6 +512,7 @@ test(
       allFile,
       applyPptxMotion(all.buffer, all.captures).buffer,
     );
+    const affine = await affineFixture(t);
     const { stdout } = await execute(
       "/usr/bin/python3",
       [
@@ -383,8 +521,10 @@ test(
         dir,
         allFile,
         JSON.stringify(Object.keys(effects)),
+        affine.file,
+        JSON.stringify(affine.expected),
       ],
-      { timeout: 90000 },
+      { timeout: 120000 },
     );
     const samples = JSON.parse(stdout),
       blue = [68, 136, 204],
@@ -405,6 +545,54 @@ test(
     );
     assert.deepEqual(samples["repeat-finished"][0], blue);
     assert.deepEqual(samples["repeat-finished"][3], blue);
+    assert.equal(samples.affine.length, affine.expected.length);
+    for (const [index, actual] of samples.affine.entries()) {
+      const expected = affine.expected[index];
+      for (const [label, bounds] of [
+        ["before", expected.before],
+        ["first", expected.steps[0]],
+        ...(expected.steps.length > 1 ? [["second", expected.steps[1]]] : []),
+      ])
+        for (let coordinate = 0; coordinate < 4; coordinate++)
+          assert.ok(
+            Math.abs(actual[label][coordinate] - bounds[coordinate]) <= 3,
+            `Affine slide ${index + 1} ${label} bounds ${actual[label]} must match browser ${bounds}`,
+          );
+      for (const [label, bounds] of [
+        ["first", expected.steps[0]],
+        ...(expected.steps.length > 1 ? [["second", expected.steps[1]]] : []),
+      ]) {
+        for (const axis of [0, 1])
+          assert.ok(
+            Math.abs(
+              actual[label][axis + 2] -
+                actual[label][axis] -
+                (bounds[axis + 2] - bounds[axis]),
+            ) <= 3,
+            `Affine slide ${index + 1} retains its browser extent`,
+          );
+      }
+      if (index >= 5) {
+        assert.ok(
+          Math.abs(actual.middle[2] - actual.middle[0] - 100) <= 2,
+          "The child waits for its after/click boundary before rotating",
+        );
+        assert.ok(
+          Math.abs(actual.middle[3] - actual.middle[1] - 65) <= 2,
+          "The waiting child retains its original height",
+        );
+      }
+      assert.notDeepEqual(
+        actual.middle,
+        actual.before,
+        `Affine slide ${index + 1} moves progressively`,
+      );
+      assert.notDeepEqual(
+        actual.middle,
+        actual.first,
+        `Affine slide ${index + 1} has an intermediate state`,
+      );
+    }
     assert.equal(samples.effects.length, 44);
     for (const result of samples.effects) {
       const spec = effects[result.effect];

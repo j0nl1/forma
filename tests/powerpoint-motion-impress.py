@@ -57,7 +57,7 @@ class AnimationCompletion(Base, XSlideShowListener):
         pass
 
 
-source, folder, all_source, names_json = sys.argv[1:]
+source, folder, all_source, names_json, affine_source, expected_json = sys.argv[1:]
 xvfb = subprocess.Popen(
     ["Xvfb", "-displayfd", "1", "-screen", "0", "1280x720x24", "-nolisten", "tcp"],
     stdout=subprocess.PIPE,
@@ -185,6 +185,57 @@ try:
             {"effect": name, "before": before, "middle": [first, second],
              "repeatMiddle": repeat_middle, "after": after}
         )
+    presentation.end()
+    document.close(True)
+    document = desktop.loadComponentFromURL(
+        uno.systemPathToFileUrl(affine_source), "_blank", 0, ()
+    )
+    time.sleep(2)
+    presentation = document.getPresentation()
+    presentation.start()
+    time.sleep(2)
+    controller = presentation.getController()
+    completion = AnimationCompletion()
+    controller.addSlideShowListener(completion)
+
+    def blue_bounds(label):
+        image = ImageGrab.grab(xdisplay=display).convert("RGB")
+        image.save(folder + "/affine-" + label + ".png")
+        red, green, blue = image.split()
+        mask = ImageChops.subtract(blue, red).point(
+            lambda value: 255 if value > 80 else 0
+        )
+        return mask.getbbox()
+
+    samples["affine"] = []
+    for index, expected in enumerate(json.loads(expected_json)):
+        controller.gotoSlideIndex(index)
+        time.sleep(0.12)
+        before = blue_bounds(str(index) + "-before")
+        completion.ended.clear()
+        controller.gotoNextEffect()
+        time.sleep(0.25)
+        middle = blue_bounds(str(index) + "-middle")
+        if len(expected["steps"]) > 1:
+            # A later click keeps the main sequence open. Observe this monotonic
+            # path reaching its rendered endpoint before sending that click.
+            deadline = time.monotonic() + 3
+            while True:
+                first = blue_bounds(str(index) + "-first")
+                if first and all(abs(a-b) <= 2 for a, b in zip(first, expected["steps"][0])):
+                    break
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("The first composed click did not reach its endpoint")
+                time.sleep(0.03)
+            completion.ended.clear()
+            controller.gotoNextEffect()
+            completion.await_end("second composed click")
+            second = blue_bounds(str(index) + "-second")
+        else:
+            completion.await_end("affine slide " + str(index))
+            first = blue_bounds(str(index) + "-first")
+            second = None
+        samples["affine"].append({"before": before, "middle": middle, "first": first, "second": second})
     presentation.end()
     document.close(True)
     desktop.terminate()

@@ -227,22 +227,22 @@ test("PowerPoint fails on malformed notes and browser resource errors and cleans
   );
 });
 
-test("PowerPoint keeps inseparable graphics, rotation and stacking as pictures but scales and translates native text", async (t) => {
+test("PowerPoint keeps inseparable graphics and stacking as pictures while similarity transforms retain native text", async (t) => {
   const { dir, url } = await fixture(
     t,
     `<style>.decorated{position:relative}.decorated::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff8,#def8)}</style><section><h1>Editable heading</h1><p class="decorated">Decorative layer</p><p style="color:color(display-p3 1 0 0)">Wide-gamut color</p><p style="direction:rtl">Right-to-left layout</p><p style="rotate:8deg">Authored rotation</p><p style="scale:0.8">Authored scale</p><p style="translate:12px 0">Authored translation</p></section><section><p style="position:relative;z-index:2">Explicit stacking</p></section>`,
   );
   const out = path.join(dir, "complex.pptx");
   const result = await exportArtifact("pptx", url, out);
-  assert.equal(result.rasterObjects, 5);
+  assert.equal(result.rasterObjects, 4);
   const zip = unzipSync(await fs.readFile(out));
   assert.match(xml(zip, "ppt/slides/slide1.xml"), /Editable heading/);
-  assert.doesNotMatch(xml(zip, "ppt/slides/slide1.xml"), /Authored rotation/);
+  assert.match(xml(zip, "ppt/slides/slide1.xml"), /Authored rotation/);
   assert.match(xml(zip, "ppt/slides/slide1.xml"), /Authored scale/);
   assert.match(xml(zip, "ppt/slides/slide1.xml"), /Authored translation/);
   assert.equal(
     (xml(zip, "ppt/slides/slide1.xml").match(/<p:pic>/g) || []).length,
-    4,
+    3,
   );
   assert.equal(
     (xml(zip, "ppt/slides/slide2.xml").match(/<p:pic>/g) || []).length,
@@ -413,11 +413,113 @@ test("PowerPoint keeps uniformly scaled, translated and safely rounded foregroun
   assert.match(slide, /sz="1875"/);
 });
 
+test("PowerPoint preserves composed rotation, custom pivots and safe inset foreground with exact style restoration", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section style="padding:0;background:white">
+    <div id="parent" style="position:absolute;left:95px;top:75px;width:240px;height:180px;background:#ed3029;transform:translate(20px,15px) rotate(30deg) scale(1.15);transform-origin:35px 25px"><p style="position:absolute;left:25px;top:20px;margin:0">Parent native</p><div id="child" style="position:absolute;left:60px;top:75px;width:155px;height:65px;background:#29ab47;transform:rotate(-45deg) scale(.8);transform-origin:15px 20px"><p style="margin:10px;font-size:18px">Child native</p></div></div>
+    <div id="paint" style="position:absolute;left:440px;top:110px;width:250px;height:220px;padding:45px;box-sizing:border-box;border-radius:24px;overflow:hidden;background:linear-gradient(#359bd6,#776bc7);rotate:-18deg;transform-origin:20% 80%"><p style="margin:0">Paint native</p></div>
+    <div id="inset" style="position:absolute;left:60px;top:350px;width:240px;height:100px;background:#f5bb16;clip-path:inset(12px 20px)"><p style="margin:24px">Inset native</p></div>
+    <div style="position:absolute;left:400px;top:390px;width:240px;height:70px;background:#ccc;clip-path:inset(20px)"><p style="margin:0">Crossing clipped copy</p></div>
+  </section>`,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const styles = () =>
+      page.evaluate(() =>
+        [
+          ...document.querySelectorAll(
+            "deck-stage > [data-deck-slide], deck-stage > [data-deck-slide] *",
+          ),
+        ].map((element) => element.getAttribute("style")),
+      );
+    const before = await styles();
+    const captured = await page.evaluate(captureSlide, 0);
+    assert.deepEqual(
+      await styles(),
+      before,
+      "Measurement restores exact source attributes",
+    );
+    for (const text of [
+      "Parent native",
+      "Child native",
+      "Paint native",
+      "Inset native",
+    ])
+      assert.ok(captured.objects.some((object) => object.text === text));
+    assert.ok(
+      !captured.objects.some(
+        (object) => object.text === "Crossing clipped copy",
+      ),
+    );
+    const child = captured.objects.find(
+      (object) => object.kind === "shape" && object.fill?.color === "29ab47",
+    );
+    assert.ok(Math.abs(child.rotate - 345) < 0.001);
+    assert.ok(Math.abs(child.w - 142.6) < 0.001);
+    const sourceBox = await page.locator("#child").boundingBox();
+    const radians = (child.rotate * Math.PI) / 180;
+    const width =
+      Math.abs(child.w * Math.cos(radians)) +
+      Math.abs(child.h * Math.sin(radians));
+    const height =
+      Math.abs(child.w * Math.sin(radians)) +
+      Math.abs(child.h * Math.cos(radians));
+    for (const [actual, expected] of [
+      [child.x + child.w / 2 - width / 2, sourceBox.x],
+      [child.y + child.h / 2 - height / 2, sourceBox.y],
+      [width, sourceBox.width],
+      [height, sourceBox.height],
+    ])
+      assert.ok(
+        Math.abs(actual - expected) < 0.001,
+        `Native geometry ${actual} matches browser ${expected}`,
+      );
+    const sourceId = await page
+      .locator("#paint")
+      .getAttribute("data-codex-pptx-source");
+    const paint = captured.objects.find(
+      (object) => object.sourceId === sourceId && object.layer === "paint",
+    );
+    assert.ok(paint.neutralizeTransforms);
+    assert.equal(paint.captureGeometry.w, 250);
+    const locator = page.locator("deck-stage > [data-deck-slide]");
+    const original = await locator.screenshot();
+    const image = await capturePptxImage(page, locator, paint);
+    assert.equal(image.readUInt32BE(16), 250);
+    assert.deepEqual(await styles(), before);
+    assert.deepEqual(await locator.screenshot(), original);
+    await page.evaluate(() => {
+      const notes = document.createElement("script");
+      notes.id = "speaker-notes";
+      notes.type = "application/json";
+      notes.textContent = "invalid";
+      document.body.append(notes);
+    });
+    const failing = await styles();
+    await assert.rejects(page.evaluate(captureSlide, 0));
+    assert.deepEqual(
+      await styles(),
+      failing,
+      "Exceptions restore transform styles too",
+    );
+  });
+  const out = path.join(dir, "composed-css.pptx");
+  await exportArtifact("pptx", url, out);
+  const slide = xml(unzipSync(await fs.readFile(out)), "ppt/slides/slide1.xml");
+  assert.match(slide, /<a:t>Child native<\/a:t>/);
+  assert.match(slide, /rot="20700000"/);
+  assert.match(slide, /<a:t>Inset native<\/a:t>/);
+});
+
 test("PowerPoint retains unsupported transform cases as explicit pictures", async (t) => {
   const cases = [
     ["Skewed", "transform:skewX(12deg)"],
     ["Stretched", "scale:1.2 .8"],
-    ["Reflected", "scale:-1"],
+    ["Reflected", "scale:-1 1"],
     ["Perspective", "perspective:300px"],
     ["Zoomed", "zoom:1.2"],
   ];
@@ -483,11 +585,11 @@ test("PowerPoint embeds actual local video and audio bytes with native media rel
   const out = path.join(dir, "media.pptx");
   const result = await exportArtifact("pptx", url, out);
   assert.equal(result.mediaObjects, 3);
-  assert.equal(result.rasterObjects, 2);
+  assert.equal(result.rasterObjects, 0);
   assert.ok(result.warnings.some((warning) => warning.includes("object-fit")));
   assert.ok(
     result.warnings.some((warning) =>
-      warning.includes("complete original source"),
+      warning.includes("looping is encoded as native repetition"),
     ),
   );
   assert.ok(result.warnings.some((warning) => warning.includes("off-slide")));
@@ -503,7 +605,7 @@ test("PowerPoint embeds actual local video and audio bytes with native media rel
   const rels = xml(zip, "ppt/slides/_rels/slide1.xml.rels");
   assert.equal((slide.match(/ppaction:\/\/media/g) || []).length, 3);
   assert.equal((slide.match(/<p14:media /g) || []).length, 3);
-  assert.equal((slide.match(/<p:pic>/g) || []).length, 5);
+  assert.equal((slide.match(/<p:pic>/g) || []).length, 3);
   assert.match(rels, /relationships\/video/);
   assert.match(rels, /relationships\/audio/);
   assert.doesNotMatch(rels, /TargetMode="External"/);

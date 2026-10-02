@@ -1,5 +1,7 @@
 import { localUrl } from "./files.mjs";
 import { settlePptxControls } from "./pptx-controls.mjs";
+import { preparePptxPlayback } from "./pptx-media-playback.mjs";
+import { addPptxMediaTiming } from "./pptx-media-timing.mjs";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
 
 const maxBytes = 128 * 1024 * 1024;
@@ -132,25 +134,36 @@ export async function preparePptxMedia(page, object, coverBuffer) {
     throw new Error(
       "PowerPoint audio/video requires an available local source.",
     );
-  const bytes = await snapshotSource(page, object.src);
+  const original = await snapshotSource(page, object.src);
   const type = object.mediaType;
-  const extn = container(bytes, type);
+  const { bytes, extn, playback } = await preparePptxPlayback(
+    original,
+    container(original, type),
+    object,
+  );
+  object.playback = playback;
   const warnings = [];
-  if (object.hidden)
+  if (object.hidden && playback.trigger === "on-click")
     warnings.push(
       "Audio without a visible HTML control is embedded off-slide; move its control onto the slide to play it manually.",
     );
-  if (
-    object.autoplay ||
-    object.loop ||
-    object.currentTime > 0 ||
-    object.trim ||
-    object.playbackRate !== 1 ||
-    object.muted ||
-    object.volume !== 1
-  )
+  if (playback.embeddedSource === "derived")
     warnings.push(
-      "Embedded media plays the complete original source on click; HTML autoplay, looping, trim/current-time, playback rate and volume/mute settings are not translated.",
+      `Embedded media uses a local ${extn.toUpperCase()} playback copy for ${playback.changes.join(", ")}: source ${playback.sourceStart}–${playback.sourceEnd}s, initial position ${playback.initialPosition}s, rate ${playback.playbackRate}, gain ${playback.gain}. The source file is unchanged; video copies use H.264/AAC encoding${playback.outputFrameRate ? ` at ${playback.outputFrameRate} fps (bounded to 1–120 fps)` : ""}.`,
+    );
+  if (playback.loop)
+    warnings.push(
+      "Media looping is encoded as native repetition, but the tested LibreOffice 25.8 player plays it once; Microsoft PowerPoint loop playback remains unverified.",
+    );
+  if (playback.trigger === "on-click")
+    warnings.push(
+      "Media uses native on-click activation; the tested LibreOffice 25.8 player starts media on slide entry instead. Verify activation in the receiving application.",
+    );
+  if (playback.fragmentEnd != null)
+    warnings.push(
+      playback.fragmentBoundary === "first-playback-trim"
+        ? `The HTML media fragment's one-shot pause at ${playback.fragmentEnd}s is exported as the first playback interval without repetition. The browser's internal consumed-pause flag is unavailable in a snapshot; the trimmed native copy cannot reproduce later continuation beyond the boundary or Chromium's 250ms pause-timer overshoot.`
+        : `The captured HTML media position has passed its fragment end (${playback.fragmentEnd}s). Export preserves continuation to the source ending; Chromium's internal one-shot pause state cannot be recovered from the media element.`,
     );
   const changesFit =
     type === "video" &&
@@ -179,6 +192,7 @@ export async function preparePptxMedia(page, object, coverBuffer) {
       cover: `image/png;base64,${coverBuffer.toString("base64")}`,
     },
     warnings,
+    playback,
   };
 }
 
@@ -244,7 +258,7 @@ export function normalizePptxMedia(buffer, slides) {
             .replace(/<\/p:video>$/, "</p:audio>")
         : source;
     });
-    zip[file] = strToU8(xml);
+    zip[file] = strToU8(addPptxMediaTiming(xml, slide.objects));
   });
   return Buffer.from(zipSync(zip, { level: 6 }));
 }

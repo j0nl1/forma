@@ -12,7 +12,7 @@ npm test
 
 Tests use OS temporary directories for generated files. Browser tests exercise native components, a real prototype flow, responsive rendering, design-system preview, PDF, and deterministic video. The installed copy is also tested with an independent lockfile. FFmpeg is required for video tests. Poppler's `pdfinfo` and `pdftotext` are required for PDF verification; install them with the OS package manager before running the suite (for example, `sudo apt-get install -y ffmpeg poppler-utils` on Debian/Ubuntu). Missing Chromium is a test failure so it cannot silently claim browser verification.
 
-CI also exercises native PowerPoint animations in a real LibreOffice Impress slideshow. On Linux, install `libreoffice-impress`, `python3-uno`, `python3-pil` and `xvfb`. The playback probe uses `/usr/bin/python3` so it can load the distribution's UNO bridge and gives each application an isolated profile and virtual display.
+CI also exercises native PowerPoint animations and embedded video in a real LibreOffice Impress slideshow. On Linux, install `libreoffice-impress`, `python3-uno`, `python3-pil`, `xvfb`, `gstreamer1.0-libav` and `gstreamer1.0-plugins-good`. The playback probes use `/usr/bin/python3` so they can load the distribution's UNO bridge and give each application an isolated profile and virtual display. Media playback isolates X11 settings from the host's display session and checks the actual color transition beside an editable native heading build.
 
 The embedded-font consumer test requires LibreOffice 25.8 or newer with EOT support; older versions do not import PPTX embedded fonts. Set `STUDIO_TEST_FONT_SOFFICE` to the compatible binary when the distribution's default is older:
 

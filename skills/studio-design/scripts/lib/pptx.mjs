@@ -94,11 +94,6 @@ export async function renderPptx(page, output, options = {}) {
   // Keep dimensions within PowerPoint's 56-inch limit, preserving the source ratio.
   const unit = 1 / Math.max(96, metadata.width / 56, metadata.height / 56);
   const deck = new PptxGenJS();
-  const transparentCover = await page.evaluate(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 1;
-    return `image/png;base64,${canvas.toDataURL("image/png").split(",")[1]}`;
-  });
   deck.defineLayout({
     name: "STUDIO",
     width: metadata.width * unit,
@@ -111,7 +106,8 @@ export async function renderPptx(page, output, options = {}) {
   deck.lang = "en-US";
   const warnings = new Set(),
     signatures = [],
-    capturedSlides = [];
+    capturedSlides = [],
+    mediaPlayback = [];
   let editableObjects = 0,
     rasterObjects = 0,
     mediaObjects = 0,
@@ -131,12 +127,6 @@ export async function renderPptx(page, output, options = {}) {
       captured.sourceIndex = index;
       // Some presentation readers omit native media covers during print. Keep a
       // real picture beneath the player so its authored artwork survives there.
-      if (config.mode === "editable")
-        captured.objects = captured.objects.flatMap((object) =>
-          object.kind === "media" && !object.hidden
-            ? [{ ...object, kind: "image", layer: "mediaPoster" }, object]
-            : [object],
-        );
       captured.objects.forEach((object, ordinal) => {
         object.objectName = `studio-object-${index}-${ordinal}`;
       });
@@ -188,7 +178,6 @@ export async function renderPptx(page, output, options = {}) {
       }
       for (const warning of captured.warnings)
         warnings.add(`Slide ${index + 1}: ${warning}`);
-      const mediaCovers = new Map();
       for (const object of captured.objects) {
         const geometry = {
           objectName: object.objectName,
@@ -196,6 +185,7 @@ export async function renderPptx(page, output, options = {}) {
           y: object.y * unit,
           w: object.w * unit,
           h: object.h * unit,
+          rotate: object.rotate ?? 0,
         };
         if (object.kind === "text") {
           const { kind, text, x, y, w, h, fontSize, charSpacing, ...style } =
@@ -220,19 +210,19 @@ export async function renderPptx(page, output, options = {}) {
           });
           editableObjects++;
         } else {
-          const image =
-            mediaCovers.get(object.sourceId) ??
-            (await capturePptxImage(page, locator, object));
-          if (object.layer === "mediaPoster")
-            mediaCovers.set(object.sourceId, image);
+          const image = await capturePptxImage(page, locator, object);
           if (object.kind === "media") {
             const media = await preparePptxMedia(page, object, image);
+            if (media.playback)
+              mediaPlayback.push({
+                ...media.playback,
+                sourceSlide: index + 1,
+                objectName: object.objectName,
+              });
             for (const warning of media.warnings)
               warnings.add(`Slide ${index + 1}: ${warning}`);
-            // A separate real poster supplies the resting artwork. Avoid
-            // compositing its semitransparent edges twice beneath the player.
-            if (mediaCovers.has(object.sourceId))
-              media.options.cover = transparentCover;
+            // The native media object's cover supplies its resting artwork.
+            // A separate poster can obscure actual playback during builds.
             slide.addMedia({ ...media.options, ...geometry });
             mediaObjects++;
             continue;
@@ -294,6 +284,7 @@ export async function renderPptx(page, output, options = {}) {
       editableObjects,
       rasterObjects,
       mediaObjects,
+      mediaPlayback,
       embeddedFonts,
       nativeAnimations,
       staticAnimations: animationCount - nativeAnimations,
