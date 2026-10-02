@@ -6,20 +6,20 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
-import { loadFig } from "../skills/codex-design/scripts/lib/figma.mjs";
+import { loadFig } from "../skills/studio-design/scripts/lib/figma.mjs";
 import {
   iconComponent,
   isIconFont,
-} from "../skills/codex-design/scripts/lib/figma-component-icons.mjs";
-import { importFig } from "../skills/codex-design/scripts/figma.mjs";
+} from "../skills/studio-design/scripts/lib/figma-component-icons.mjs";
+import { importFig } from "../skills/studio-design/scripts/figma.mjs";
 import {
   compile,
   preview,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 const guid = (localID) => ({ sessionID: 1, localID });
 const matrix = (x = 0, y = 0) => ({
   m00: 1,

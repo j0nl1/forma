@@ -7,7 +7,7 @@ import {
   Captions,
   Easing,
   animate,
-} from "../../skills/codex-design/assets/starters/animations.jsx";
+} from "../../skills/studio-design/assets/starters/animations.jsx";
 
 const MOTION = {
   enter: (from, to, start, end, time) =>
@@ -73,7 +73,7 @@ function Piece() {
           bottom: 24,
         }}
       />
-      <div className="label">CODEX DESIGN / CONTINUOUS COMPOSITION</div>
+      <div className="label">STUDIO DESIGN / CONTINUOUS COMPOSITION</div>
       <output data-authored-time style={{ display: "none" }}>
         {T.toFixed(6)}
       </output>

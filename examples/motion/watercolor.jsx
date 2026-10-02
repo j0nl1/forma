@@ -5,7 +5,7 @@ import {
   WatercolorPainting,
   WatercolorReveal,
   useComposition,
-} from "../../skills/codex-design/assets/starters/animations.jsx";
+} from "../../skills/studio-design/assets/starters/animations.jsx";
 import { paintBird } from "./painting.js";
 
 function Piece() {

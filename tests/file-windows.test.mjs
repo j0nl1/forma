@@ -3,23 +3,23 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 import {
   fileGeometry,
   fileName,
   fileUrl,
   sameFilePath,
   modalGeometry,
-} from "../skills/codex-design/assets/starters/file-window-model.js";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+} from "../skills/studio-design/assets/starters/file-window-model.js";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 const target = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Live project</title><style>html,body{margin:0}section{height:600px;background:#cf362f}section:nth-child(2){background:#269d80}section:nth-child(3){background:#365bcf}section:nth-child(4){height:900px;background:#e4b754}button{position:absolute;top:620px;left:180px}.vh{position:fixed;width:5px;height:100vh}</style></head><body><section>First</section><section>Second</section><section>Third</section><section>Last strip</section><button onclick="window.clicked=true">Embedded action</button><div class="vh"></div></body></html>`;
 async function fixture(t, html = "", files = { "project.html": target }) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/file-window.js"),
+    path.join(root, "skills/studio-design/assets/starters/file-window.js"),
     path.join(dir, "app.js"),
   );
   for (const [name, content] of Object.entries(files)) {

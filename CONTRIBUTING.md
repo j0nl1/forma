@@ -14,8 +14,8 @@ Tests use OS temporary directories for generated files. Browser tests exercise n
 
 For optional macOS verification in the maintained environment, transfer a source checkout to `sirius` and run cross-platform checks there through SSH. Do not run macOS-specific commands on the Linux host.
 
-Keep dependency versions exact and refresh both lockfiles together. Use `npm ci --ignore-scripts` and review dependency changes. Never copy an unknown minified bundle or execute a reference repository's hooks to port a feature. Preserve third-party attribution when intentionally incorporating licensed source in a future change.
+Keep dependency versions exact and refresh both lockfiles together. Use `npm ci --ignore-scripts` and review dependency changes. Never copy an unknown minified bundle or execute external repository hooks merely to inspect source. Preserve third-party attribution when intentionally incorporating licensed source in a future change.
 
 When changing contracts, update references, examples, capability limits, and behavioral tests together. Test results and known limits belong in the pull request body. Leave pull requests open for the user to merge; no automatic report archives are needed.
 
-The initial Linux validation passed 28 tests without skips, including an independent installed-copy setup, Figma ZIP/Zstandard input, a three-page deck PDF, and encoded MP4/WebM/GIF frames. Desktop and narrow-viewport screenshots were inspected. Native macOS behavior has not been separately verified.
+Run the checks above against the current checkout. Native macOS behavior and physical-device gestures require separate verification when relevant to a change.

@@ -1,6 +1,0 @@
-interface:
-  display_name: "Codex Design"
-  short_description: "Design and verify local HTML artifacts in Codex"
-  default_prompt: "Use $codex-design to build a polished interactive prototype from my brief."
-policy:
-  allow_implicit_invocation: true

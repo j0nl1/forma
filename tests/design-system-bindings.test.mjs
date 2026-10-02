@@ -13,10 +13,10 @@ import {
   wiring,
   discoverSystems,
   setPrimary,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 
 async function system(directory, name, color) {
   await fs.mkdir(directory, { recursive: true });
@@ -386,7 +386,7 @@ test("CLI discovery, update, primary selection and wiring work from a compiled s
       execFileSync(
         process.execPath,
         [
-          path.join(root, "skills/codex-design/scripts/design-system.mjs"),
+          path.join(root, "skills/studio-design/scripts/design-system.mjs"),
           ...args,
         ],
         { encoding: "utf8" },

@@ -4,11 +4,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-const starters = path.join(root, "skills/codex-design/assets/starters");
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+const starters = path.join(root, "skills/studio-design/assets/starters");
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(

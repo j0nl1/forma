@@ -5,7 +5,7 @@ import {
   DCSection,
   DCArtboard,
   DCPostIt,
-} from "../../skills/codex-design/assets/starters/canvas-components.jsx";
+} from "../../skills/studio-design/assets/starters/canvas-components.jsx";
 function Reading({ dense = false }) {
   const [saved, setSaved] = useState(false);
   return (

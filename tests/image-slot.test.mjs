@@ -4,21 +4,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 import {
   imageSlots,
   framing,
   zoomAt,
   resizeCorner,
-} from "../skills/codex-design/assets/starters/image-model.js";
+} from "../skills/studio-design/assets/starters/image-model.js";
 import {
   unsplash,
   creditUrl,
-} from "../skills/codex-design/assets/starters/image-credit.js";
+} from "../skills/studio-design/assets/starters/image-credit.js";
 const svg = (color) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100"><rect width="400" height="100" fill="${color}"/></svg>`)}`;
 const author = svg("#365bcf");
@@ -35,12 +35,12 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/image-slot.js"),
+    path.join(root, "skills/studio-design/assets/starters/image-slot.js"),
     path.join(dir, "image-slot.js"),
   );
   if (deck)
     await bundle(
-      path.join(root, "skills/codex-design/assets/starters/deck.js"),
+      path.join(root, "skills/studio-design/assets/starters/deck.js"),
       path.join(dir, "deck.js"),
     );
   await fs.writeFile(
@@ -578,7 +578,7 @@ test("canonical attribution errors replace uncredited stock, split safe photogra
     );
     assert.equal(
       new URL(links[1].href).searchParams.get("utm_source"),
-      "codex_design",
+      "studio_design",
     );
     assert.equal(links[0].rel, "noopener noreferrer");
     await upload(page, "hero", buffer);

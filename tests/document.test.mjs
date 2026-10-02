@@ -4,21 +4,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
 import {
   length,
   pixels,
   geometry,
   printOptions,
-} from "../skills/codex-design/assets/starters/document-model.js";
+} from "../skills/studio-design/assets/starters/document-model.js";
 async function fixture(t, content, attributes = "", style = "", before = "") {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/document.js"),
+    path.join(root, "skills/studio-design/assets/starters/document.js"),
     path.join(dir, "document.js"),
   );
   await fs.writeFile(
@@ -830,7 +830,7 @@ test("paper laboratory modes preserve named-paper geometry, panel order and nati
     path.join(dir, "documents.js"),
   );
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/document.js"),
+    path.join(root, "skills/studio-design/assets/starters/document.js"),
     path.join(dir, "starters/document.js"),
   );
   const { server, url } = await serve(dir, 0);

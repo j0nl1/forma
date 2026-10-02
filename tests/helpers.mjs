@@ -6,7 +6,7 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 export const root = fileURLToPath(new URL("..", import.meta.url));
 export async function temporary(t) {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-design-test-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "studio-design-test-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
   return dir;
 }

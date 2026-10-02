@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { applyDeckSource } from "../skills/codex-design/scripts/lib/deck-source.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-const starters = path.resolve("skills/codex-design/assets/starters");
+import { applyDeckSource } from "../skills/studio-design/scripts/lib/deck-source.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+const starters = path.resolve("skills/studio-design/assets/starters");
 const notes =
   '<script id="speaker-notes" type="application/json">["One note","Two note","Three note","Four note"]</script>';
 const content =

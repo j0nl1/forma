@@ -6,9 +6,9 @@ import {
   walk,
   readJson,
   exists,
-} from "../skills/codex-design/scripts/lib/files.mjs";
+} from "../skills/studio-design/scripts/lib/files.mjs";
 const root = fileURLToPath(new URL("..", import.meta.url));
-const skill = path.join(root, "skills/codex-design");
+const skill = path.join(root, "skills/studio-design");
 const files = await walk(root);
 const issues = [];
 for (const file of files) {
@@ -48,7 +48,7 @@ for (const t of types.projectTypes)
     if (!(await exists(path.join(skill, relative))))
       issues.push(`Missing routed resource: ${relative}`);
 const body = await fs.readFile(path.join(skill, "SKILL.md"), "utf8");
-if (!body.startsWith("---\nname: codex-design\ndescription:"))
+if (!body.startsWith("---\nname: studio-design\ndescription:"))
   issues.push("Invalid skill frontmatter");
 try {
   const description = JSON.parse(body.match(/^description: (.+)$/m)?.[1] ?? "");

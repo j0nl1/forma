@@ -10,14 +10,14 @@ import {
   preview,
   importSystem,
   wiring,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
 import {
   sourceAST,
   declarationContracts,
-} from "../skills/codex-design/scripts/lib/system-contracts.mjs";
+} from "../skills/studio-design/scripts/lib/system-contracts.mjs";
 
 const declaration = `type Variant = 'soft' | 'solid';
 type Alias = Variant;

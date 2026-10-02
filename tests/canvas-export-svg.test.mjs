@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
-const starters = path.resolve("skills/codex-design/assets/starters");
+const starters = path.resolve("skills/studio-design/assets/starters");
 const svg = (id, attribute) =>
   `<svg width="120" height="80" aria-label="Green reference tile"><defs><rect id="${id}" x="10" y="10" width="80" height="50" fill="lime"/></defs><use ${attribute}="#${id}"/></svg>`;
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0}design-canvas{height:100vh}svg{display:block}</style><design-canvas id="svg-exports"><design-section id="references" title="SVG references"><design-board id="legacy" label="Legacy reference" width="120" height="80">${svg("legacy-tile", "xlink:href")}</design-board></design-section><design-section id="modern-references" title="Modern SVG references"><design-board id="modern" label="Modern reference" width="120" height="80">${svg("modern-tile", "href")}</design-board></design-section></design-canvas><script src="starters/canvas.js"></script></html>`;

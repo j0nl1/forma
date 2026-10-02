@@ -11,15 +11,15 @@ import {
   renderDocument,
   select,
   extractedTokens,
-} from "../skills/codex-design/scripts/lib/figma.mjs";
-import { importFig } from "../skills/codex-design/scripts/figma.mjs";
+} from "../skills/studio-design/scripts/lib/figma.mjs";
+import { importFig } from "../skills/studio-design/scripts/figma.mjs";
 import {
   compile,
   preview,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
 const red = { r: 1, g: 0, b: 0, a: 1 },
   blue = { r: 0, g: 0, b: 1, a: 1 },

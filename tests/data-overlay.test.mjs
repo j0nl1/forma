@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
 import {
   buildRamp,
   metaParts,
@@ -14,15 +14,15 @@ import {
   attributeName,
   closestMetric,
   triple,
-} from "../skills/codex-design/assets/starters/data-overlay-model.js";
+} from "../skills/studio-design/assets/starters/data-overlay-model.js";
 import {
   linearOf,
   ownLinear,
   mulLin,
   quadOffset,
   cornerRad,
-} from "../skills/codex-design/assets/starters/data-overlay-geometry.js";
-import { layoutCallouts } from "../skills/codex-design/assets/starters/data-overlay-layout.js";
+} from "../skills/studio-design/assets/starters/data-overlay-geometry.js";
+import { layoutCallouts } from "../skills/studio-design/assets/starters/data-overlay-layout.js";
 const data = {
   suggest: { window: ["last 28 days", "weekends only", "last 24 hours"] },
   views: [
@@ -95,7 +95,7 @@ const data = {
 async function fixture(t, { src = "", contents = data } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/data-overlay.js"),
+    path.join(root, "skills/studio-design/assets/starters/data-overlay.js"),
     path.join(dir, "overlay.js"),
   );
   await fs.writeFile(path.join(dir, "data.json"), JSON.stringify(contents));

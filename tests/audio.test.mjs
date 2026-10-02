@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 import {
   audioTimeline,
   createAudioExport,
-} from "../skills/codex-design/scripts/lib/audio.mjs";
-import { videoOptions } from "../skills/codex-design/scripts/lib/video.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
+} from "../skills/studio-design/scripts/lib/audio.mjs";
+import { videoOptions } from "../skills/studio-design/scripts/lib/video.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
 
 const ffmpeg = (args) =>
   execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", ...args]);
@@ -389,7 +389,7 @@ test("local editor exports and downloads a real audio stream with an explicit mu
   const { dir } = await setup(t, []);
   const runtime = path.join(
     root,
-    "skills/codex-design/assets/starters/animations.jsx",
+    "skills/studio-design/assets/starters/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "entry.jsx"),

@@ -11,12 +11,12 @@ import {
   walk,
   readJson,
   writeJson,
-} from "../skills/codex-design/scripts/lib/files.mjs";
+} from "../skills/studio-design/scripts/lib/files.mjs";
 const source = fileURLToPath(
-  new URL("../skills/codex-design", import.meta.url),
+  new URL("../skills/studio-design", import.meta.url),
 );
 const digest = (data) => createHash("sha256").update(data).digest("hex");
-const marker = ".codex-design-install.json";
+const marker = ".studio-design-install.json";
 export async function install(
   destination,
   { update = false, dryRun = false } = {},
@@ -32,8 +32,10 @@ export async function install(
     if ((await fs.lstat(destination)).isSymbolicLink())
       throw new Error("Refusing to update a symlink installation");
     const record = await readJson(path.join(destination, marker));
-    if (record.package !== "codex-design" || record.schemaVersion !== 1)
-      throw new Error("Destination is not a managed Codex Design installation");
+    if (record.package !== "studio-design" || record.schemaVersion !== 1)
+      throw new Error(
+        "Destination is not a managed Studio Design installation",
+      );
     const present = await walk(destination);
     for (const file of present) {
       const name = path.relative(destination, file);
@@ -53,7 +55,7 @@ export async function install(
   // Resolve ancestors once; a symlink at the destination itself is rejected above.
   const parent = await fs.realpath(path.dirname(destination));
   destination = path.join(parent, path.basename(destination));
-  const staged = path.join(parent, `.codex-design-${randomUUID()}`),
+  const staged = path.join(parent, `.studio-design-${randomUUID()}`),
     backup = staged + ".previous";
   const hashes = {};
   await fs.mkdir(staged);
@@ -68,7 +70,7 @@ export async function install(
     }
     await writeJson(path.join(staged, marker), {
       schemaVersion: 1,
-      package: "codex-design",
+      package: "studio-design",
       version: "1.0.0",
       files: hashes,
     });
@@ -107,7 +109,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
         flags.global ? os.homedir() : path.resolve(flags.project),
         ".agents",
         "skills",
-        "codex-design",
+        "studio-design",
       );
     console.log(
       JSON.stringify(

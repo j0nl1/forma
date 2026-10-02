@@ -10,11 +10,11 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { shadowCss } from "../skills/codex-design/scripts/lib/system-review-data.mjs";
-import { scriptBindings } from "../skills/codex-design/scripts/lib/system-card-scripts.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { shadowCss } from "../skills/studio-design/scripts/lib/system-review-data.mjs";
+import { scriptBindings } from "../skills/studio-design/scripts/lib/system-card-scripts.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),
@@ -24,7 +24,7 @@ async function fixture(t) {
   await fs.copyFile(
     path.join(
       root,
-      "skills/codex-design/assets/starters/fonts/inter-medium.woff2",
+      "skills/studio-design/assets/starters/fonts/inter-medium.woff2",
     ),
     path.join(source, "assets/font.woff2"),
   );

@@ -8,13 +8,13 @@ import {
   mergeTweaks,
   scrubNumber,
   segmentedOptions,
-} from "../skills/codex-design/assets/starters/tweaks-model.js";
-import { tweakBinding } from "../skills/codex-design/scripts/lib/tweaks-source.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+} from "../skills/studio-design/assets/starters/tweaks-model.js";
+import { tweakBinding } from "../skills/studio-design/scripts/lib/tweaks-source.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 const starter = path.resolve(
-  "skills/codex-design/assets/starters/tweaks-components.jsx",
+  "skills/studio-design/assets/starters/tweaks-components.jsx",
 );
 const defaults = {
   size: 16,

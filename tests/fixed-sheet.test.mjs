@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { renderPdf } from "../skills/codex-design/scripts/lib/pdf.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { renderPdf } from "../skills/studio-design/scripts/lib/pdf.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
 import {
   injectFixedSheet,
   needsFixedSheet,
-} from "../skills/codex-design/scripts/lib/fixed-sheet.mjs";
+} from "../skills/studio-design/scripts/lib/fixed-sheet.mjs";
 async function fixture(
   t,
   {

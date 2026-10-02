@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
-const starter = path.resolve("skills/codex-design/assets/starters/email.html");
+const starter = path.resolve("skills/studio-design/assets/starters/email.html");
 
 test("email remains readable and responsive with header styles stripped", async (t) => {
   const dir = await temporary(t);

@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
 async function fixture(t) {
   const dir = await temporary(t);
@@ -22,7 +22,7 @@ async function fixture(t) {
     ["street-libraries.js", "street.bundle.js"],
   ])
     await bundle(
-      path.join(root, "skills/codex-design/assets/starters", entry),
+      path.join(root, "skills/studio-design/assets/starters", entry),
       path.join(source, output),
     );
   const { server, url } = await serve(dir, 0);

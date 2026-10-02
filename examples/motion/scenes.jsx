@@ -9,7 +9,7 @@ import {
   ImageSprite,
   RectSprite,
   Easing,
-} from "../../skills/codex-design/assets/starters/animations.jsx";
+} from "../../skills/studio-design/assets/starters/animations.jsx";
 
 const chapters = [
   {

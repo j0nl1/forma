@@ -5,8 +5,8 @@ import path from "node:path";
 import http from "node:http";
 import { deflateSync } from "node:zlib";
 import { temporary } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
 // Synthetic solid tiles test interactions without contacting a public tile service.
 function tilePNG() {
@@ -49,7 +49,7 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.resolve("skills/codex-design/assets/starters/street-libraries.js"),
+    path.resolve("skills/studio-design/assets/starters/street-libraries.js"),
     path.join(dir, "street.bundle.js"),
   );
   await fs.copyFile(

@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { injectPlainCanvas } from "../skills/codex-design/scripts/lib/plain-canvas.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { injectPlainCanvas } from "../skills/studio-design/scripts/lib/plain-canvas.mjs";
 const source = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="design_doc_mode" content="canvas"><title>Plain design options</title><style>body>article{position:absolute;width:240px;height:180px;background:#269d80;box-sizing:border-box;padding:20px;color:white}#first{left:100px;top:130px}#second{left:1700px;top:430px;background:#365bcf}#third{left:500px;top:850px}a{color:inherit}</style></head><body><article id="first" aria-label="First direction"><button id="action">Open</button><input value="Original"><a href="#second">Compare second</a></article><article id="second"><p>Second direction</p></article><article id="third">Third direction</article><template><article id="inert">Inert template</article></template><script>window.originalNode=document.querySelector('#first');window.originalInput=document.querySelector('input');window.clicks=0;document.querySelector('#action').addEventListener('click',()=>{window.clicks++;document.querySelector('#action').textContent='Opened';});</script></body></html>`;
 async function fixture(t, html = source, options = {}) {
   const dir = await temporary(t);

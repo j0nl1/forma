@@ -13,20 +13,20 @@ node tools/install.mjs --global --dry-run
 node tools/install.mjs --global
 ```
 
-Destination: `~/.agents/skills/codex-design`. For one project:
+Destination: `~/.agents/skills/studio-design`. For one project:
 
 ```sh
 node tools/install.mjs --project /absolute/path/to/project --dry-run
 node tools/install.mjs --project /absolute/path/to/project
 ```
 
-Destination: `<project>/.agents/skills/codex-design`. For a custom or legacy root:
+Destination: `<project>/.agents/skills/studio-design`. For a custom or legacy root:
 
 ```sh
-node tools/install.mjs --dest /absolute/path/to/skills/codex-design
+node tools/install.mjs --dest /absolute/path/to/skills/studio-design
 ```
 
-The installer rejects existing destinations and source symlinks, stages a complete copy, and performs no network calls or package installs. It copies no `node_modules`. Avoid duplicate discovery roots. Reload Codex or start a new chat if needed, then explicitly invoke `$codex-design`.
+The installer rejects existing destinations and source symlinks, stages a complete copy, and performs no network calls or package installs. It copies no `node_modules`. Avoid duplicate discovery roots. Reload Codex or start a new chat if needed, then explicitly invoke `$studio-design`.
 
 ## Runtime dependencies
 
@@ -40,7 +40,7 @@ npx playwright install chromium
 For the installed global skill:
 
 ```sh
-cd "$HOME/.agents/skills/codex-design"
+cd "$HOME/.agents/skills/studio-design"
 npm ci --ignore-scripts
 npx playwright install chromium
 ```
@@ -51,31 +51,31 @@ For macOS-specific operations in the maintained workspace, use `ssh sirius`. Oth
 
 The design-system compiler, public module entries and read-only `scripts/adherence.mjs` checker use these same installed dependencies. They require no host service, project compiler plugin or model API key. See the [design-system usage](usage.md#design-systems) for compilation, imports and advisory checks.
 
-Animation captions include Inter Medium 4.1 under the SIL Open Font License; no font download or additional setup is required. When copying the animation starter, retain its companion modules and the complete `assets/starters/fonts/` directory, including its license. The build helper embeds the default font in the output bundle. See [portable fonts](../skills/codex-design/references/motion.md#portable-fonts) for authored fonts and optional provider configuration.
+Animation captions include Inter Medium 4.1 under the SIL Open Font License; no font download or additional setup is required. When copying the animation starter, retain its companion modules and the complete `assets/starters/fonts/` directory, including its license. The build helper embeds the default font in the output bundle. See [portable fonts](../skills/studio-design/references/motion.md#portable-fonts) for authored fonts and optional provider configuration.
 
 ## Use the installed helpers
 
 Commands in the usage guide show checkout-relative paths. For an installed skill, use its absolute directory instead:
 
 ```sh
-CODEX_DESIGN_SKILL="$HOME/.agents/skills/codex-design"
-node "$CODEX_DESIGN_SKILL/scripts/preview.mjs" /absolute/path/to/design --port 0
+STUDIO_DESIGN_SKILL="$HOME/.agents/skills/studio-design"
+node "$STUDIO_DESIGN_SKILL/scripts/preview.mjs" /absolute/path/to/design --port 0
 ```
 
 Open the reported loopback URL and append your HTML filename. Keep this server running while using a separate terminal for browser exports. HTML export reads a local file; PNG and PDF export read the running loopback URL:
 
 ```sh
-node "$CODEX_DESIGN_SKILL/scripts/export.mjs" html /absolute/path/to/design/index.html /absolute/path/to/output/design.html
-node "$CODEX_DESIGN_SKILL/scripts/export.mjs" png http://127.0.0.1:REPORTED_PORT/index.html /absolute/path/to/output/design.png
+node "$STUDIO_DESIGN_SKILL/scripts/export.mjs" html /absolute/path/to/design/index.html /absolute/path/to/output/design.html
+node "$STUDIO_DESIGN_SKILL/scripts/export.mjs" png http://127.0.0.1:REPORTED_PORT/index.html /absolute/path/to/output/design.png
 ```
 
 Replace `REPORTED_PORT` with the printed port. Output files must not already exist. To build copied React or animation source, preserve its local companion imports and run:
 
 ```sh
-node "$CODEX_DESIGN_SKILL/scripts/build.mjs" /absolute/path/to/design/main.jsx /absolute/path/to/design/app.bundle.js
+node "$STUDIO_DESIGN_SKILL/scripts/build.mjs" /absolute/path/to/design/main.jsx /absolute/path/to/design/app.bundle.js
 ```
 
-Reference `app.bundle.js` from the design's HTML. The installed helper resolves its own pinned React and build dependencies; the design does not need a second package installation. Follow the [motion recipe](../skills/codex-design/references/motion.md) when authoring continuous compositions.
+Reference `app.bundle.js` from the design's HTML. The installed helper resolves its own pinned React and build dependencies; the design does not need a second package installation. Follow the [motion recipe](../skills/studio-design/references/motion.md) when authoring continuous compositions.
 
 ## Update and remove
 
@@ -88,8 +88,8 @@ node tools/install.mjs --global --update
 
 An update requires a managed install marker and refuses changed, added, or deleted source files. Preserve local customizations separately. Re-run `npm ci --ignore-scripts` after updating; generated dependencies are not retained. Manually copied and symlink installations are not adopted automatically.
 
-To uninstall, inspect and remove only the chosen `codex-design` installation directory with your file manager, then reload Codex. Generated designs stay in their output folders. The installer and removal do not alter Codex configuration.
+To uninstall, inspect and remove only the chosen `studio-design` installation directory with your file manager, then reload Codex. Generated designs stay in their output folders. The installer and removal do not alter Codex configuration.
 
-Geography dependencies are pinned with the other helpers: D3 7.9.0, topojson-client 3.1.0, world-atlas 2.0.2 and Leaflet 1.9.4. Build the vector and street entries as described in the [geography guide](../skills/codex-design/references/geography.md). Copy/link the street bundle's generated CSS alongside its JavaScript. Country geometry is local; an enabled street tile provider uses the page's normal network connection.
+Geography dependencies are pinned with the other helpers: D3 7.9.0, topojson-client 3.1.0, world-atlas 2.0.2 and Leaflet 1.9.4. Build the vector and street entries as described in the [geography guide](../skills/studio-design/references/geography.md). Copy/link the street bundle's generated CSS alongside its JavaScript. Country geometry is local; an enabled street tile provider uses the page's normal network connection.
 
-Generated sound uses the Node.js helper and a configured provider credential; it adds no npm SDK dependency. Set `ELEVENLABS_API_KEY` through your process environment and follow the [sound workflow](../skills/codex-design/references/sound-effects.md) to review an offline plan before `--generate`. FFmpeg is checked before generation and decodes the downloaded MP3 before publication. FFprobe measures exact audio metadata when needed; both are also used by marked animation audio export.
+Generated sound uses the Node.js helper and a configured provider credential; it adds no npm SDK dependency. Set `ELEVENLABS_API_KEY` through your process environment and follow the [sound workflow](../skills/studio-design/references/sound-effects.md) to review an offline plan before `--generate`. FFmpeg is checked before generation and decodes the downloaded MP3 before publication. FFprobe measures exact audio metadata when needed; both are also used by marked animation audio export.

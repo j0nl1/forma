@@ -4,9 +4,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
 
 const formats = [
   ["instagramPost", 1080, 1080],
@@ -37,7 +37,7 @@ async function fixture(t) {
     path.join(dir, "campaign.bundle.js"),
   );
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/plain-canvas.js"),
+    path.join(root, "skills/studio-design/assets/starters/plain-canvas.js"),
     path.join(dir, "starters/plain-canvas.js"),
   );
   const { server, url } = await serve(dir, 0);

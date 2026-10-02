@@ -5,11 +5,11 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
-import { captionFrame } from "../skills/codex-design/assets/starters/motion-model.js";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { captionFrame } from "../skills/studio-design/assets/starters/motion-model.js";
 
 const near = (actual, expected, tolerance = 1e-8) =>
   assert.ok(
@@ -98,7 +98,7 @@ async function setup(t, { media = false } = {}) {
   const dir = await temporary(t);
   const runtime = path.join(
     root,
-    "skills/codex-design/assets/starters/animations.jsx",
+    "skills/studio-design/assets/starters/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
@@ -431,7 +431,7 @@ test("real encoded caption frames retain the authored fade envelope and explicit
   const { dir, url } = await setup(t);
   await fs.copyFile(
     new URL(
-      "../skills/codex-design/assets/starters/fonts/inter-medium.woff2",
+      "../skills/studio-design/assets/starters/fonts/inter-medium.woff2",
       import.meta.url,
     ),
     path.join(dir, "inter-medium.woff2"),

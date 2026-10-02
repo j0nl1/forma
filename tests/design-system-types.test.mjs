@@ -10,8 +10,8 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),

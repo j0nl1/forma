@@ -11,17 +11,17 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/codex-design/scripts/design-system.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
 import {
   loadFig,
   outline,
   select,
   renderDocument,
-} from "../skills/codex-design/scripts/lib/figma.mjs";
-import { importFig } from "../skills/codex-design/scripts/figma.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { record } from "../skills/codex-design/scripts/project.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
+} from "../skills/studio-design/scripts/lib/figma.mjs";
+import { importFig } from "../skills/studio-design/scripts/figma.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { record } from "../skills/studio-design/scripts/project.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
 
 test("installation stages a standalone skill and refuses destructive updates", async (t) => {
   const dir = await temporary(t),
@@ -31,7 +31,7 @@ test("installation stages a standalone skill and refuses destructive updates", a
   await install(dest);
   assert.match(
     await fs.readFile(path.join(dest, "SKILL.md"), "utf8"),
-    /name: codex-design/,
+    /name: studio-design/,
   );
   assert.ok(await fs.stat(path.join(dest, "package-lock.json")));
   await assert.rejects(install(dest), /Destination exists/);

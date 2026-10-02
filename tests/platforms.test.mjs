@@ -3,14 +3,14 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/codex-design/scripts/lib/inline.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 const components = path.join(
   root,
-  "skills/codex-design/assets/starters/platform-components.jsx",
+  "skills/studio-design/assets/starters/platform-components.jsx",
 );
 async function fixture(t, html, entry) {
   const dir = await temporary(t);
@@ -19,7 +19,7 @@ async function fixture(t, html, entry) {
     await bundle(path.join(dir, "app.jsx"), path.join(dir, "app.js"));
   } else
     await bundle(
-      path.join(root, "skills/codex-design/assets/starters/frames.js"),
+      path.join(root, "skills/studio-design/assets/starters/frames.js"),
       path.join(dir, "app.js"),
     );
   const source = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Platform contracts</title><style>body{margin:30px;font:15px system-ui}.narrow{display:flex;align-items:stretch;width:180px;height:1000px}.asset{height:160px;background:#cf362f}.long{height:2500px;background:linear-gradient(#cf362f,#365bcf)}</style></head><body>${html}<script src="app.js"></script></body></html>`;
@@ -377,7 +377,7 @@ test("shell child events, React reconciliation, reconnect and independent cloned
   const { url } = await fixture(
     t,
     "<div id='app'></div>",
-    `import React from 'react'; import {createRoot} from 'react-dom/client'; import ${JSON.stringify(path.join(root, "skills/codex-design/assets/starters/platform-shells.js"))}; const root=createRoot(document.getElementById('app')); window.renderShell=flag=>root.render(<ios-shell id="phone" image-only={String(flag)}><input id="live" aria-label="Live input"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>Live action</button>{flag && <p id="dynamic">New content</p>}</ios-shell>); renderShell(false);`,
+    `import React from 'react'; import {createRoot} from 'react-dom/client'; import ${JSON.stringify(path.join(root, "skills/studio-design/assets/starters/platform-shells.js"))}; const root=createRoot(document.getElementById('app')); window.renderShell=flag=>root.render(<ios-shell id="phone" image-only={String(flag)}><input id="live" aria-label="Live input"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>Live action</button>{flag && <p id="dynamic">New content</p>}</ios-shell>); renderShell(false);`,
   );
   await withPage(url, async (page) => {
     await page.getByLabel("Live input").fill("Retained");
@@ -549,7 +549,7 @@ test("shell capture settles a root image slot and excludes its editor and credit
     `<ios-shell id="phone"><image-slot id="image" data-codex-frame-export style="width:100px;height:100px" src="${source}" credit="Original studio study"></image-slot></ios-shell>`,
   );
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/image-slot.js"),
+    path.join(root, "skills/studio-design/assets/starters/image-slot.js"),
     path.join(dir, "image.js"),
   );
   await fs.writeFile(

@@ -5,14 +5,14 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
 import { prepareDemo } from "../tools/demo.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 import {
   compile,
   preview,
-} from "../skills/codex-design/scripts/design-system.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
+} from "../skills/studio-design/scripts/design-system.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
 
 test("native examples load without runtime errors and fit narrow layouts", async (t) => {
   const dir = await temporary(t);
@@ -297,7 +297,7 @@ test("3D source bundles locally and provides real model export controls", async 
     path.join(dir, "index.html"),
   );
   await bundle(
-    path.join(root, "skills/codex-design/assets/starters/three-stage.js"),
+    path.join(root, "skills/studio-design/assets/starters/three-stage.js"),
     path.join(dir, "three-stage.bundle.js"),
   );
   const { server, url } = await serve(dir, 0);

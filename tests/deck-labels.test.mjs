@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { slideLabel } from "../skills/codex-design/assets/starters/deck-labels.js";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { slideLabel } from "../skills/studio-design/assets/starters/deck-labels.js";
 
 const longTitle = "A deliberately long heading describing quarterly growth";
 const names = [
@@ -21,7 +21,7 @@ const html = `<!doctype html><html lang="en"><meta charset="utf-8"><style>body{m
 async function fixture(t, connected = false) {
   const dir = await temporary(t);
   await fs.cp(
-    path.resolve("skills/codex-design/assets/starters"),
+    path.resolve("skills/studio-design/assets/starters"),
     path.join(dir, "starters"),
     { recursive: true },
   );
@@ -171,7 +171,7 @@ test("source editing preserves authored graphical names across duplicate, move, 
     assert.ok(saved.includes('data-screen-label="09 Revenue"'));
     assert.ok(!saved.includes("data-deck-skip"));
     const artifact =
-      "/home/cerberus/.codex-artifacts/home/cerberus/Projects/codex-design/screenshots/deck-labels";
+      "/home/cerberus/.codex-artifacts/home/cerberus/Projects/studio-design/screenshots/deck-labels";
     await fs.mkdir(artifact, { recursive: true });
     await page.screenshot({
       path: path.join(artifact, "persisted-labels.png"),

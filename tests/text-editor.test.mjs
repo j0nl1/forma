@@ -7,15 +7,15 @@ import { temporary, root } from "./helpers.mjs";
 import {
   inspectText,
   applyTextEdits,
-} from "../skills/codex-design/scripts/lib/text-bindings.mjs";
+} from "../skills/studio-design/scripts/lib/text-bindings.mjs";
 import {
   sourceTransaction,
   replaceSource,
-} from "../skills/codex-design/scripts/lib/source-transaction.mjs";
-import { serve } from "../skills/codex-design/scripts/preview.mjs";
-import { bundle } from "../skills/codex-design/scripts/build.mjs";
-import { withPage } from "../skills/codex-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/codex-design/scripts/export.mjs";
+} from "../skills/studio-design/scripts/lib/source-transaction.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
 const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Text contract</title><style>body{font:18px/1.5 Georgia;margin:30px;max-width:640px}h1{font-size:32px}p{margin:15px 0}</style></head><body><main><h1 id="title" contenteditable="false" tabindex="3">Original title</h1><p id="mixed">Before <strong data-kind="emphasis">important</strong> after <a href="#title">a link</a><br>last line<!--Keep comment--></p><ul><li>Repeated bullet</li><li>Repeated bullet</li></ul><p id="empty"></p><div id="generated"></div></main><script>window.originalTitle=document.getElementById('title');window.originalNode=originalTitle.firstChild;window.originalStrong=document.querySelector('strong');window.count=0;originalStrong.addEventListener('probe',()=>window.count++);document.getElementById('generated').textContent='Generated content';</script></body></html>`;
 async function fixture(
   t,
@@ -25,7 +25,7 @@ async function fixture(
   let html = content;
   if (document) {
     await bundle(
-      path.join(root, "skills/codex-design/assets/starters/document.js"),
+      path.join(root, "skills/studio-design/assets/starters/document.js"),
       path.join(dir, "document.js"),
     );
     html = html
@@ -35,7 +35,7 @@ async function fixture(
   }
   if (session) {
     await bundle(
-      path.join(root, "skills/codex-design/assets/starters/text-editor.js"),
+      path.join(root, "skills/studio-design/assets/starters/text-editor.js"),
       path.join(dir, "editor.js"),
     );
     html = html.replace(
