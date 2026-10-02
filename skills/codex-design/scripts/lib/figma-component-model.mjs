@@ -116,7 +116,8 @@ function normalizedOptions(name, raw) {
     booleans.every((v) => typeof v === "boolean") &&
     new Set(booleans).size === 2;
   let values = boolean ? booleans : raw.map(label);
-  if (new Set(values.map(String)).size < values.length) values = raw;
+  const duplicates = new Set(values.map(String)).size < values.length;
+  if (duplicates) values = raw;
   const map = new Map(raw.map((value, i) => [value, values[i]]));
   return {
     values,
@@ -126,7 +127,15 @@ function normalizedOptions(name, raw) {
         : /^(false|no)$/i.test(value.trim())
           ? false
           : label(value),
-    normalize: (value) => (map.has(value) ? map.get(value) : label(value)),
+    normalize: (value) => {
+      const original = String(value);
+      if (map.has(original)) return map.get(original);
+      if (map.has(original.trim())) return map.get(original.trim());
+      if (duplicates) return original;
+      return boolean && /^(true|yes|false|no)$/i.test(original.trim())
+        ? /^(true|yes)$/i.test(original.trim())
+        : label(original);
+    },
   };
 }
 export function componentModel(node, warnings = []) {
@@ -202,7 +211,16 @@ export function componentModel(node, warnings = []) {
       warn(`unsupported component property ${String(def.type)}`);
       continue;
     }
-    const prop = { key, name: def.name, kind: def.type, type, value };
+    const prop = {
+      key,
+      name: def.name,
+      kind: def.type,
+      type,
+      value,
+      ...(def.type === "VARIANT" && options.has(def.name)
+        ? { normalize: options.get(def.name).normalize }
+        : {}),
+    };
     props.push(prop);
     byId.set(nodeId(def.id), prop);
   }

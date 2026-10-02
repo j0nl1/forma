@@ -1,6 +1,8 @@
 import { parseFragment } from "parse5";
 import postcss from "postcss";
 import { renderNode, nodeId } from "./figma.mjs";
+import { applyNodeLayout, layoutChildrenStretched } from "./figma-layout.mjs";
+import { instanceJsx } from "./figma-component-instances.mjs";
 
 const camel = (value) =>
   value.startsWith("--")
@@ -33,10 +35,22 @@ function scoped(value, ids) {
   pieces.push(quote(remaining.slice(start)));
   return pieces.filter((piece) => piece !== '""').join(" + ") || '""';
 }
-export function componentBody(doc, root, model, warnings) {
-  const clones = new Map();
-  function clone(node) {
-    const copy = { ...node, children: node.children.map(clone) };
+export function componentBody(doc, root, model, warnings, context = {}) {
+  const clones = new Map(),
+    parents = new Map(),
+    stretches = new Map(),
+    rendered = new Map();
+  function clone(node, parent = null, parentStretched = false) {
+    const stretched = layoutChildrenStretched(node, parent, {
+      isRoot: parent === null,
+      parentStretched,
+    });
+    const copy = {
+      ...node,
+      children: node.children.map((child) => clone(child, node, stretched)),
+    };
+    parents.set(nodeId(node.guid), parent);
+    stretches.set(nodeId(node.guid), parentStretched);
     clones.set(nodeId(copy.guid), copy);
     const refs = (node.componentPropRefs ?? []).filter((ref) => !ref.isDeleted);
     if (
@@ -58,7 +72,21 @@ export function componentBody(doc, root, model, warnings) {
       copy.derivedTextData = { ...copy.derivedTextData, glyphs: [] };
     return copy;
   }
-  const markup = renderNode(doc, clone(root), { warnings });
+  const markup = renderNode(doc, clone(root), {
+    warnings,
+    componentGeometry: true,
+    onNode: (node, { parent, parentKey, key }) => {
+      const parentStretched = stretches.get(parentKey) ?? false;
+      rendered.set(key, { node, parent, parentStretched });
+      stretches.set(
+        key,
+        layoutChildrenStretched(node, parent, {
+          isRoot: parent === null,
+          parentStretched,
+        }),
+      );
+    },
+  });
   const fragment = parseFragment(markup),
     ids = [];
   const visit = (node) => {
@@ -67,31 +95,47 @@ export function componentBody(doc, root, model, warnings) {
     for (const child of node.childNodes ?? []) visit(child);
   };
   visit(fragment);
-  function emit(element, isRoot = false) {
+  function emit(element, isRoot = false, disabled = false) {
     if (element.nodeName === "#text") return `{${quote(element.value)}}`;
     if (!element.tagName) return "";
     const id = element.attrs.find(
       (attr) => attr.name === "data-figma-id",
     )?.value;
-    const source = clones.get(id),
+    const renderKey = element.attrs.find(
+      (attr) => attr.name === "data-figma-render-key",
+    )?.value;
+    const snapshot = rendered.get(renderKey);
+    const source = clones.get(id) ?? snapshot?.node ?? doc.nodes.get(id),
       refs = (source?.componentPropRefs ?? []).filter((ref) => !ref.isDeleted);
     const binding = (field) =>
       refs
         .filter((ref) => ref.componentPropNodeField === field)
         .map((ref) => model.byId.get(nodeId(ref.defID)))
         .find(Boolean);
-    const visible = binding("VISIBLE"),
-      text = binding("TEXT_DATA"),
+    const visible = disabled ? null : binding("VISIBLE"),
+      text = disabled ? null : binding("TEXT_DATA"),
       slot =
         source?.type === "INSTANCE" ? binding("OVERRIDDEN_SYMBOL_ID") : null;
     const attrs = [];
+    let style = {};
     for (const attr of element.attrs) {
+      if (attr.name === "data-figma-render-key") continue;
       if (attr.name === "style") {
         const declarations = postcss
           .parse(`a{${attr.value}}`)
           .first.nodes.filter((node) => node.type === "decl");
-        const entries = declarations.map(
-          (decl) => `${quote(camel(decl.prop))}:${scoped(decl.value, ids)}`,
+        style = Object.fromEntries(
+          declarations.map((decl) => [camel(decl.prop), decl.value]),
+        );
+        if (source)
+          applyNodeLayout(style, snapshot?.node ?? source, {
+            parent: snapshot?.parent ?? parents.get(id),
+            isRoot,
+            warnings,
+            parentStretched: snapshot?.parentStretched ?? stretches.get(id),
+          });
+        const entries = Object.entries(style).map(
+          ([key, value]) => `${quote(key)}:${scoped(value, ids)}`,
         );
         if (isRoot) entries.push("...props.style");
         attrs.push(`style={{${entries.join(",")}}}`);
@@ -107,9 +151,25 @@ export function componentBody(doc, root, model, warnings) {
         attrs.push(`${name}={${scoped(attr.value, ids)}}`);
       }
     }
+    if (source?.type === "INSTANCE" && context.registry && !disabled) {
+      const instance = instanceJsx(
+        doc,
+        source,
+        style,
+        context.registry,
+        context.deps,
+        warnings,
+        { slot, isRoot, current: context.entry },
+      );
+      if (instance)
+        return visible?.kind === "BOOL"
+          ? `{props.${visible.key} && (${instance})}`
+          : instance;
+      disabled = true;
+    }
     if (isRoot) attrs.push("className={props.className}");
     let content = (element.childNodes ?? [])
-      .map((child) => emit(child))
+      .map((child) => emit(child, false, disabled))
       .join("");
     if (text?.kind === "TEXT") content = `{props.${text.key}}`;
     if (slot?.kind === "INSTANCE_SWAP")

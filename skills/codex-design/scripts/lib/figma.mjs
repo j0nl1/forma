@@ -10,6 +10,7 @@ import { boxStroke } from "./figma-strokes.mjs";
 import { nodeGeometry } from "./figma-geometry.mjs";
 import { renderMaskedChildren } from "./figma-masks.mjs";
 import { hasGlyphOutlines, nodeText } from "./figma-text.mjs";
+import { resolveInstance } from "./figma-instances.mjs";
 const LIMIT = 128 * 1024 * 1024;
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
@@ -190,9 +191,52 @@ const finite = (v, fallback = 0) =>
 export function color(c, opacity = 1) {
   return `rgba(${["r", "g", "b"].map((k) => Math.round(Math.min(1, Math.max(0, finite(c?.[k]))) * 255)).join(",")},${Math.min(1, Math.max(0, finite(c?.a, 1) * opacity))})`;
 }
-export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
+export function renderNode(
+  doc,
+  node,
+  {
+    root = true,
+    warnings = [],
+    scope = "",
+    componentGeometry = false,
+    onNode,
+    parent = null,
+    parentKey = null,
+  } = {},
+) {
+  if (
+    componentGeometry &&
+    node.type === "TEXT" &&
+    node.derivedTextData?.glyphs?.length &&
+    !/font ?awesome|material (icons|symbols)|icomoon|glyphicons?|ionicons/i.test(
+      node.fontName?.family ?? "",
+    )
+  )
+    node = {
+      ...node,
+      derivedTextData: { ...node.derivedTextData, glyphs: [] },
+    };
   if (node.visible === false) return "";
+  if (
+    node.type === "INSTANCE" &&
+    (componentGeometry || !node.children?.length)
+  ) {
+    const expanded = resolveInstance(doc, node, { warnings });
+    if (expanded)
+      return renderNode(doc, expanded, {
+        root,
+        warnings,
+        scope,
+        componentGeometry,
+        onNode,
+        parent,
+        parentKey,
+      });
+  }
+  if (node.instanceSymbol) scope += "instance-" + nodeId(node.guid) + "-";
   const id = nodeId(node.guid);
+  const paintId = scope ? scope + id : id;
+  onNode?.(node, { parent, parentKey, key: paintId });
   const css = [];
   const w = finite(node.size?.x, 320),
     h = finite(node.size?.y, 200);
@@ -238,7 +282,7 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     doc,
     glyphs ? { ...node, fillPaints: [], backgroundPaints: [] } : node,
     {
-      id,
+      id: paintId,
       w,
       h,
       color,
@@ -254,14 +298,14 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     )
       warnings.push(`${id}: ${key} needs visual review`);
   const stroke = boxStroke(node, {
-    id,
+    id: paintId,
     color,
     vector: vector || glyphs,
     warnings,
   });
   css.push(...stroke.declarations);
   const effects = nodeEffects(node, {
-    id,
+    id: paintId,
     color,
     alpha: node.type === "TEXT" || vector,
     warnings,
@@ -270,28 +314,45 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   css.push(...effects.declarations);
   let content = "";
   if (node.type === "TEXT") {
-    const text = nodeText(doc, node, paints, { id, w, h, color, warnings });
+    const text = nodeText(doc, node, paints, {
+      id: paintId,
+      w,
+      h,
+      color,
+      warnings,
+    });
     css.push(...text.declarations);
     content = text.content;
   } else if (vector) {
     content = nodeGeometry(doc, node, paints, {
-      id,
+      id: paintId,
       w,
       h,
       color,
       vector,
+      componentGeometry,
       warnings,
     });
   }
-  if (node.stackMode) {
+  if (node.stackMode && !componentGeometry) {
     warnings.push(`${id}: auto-layout rendered from saved geometry`);
   }
   content = effects.defs + content;
   content += renderMaskedChildren(doc, node, {
     warnings,
-    renderChild: (child) => renderNode(doc, child, { root: false, warnings }),
+    scope,
+    renderChild: (child) =>
+      renderNode(doc, child, {
+        root: false,
+        warnings,
+        scope,
+        componentGeometry,
+        onNode,
+        parent: node,
+        parentKey: paintId,
+      }),
   });
-  return `<div data-figma-id="${html(id)}" aria-label="${html(node.name)}" style="${html(css.join(";"))}">${content}</div>`;
+  return `<div data-figma-id="${html(id)}"${componentGeometry ? ` data-figma-render-key="${html(paintId)}"` : ""} aria-label="${html(node.name)}" style="${html(css.join(";"))}">${content}</div>`;
 }
 export function renderDocument(doc, node) {
   const warnings = [];

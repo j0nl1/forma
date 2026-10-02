@@ -1,15 +1,16 @@
 import path from "node:path";
 import { write } from "./files.mjs";
 import { nodeId } from "./figma.mjs";
-import { componentEntries, componentModel } from "./figma-component-model.mjs";
+import { componentRegistry } from "./figma-component-instances.mjs";
 import { componentBody } from "./figma-component-jsx.mjs";
 
 export async function emitComponents(doc, output, warnings = [], selection) {
-  const entries = componentEntries(doc);
+  const registry = componentRegistry(doc, warnings),
+    entries = registry.entries;
   const selected = selection
     ? entries.filter(
         (entry) =>
-          nodeId(entry.node.guid) === selection ||
+          registry.byId.get(selection) === entry ||
           entry.node.name === selection ||
           entry.name === selection,
       )
@@ -20,9 +21,17 @@ export async function emitComponents(doc, output, warnings = [], selection) {
         ? "Ambiguous component selection; use a node id"
         : "No matching component",
     );
-  const components = [];
-  for (const { node, name } of selected) {
-    const model = componentModel(node, warnings),
+  const components = [],
+    queue = [...selected],
+    emitted = new Set();
+  for (let index = 0; index < queue.length; index++) {
+    const entry = queue[index];
+    if (emitted.has(entry)) continue;
+    emitted.add(entry);
+    const { node, name } = entry,
+      deps = new Set(),
+      context = { registry, deps, entry };
+    const model = registry.models.get(entry),
       cases = model.axes.length
         ? model.cases
         : model.initial
@@ -44,13 +53,19 @@ export async function emitComponents(doc, output, warnings = [], selection) {
     const bodies = cases
       .map(
         (item) =>
-          `case ${JSON.stringify(JSON.stringify(item.values))}: return (${componentBody(doc, item.node, model, warnings)});`,
+          `case ${JSON.stringify(JSON.stringify(item.values))}: return (${componentBody(doc, item.node, model, warnings, context)});`,
       )
       .join("\n");
     const fallback = model.initial
-      ? componentBody(doc, model.initial.node, model, warnings)
+      ? componentBody(doc, model.initial.node, model, warnings, context)
       : "null";
-    const source = `import React, {useId} from 'react';\n// Figma node: ${nodeId(node.guid)}. Generated independently from decoded design data.\nexport function ${name}(input = {}) {\n const scope = useId().replace(/:/g, '') + '-';\n const props = {...input, ${init}};\n switch (${key}) {\n ${bodies}\n default: return (${fallback});\n }\n}\nexport default ${name};\n`;
+    for (const dependency of deps)
+      if (!emitted.has(dependency)) queue.push(dependency);
+    const imports = [...deps]
+      .filter((dep) => dep !== entry)
+      .map((dep) => `import {${dep.name}} from './${dep.name}.jsx';`)
+      .join("\n");
+    const source = `import React, {useId} from 'react';\n${imports}\n// Figma node: ${nodeId(node.guid)}. Generated independently from decoded design data.\nexport function ${name}(input = {}) {\n const scope = useId().replace(/:/g, '') + '-';\n const props = {...input, ${init}};\n switch (${key}) {\n ${bodies}\n default: return (${fallback});\n }\n}\nexport default ${name};\n`;
     const declaration = `import * as React from 'react';\nexport interface ${name}Props {\n className?: string;\n style?: React.CSSProperties;\n${model.props
       .map(
         (prop) =>
@@ -76,6 +91,10 @@ export async function emitComponents(doc, output, warnings = [], selection) {
       kind: "component",
       props: defaults,
       figmaNode: nodeId(node.guid),
+      dependencies: [...deps]
+        .filter((dep) => dep !== entry)
+        .map((dep) => dep.name),
+      requested: selected.includes(entry),
       variants: cases.map((item) => ({
         node: nodeId(item.node.guid),
         props: Object.fromEntries(

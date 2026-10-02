@@ -139,7 +139,11 @@ function shapes(doc, node, parent, warnings, depth = 0) {
 }
 
 // A visible mask starts a sibling run. Every mask ends that run, including hidden masks.
-export function renderMaskedChildren(doc, parent, { warnings, renderChild }) {
+export function renderMaskedChildren(
+  doc,
+  parent,
+  { warnings, renderChild, scope = "" },
+) {
   const children = Array.isArray(parent.children) ? parent.children : [];
   const output = [];
   let index = 0;
@@ -167,7 +171,7 @@ export function renderMaskedChildren(doc, parent, { warnings, renderChild }) {
     }
     const key =
       "codex-figma-mask-" +
-      `${idOf(parent)}-${idOf(child)}`.replace(/[^\w-]/g, "-");
+      `${scope}${idOf(parent)}-${idOf(child)}`.replace(/[^\w-]/g, "-");
     output.push(
       `<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true"><defs><clipPath id="${html(key)}" clipPathUnits="userSpaceOnUse">${geometry.join("")}</clipPath></defs></svg><div data-figma-mask-group="${html(idOf(child))}" style="position:absolute;inset:0;clip-path:url(#${html(key)})">${content.join("")}</div>`,
     );

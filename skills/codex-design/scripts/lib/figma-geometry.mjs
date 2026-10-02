@@ -1,6 +1,7 @@
 import { html } from "./files.mjs";
 import { paintLayers } from "./figma-paints.mjs";
 import { strokeAlignment } from "./figma-strokes.mjs";
+import { vectorNetworkPaths } from "./figma-vector-network.mjs";
 export function decodePathData(bytes) {
   const view = new DataView(Uint8Array.from(bytes).buffer);
   let offset = 0;
@@ -70,6 +71,12 @@ export function nodeGeometry(doc, node, fills, options) {
     vector: true,
     kind: "stroke",
   });
+  if (options.componentGeometry && !fillPaths.length && !strokePaths.length)
+    fillPaths.push(
+      ...vectorNetworkPaths(doc, node, warn).map(
+        ({ d, rule }) => `<path d="${html(d)}" fill-rule="${html(rule)}"/>`,
+      ),
+    );
   if (strokes.layers.length && !strokePaths.length)
     warn("vector stroke geometry missing; visual review required");
   if (fills.layers.length && !fillPaths.length)
