@@ -214,3 +214,23 @@ test("PowerPoint fails on malformed notes and browser resource errors and cleans
     0,
   );
 });
+
+test("PowerPoint retains decorative pseudo-elements, wide-gamut color, RTL and explicit stacking as pictures", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<style>.decorated{position:relative}.decorated::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff8,#def8)}</style><section><h1>Editable heading</h1><p class="decorated">Decorative layer</p><p style="color:color(display-p3 1 0 0)">Wide-gamut color</p><p style="direction:rtl">Right-to-left layout</p></section><section><p style="position:relative;z-index:2">Explicit stacking</p></section>`,
+  );
+  const out = path.join(dir, "complex.pptx");
+  const result = await exportArtifact("pptx", url, out);
+  assert.equal(result.rasterObjects, 4);
+  const zip = unzipSync(await fs.readFile(out));
+  assert.match(xml(zip, "ppt/slides/slide1.xml"), /Editable heading/);
+  assert.equal(
+    (xml(zip, "ppt/slides/slide1.xml").match(/<p:pic>/g) || []).length,
+    3,
+  );
+  assert.equal(
+    (xml(zip, "ppt/slides/slide2.xml").match(/<p:pic>/g) || []).length,
+    1,
+  );
+});

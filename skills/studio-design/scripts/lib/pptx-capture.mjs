@@ -115,9 +115,7 @@ export function captureSlide(index) {
     if (!opacity) return;
     const pseudo = ["::before", "::after"].some((name) => {
       const s = getComputedStyle(element, name);
-      return (
-        !["none", "normal", '""'].includes(s.content) && s.display !== "none"
-      );
+      return !["none", "normal"].includes(s.content) && s.display !== "none";
     });
     const complex =
       !color(style.color) ||
@@ -135,6 +133,11 @@ export function captureSlide(index) {
       pseudo ||
       parseFloat(style.borderRadius) > 0 ||
       style.writingMode !== "horizontal-tb" ||
+      style.direction === "rtl" ||
+      (element === root &&
+        [...root.querySelectorAll("*")].some(
+          (child) => getComputedStyle(child).zIndex !== "auto",
+        )) ||
       style.textTransform === "capitalize" ||
       (element.tagName === "LI" &&
         style.listStyleType !== "none" &&
