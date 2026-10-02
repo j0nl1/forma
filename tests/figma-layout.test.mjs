@@ -399,9 +399,9 @@ test("generated layout infers source fill/hug behavior, retained rotation/absolu
     },
     { parent: row, warnings },
   );
-  assert.equal(icon.width, "40px");
-  assert.equal(icon.height, "60px");
-  assert.match(warnings.join("\n"), /glyph icon.*fixed layout/);
+  assert.equal(icon.width, undefined);
+  assert.equal(icon.height, undefined);
+  assert.doesNotMatch(warnings.join("\n"), /glyph icon.*fixed layout/);
   const fixed = renderDocument(doc, row);
   assert.match(fixed.html, /left:60px/);
   assert.doesNotMatch(fixed.html, /display:flex/);

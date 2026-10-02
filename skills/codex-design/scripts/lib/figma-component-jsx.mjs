@@ -3,6 +3,7 @@ import postcss from "postcss";
 import { renderNode, nodeId } from "./figma.mjs";
 import { applyNodeLayout, layoutChildrenStretched } from "./figma-layout.mjs";
 import { instanceJsx } from "./figma-component-instances.mjs";
+import { iconComponent } from "./figma-component-icons.mjs";
 
 const camel = (value) =>
   value.startsWith("--")
@@ -36,6 +37,11 @@ function scoped(value, ids) {
   return pieces.filter((piece) => piece !== '""').join(" + ") || '""';
 }
 export function componentBody(doc, root, model, warnings, context = {}) {
+  const synthesis = model.synthPlans?.get(nodeId(root.guid));
+  const register = (key, type, fallback) => {
+    if (!model.synthProps?.some((prop) => prop.key === key))
+      model.synthProps?.push({ key, type, fallback });
+  };
   const clones = new Map(),
     parents = new Map(),
     stretches = new Map(),
@@ -113,9 +119,37 @@ export function componentBody(doc, root, model, warnings, context = {}) {
         .map((ref) => model.byId.get(nodeId(ref.defID)))
         .find(Boolean);
     const visible = disabled ? null : binding("VISIBLE"),
-      text = disabled ? null : binding("TEXT_DATA"),
-      slot =
-        source?.type === "INSTANCE" ? binding("OVERRIDDEN_SYMBOL_ID") : null;
+      text = disabled ? null : binding("TEXT_DATA");
+    let slot =
+      source?.type === "INSTANCE" && !disabled
+        ? binding("OVERRIDDEN_SYMBOL_ID")
+        : null;
+    const synthText = !disabled && !text ? synthesis?.text.get(id) : undefined;
+    const synthIcon = !disabled && !slot ? synthesis?.icon.get(id) : undefined;
+    if (synthIcon && source?.type === "INSTANCE")
+      slot = {
+        kind: "INSTANCE_SWAP",
+        key: `icon${synthIcon.i + 1}`,
+        synthetic: true,
+      };
+    const rich = source?.textData?.lines?.some((line) =>
+      ["ORDERED_LIST", "UNORDERED_LIST"].includes(line.lineType),
+    );
+    const synthKey =
+      synthText !== undefined && !rich ? `text${synthText + 1}` : null;
+    const icon =
+      source?.type === "TEXT"
+        ? iconComponent(doc, snapshot?.node ?? source, {
+            warnings,
+            boundText: !!text,
+          })
+        : null;
+    if (icon) {
+      const svg = parseFragment(icon.markup).childNodes.find(
+        (node) => node.tagName === "svg",
+      );
+      element = { ...svg, attrs: [...svg.attrs, ...element.attrs] };
+    }
     const attrs = [];
     let style = {};
     for (const attr of element.attrs) {
@@ -134,6 +168,41 @@ export function componentBody(doc, root, model, warnings, context = {}) {
             warnings,
             parentStretched: snapshot?.parentStretched ?? stretches.get(id),
           });
+        if (icon) {
+          const allowed = new Set([
+            "position",
+            "left",
+            "top",
+            "transform",
+            "transformOrigin",
+            "flexShrink",
+            "alignSelf",
+            "flexGrow",
+            "opacity",
+            "color",
+          ]);
+          style = {
+            ...Object.fromEntries(
+              Object.entries(style).filter(([key]) => allowed.has(key)),
+            ),
+            ...icon.style,
+          };
+        }
+        if (synthKey) {
+          const characters = source.textData?.characters ?? "";
+          const parent = snapshot?.parent ?? parents.get(id);
+          if (
+            ["HORIZONTAL", "VERTICAL", "GRID"].includes(parent?.stackMode) &&
+            !characters.includes("\n") &&
+            (source.textAutoResize == null ||
+              source.textAutoResize === "WIDTH_AND_HEIGHT" ||
+              characters.length <= 30)
+          ) {
+            delete style.width;
+            delete style.height;
+            style.whiteSpace = "nowrap";
+          }
+        }
         const entries = Object.entries(style).map(
           ([key, value]) => `${quote(key)}:${scoped(value, ids)}`,
         );
@@ -159,12 +228,20 @@ export function componentBody(doc, root, model, warnings, context = {}) {
         context.registry,
         context.deps,
         warnings,
-        { slot, isRoot, current: context.entry },
+        {
+          slot,
+          isRoot,
+          current: context.entry,
+          parent: snapshot?.parent ?? parents.get(id),
+        },
       );
-      if (instance)
+      if (instance) {
+        if (slot?.synthetic) register(slot.key, "React.ReactNode");
         return visible?.kind === "BOOL"
           ? `{props.${visible.key} && (${instance})}`
           : instance;
+      }
+      if (slot?.synthetic) slot = null;
       disabled = true;
     }
     if (isRoot) attrs.push("className={props.className}");
@@ -172,6 +249,11 @@ export function componentBody(doc, root, model, warnings, context = {}) {
       .map((child) => emit(child, false, disabled))
       .join("");
     if (text?.kind === "TEXT") content = `{props.${text.key}}`;
+    else if (synthKey && !disabled) {
+      const characters = source.textData?.characters ?? "";
+      register(synthKey, "string", characters);
+      content = `{props.${synthKey} ?? ${quote(characters)}}`;
+    }
     if (slot?.kind === "INSTANCE_SWAP")
       content = `{props.${slot.key} ?? <>${content}</>}`;
     const tag = `<${element.tagName} ${attrs.join(" ")}>${content}</${element.tagName}>`;

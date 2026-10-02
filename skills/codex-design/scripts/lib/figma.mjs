@@ -12,6 +12,15 @@ import { renderMaskedChildren } from "./figma-masks.mjs";
 import { hasGlyphOutlines, nodeText } from "./figma-text.mjs";
 import { resolveInstance } from "./figma-instances.mjs";
 const LIMIT = 128 * 1024 * 1024;
+const componentExcluded = new Set([
+  "VARIABLE",
+  "VARIABLE_SET",
+  "STYLE",
+  "VARIABLE_OVERRIDE",
+  "STICKY",
+  "WIDGET",
+  "SLICE",
+]);
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
 // Interpret the file's Kiwi schema as data; never compile it into JavaScript.
@@ -204,6 +213,11 @@ export function renderNode(
     parentKey = null,
   } = {},
 ) {
+  if (
+    componentGeometry &&
+    (node.internalOnly || componentExcluded.has(node.type))
+  )
+    return "";
   if (
     componentGeometry &&
     node.type === "TEXT" &&

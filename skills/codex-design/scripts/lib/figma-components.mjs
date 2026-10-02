@@ -66,14 +66,17 @@ export async function emitComponents(doc, output, warnings = [], selection) {
       .map((dep) => `import {${dep.name}} from './${dep.name}.jsx';`)
       .join("\n");
     const source = `import React, {useId} from 'react';\n${imports}\n// Figma node: ${nodeId(node.guid)}. Generated independently from decoded design data.\nexport function ${name}(input = {}) {\n const scope = useId().replace(/:/g, '') + '-';\n const props = {...input, ${init}};\n switch (${key}) {\n ${bodies}\n default: return (${fallback});\n }\n}\nexport default ${name};\n`;
-    const declaration = `import * as React from 'react';\nexport interface ${name}Props {\n className?: string;\n style?: React.CSSProperties;\n${model.props
+    const declaration = `import * as React from 'react';\nexport interface ${name}Props {\n className?: string;\n style?: React.CSSProperties;\n${[
+      ...model.props,
+      ...model.synthProps,
+    ]
       .map(
         (prop) =>
           `${
-            prop.value === undefined
+            prop.value === undefined && prop.fallback === undefined
               ? ""
               : " /** @default " +
-                JSON.stringify(prop.value)
+                JSON.stringify(prop.value ?? prop.fallback)
                   .replaceAll("*/", "* /")
                   .replace(/[\r\n]/g, " ") +
                 " */\n"

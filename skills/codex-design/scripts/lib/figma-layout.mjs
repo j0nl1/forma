@@ -1,3 +1,5 @@
+import { applyGridChildLayout, applyGridLayout } from "./figma-grid.mjs";
+
 const axis = (node) =>
   ["HORIZONTAL", "VERTICAL"].includes(node?.stackMode) ? node.stackMode : null;
 const finite = (value, fallback = 0) =>
@@ -132,13 +134,11 @@ export function applyNodeLayout(
       else style[prefix + dimension] = `${size[key]}px`;
     }
   }
-  const savedGlyphs =
-    node.type === "TEXT" &&
-    Array.isArray(node.derivedTextData?.glyphs) &&
-    node.derivedTextData.glyphs.length > 0;
   const direction = axis(node),
     parentAxis = axis(parent),
     flowing = parentAxis && node.stackPositioning !== "ABSOLUTE";
+  if (parent?.stackMode === "GRID")
+    applyGridChildLayout(style, node, parent, warn);
   if (flowing) {
     if (rotated(node))
       warn("rotated auto-layout child retains absolute saved geometry");
@@ -160,7 +160,6 @@ export function applyNodeLayout(
       }
       if (
         node.type === "TEXT" &&
-        !savedGlyphs &&
         (node.textAutoResize == null ||
           ["HEIGHT", "WIDTH_AND_HEIGHT"].includes(node.textAutoResize))
       ) {
@@ -169,27 +168,16 @@ export function applyNodeLayout(
       }
     }
   }
-  if (savedGlyphs && flowing && !rotated(node)) {
-    style.width = `${finite(node.size?.x)}px`;
-    style.height = `${finite(node.size?.y)}px`;
-    warn(
-      "saved glyph icon retains fixed layout dimensions; direct flow SVG sizing needs visual review",
-    );
-  }
   if (
     isRoot &&
     node.type === "TEXT" &&
-    !savedGlyphs &&
     (node.textAutoResize == null ||
       ["HEIGHT", "WIDTH_AND_HEIGHT"].includes(node.textAutoResize))
   ) {
     delete style.height;
     if (node.textAutoResize !== "HEIGHT") delete style.width;
   }
-  if (node.stackMode === "GRID")
-    warn(
-      "GRID responsive layout retains saved geometry; grid tracks and child placement need porting",
-    );
+  if (node.stackMode === "GRID") applyGridLayout(style, node, warn);
   if (direction) {
     const horizontal = direction === "HORIZONTAL";
     style.display = "flex";

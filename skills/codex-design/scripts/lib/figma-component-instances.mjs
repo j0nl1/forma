@@ -1,6 +1,7 @@
 import { nodeId } from "./figma.mjs";
 import { componentEntries, componentModel } from "./figma-component-model.mjs";
 import { instanceSymbolId } from "./figma-instances.mjs";
+import { planSynthesis } from "./figma-component-synthesis.mjs";
 
 export function componentRegistry(doc, warnings) {
   const entries = componentEntries(doc),
@@ -8,6 +9,18 @@ export function componentRegistry(doc, warnings) {
     models = new Map();
   for (const entry of entries) {
     const model = componentModel(entry.node, warnings);
+    model.synthPlans = new Map();
+    model.synthProps = [];
+    model.synthTextSlots = new Map();
+    model.synthIconSlots = new Map();
+    for (const item of model.cases) {
+      const plan = planSynthesis(item.node, model);
+      model.synthPlans.set(nodeId(item.node.guid), plan);
+      for (const [id, value] of plan.text)
+        if (!model.synthTextSlots.has(id)) model.synthTextSlots.set(id, value);
+      for (const [id, value] of plan.icon)
+        if (!model.synthIconSlots.has(id)) model.synthIconSlots.set(id, value);
+    }
     models.set(entry, model);
     byId.set(nodeId(entry.node.guid), entry);
     if (entry.node.isStateGroup)
@@ -130,6 +143,42 @@ export function instancePlan(doc, node, registry, warnings) {
         (ref) => !ref.isDeleted && ref.componentPropNodeField === mapped,
       );
       const prop = ref && model.byId.get(nodeId(ref.defID));
+      const synthText = model.synthTextSlots.get(nodeId(path[0]));
+      const synthIcon = model.synthIconSlots.get(nodeId(path[0]));
+      if (
+        !prop &&
+        field === "textData" &&
+        synthText !== undefined &&
+        typeof override.textData?.characters === "string"
+      ) {
+        const key = `text${synthText + 1}`;
+        if (!props.has(key))
+          props.set(key, { value: override.textData.characters });
+        continue;
+      }
+      if (!prop && field === "overriddenSymbolID" && synthIcon) {
+        const id = nodeId(override.overriddenSymbolID),
+          swap = registry.byId.get(id);
+        if (swap) {
+          deps.add(swap);
+          const symbol = doc.nodes.get(id),
+            w = symbol?.size?.x,
+            h = symbol?.size?.y;
+          let style = { width: "100%", height: "100%" };
+          if (w > 0 && h > 0) {
+            const sx = synthIcon.w / w,
+              sy = synthIcon.h / h;
+            if (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01)
+              style = ["HORIZONTAL", "VERTICAL"].includes(symbol.stackMode)
+                ? { width: synthIcon.w, height: synthIcon.h }
+                : { transform: `scale(${sx},${sy})`, transformOrigin: "0 0" };
+          }
+          const key = `icon${synthIcon.i + 1}`;
+          if (!props.has(key))
+            props.set(key, { swap, values: registry.variantProps(id), style });
+        } else baked = true;
+        continue;
+      }
       if (prop && props.has(prop.key)) continue;
       if (
         prop?.kind === "TEXT" &&
@@ -183,7 +232,7 @@ export function instanceJsx(
   registry,
   deps,
   warnings,
-  { slot, isRoot = false, current } = {},
+  { slot, isRoot = false, current, parent } = {},
 ) {
   const plan = instancePlan(doc, node, registry, warnings);
   if (plan.baked) return null;
@@ -200,17 +249,25 @@ export function instanceJsx(
       attributes.push(
         `${key}={<${value.swap.name} ${Object.entries(value.values)
           .map(([name, value]) => `${name}={${JSON.stringify(value)}}`)
-          .join(" ")}/>}`,
+          .join(
+            " ",
+          )}${value.style ? ` style={${JSON.stringify(value.style)}}` : ""}/>}`,
       );
     } else attributes.push(`${key}={${JSON.stringify(value.value)}}`);
   }
   const outer = Object.fromEntries(
-      Object.entries(style).filter(([key]) => placement.has(key)),
-    ),
-    outerStyle = JSON.stringify(outer).replace(
-      /}$/,
-      isRoot ? ",...props.style}" : "}",
-    );
+    Object.entries(style).filter(([key]) => placement.has(key)),
+  );
+  if (parent?.stackMode) {
+    if (style.flexGrow != null)
+      outer[parent.stackMode === "VERTICAL" ? "height" : "width"] = "auto";
+    if (style.alignSelf === "stretch")
+      outer[parent.stackMode === "VERTICAL" ? "width" : "height"] = "auto";
+  }
+  const outerStyle = JSON.stringify(outer).replace(
+    /}$/,
+    isRoot ? ",...props.style}" : "}",
+  );
   const identity = `data-figma-id={${JSON.stringify(nodeId(node.guid))}}`;
   const className = isRoot ? " className={props.className}" : "";
   if (plan.external) {
