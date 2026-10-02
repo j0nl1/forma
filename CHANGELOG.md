@@ -5,6 +5,7 @@
 - Fixed progressive native box-out clipping and stale outlines in Impress through a bounded one-angular-unit animation adjustment, with strict pixel and repeat regression coverage.
 
 - Added explicit static TTF/OTF font snapshots and full PowerPoint font embedding, with actual family/style/glyph coverage diagnostics.
+- Pinned a compatible stable embedded-font consumer for CI and retained distribution Impress/UNO playback; font checks log the actual reader version and require four real embedded variants.
 - Retained editable foreground under uniform positive 2D scale/translation and safely inset rounded clips; corrected native border bounds and translucent-border paint.
 
 - Added local PowerPoint export from HTML decks: native editable text/shapes, individual pictures, screenshot mode, slide order/skip handling, notes, font substitutions and explicit fidelity warnings.

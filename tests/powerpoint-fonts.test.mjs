@@ -427,6 +427,18 @@ test(
   "LibreOffice uses every embedded style of an uninstalled font while the control deck substitutes",
   { skip: process.env.STUDIO_TEST_IMPRESS !== "1" },
   async (t) => {
+    const soffice = process.env.STUDIO_TEST_FONT_SOFFICE || "soffice";
+    const { stdout: version } = await execute(soffice, ["--version"], {
+      timeout: 15000,
+    });
+    t.diagnostic(`Embedded-font consumer: ${soffice}: ${version.trim()}`);
+    const release = version.match(/LibreOffice(?:Dev)? (\d+)\.(\d+)/);
+    assert.ok(
+      release &&
+        (Number(release[1]) > 25 ||
+          (Number(release[1]) === 25 && Number(release[2]) >= 8)),
+      `PPTX embedded-font import requires LibreOffice 25.8 or newer with EOT support; received ${version.trim()}. Set STUDIO_TEST_FONT_SOFFICE to the supported consumer binary.`,
+    );
     const { dir, paths } = await fontFixture(t),
       plan = await loadPptxFonts(paths.map((path) => ({ path }))),
       deck = new PptxGenJS(),
@@ -457,20 +469,22 @@ test(
       embedded = embedPptxFonts(buffer, plan, [{ objects }]).buffer;
     await fs.writeFile(path.join(dir, "control.pptx"), buffer);
     await fs.writeFile(path.join(dir, "embedded.pptx"), embedded);
-    await execute(
-      "soffice",
-      [
-        `-env:UserInstallation=${pathToFileURL(path.join(dir, "profile")).href}`,
-        "--headless",
-        "--convert-to",
-        "pdf",
-        "--outdir",
-        dir,
-        path.join(dir, "control.pptx"),
-        path.join(dir, "embedded.pptx"),
-      ],
-      { timeout: 60000 },
-    );
+    // Each document gets a new process and profile so a previously loaded font
+    // or cached substitution cannot make either half of the comparison pass.
+    for (const name of ["control", "embedded"])
+      await execute(
+        soffice,
+        [
+          `-env:UserInstallation=${pathToFileURL(path.join(dir, `${name}-profile`)).href}`,
+          "--headless",
+          "--convert-to",
+          "pdf",
+          "--outdir",
+          dir,
+          path.join(dir, `${name}.pptx`),
+        ],
+        { timeout: 60000 },
+      );
     const control = await execute("pdffonts", [path.join(dir, "control.pdf")]),
       actual = await execute("pdffonts", [path.join(dir, "embedded.pdf")]);
     assert.doesNotMatch(control.stdout, /PptxFontSample/);
@@ -478,6 +492,25 @@ test(
       .split("\n")
       .filter((line) => line.includes("PptxFontSample"));
     assert.equal(embeddedStyles.length, 4, actual.stdout);
+    const italic =
+      fixture.sourceFamily === "DejaVu Sans Mono" ? "Oblique" : "Italic";
+    assert.deepEqual(
+      embeddedStyles
+        .map((line) =>
+          line
+            .trim()
+            .split(/\s+/)[0]
+            .replace(/^[A-Z]{6}\+/, ""),
+        )
+        .sort(),
+      [
+        "PptxFontSample",
+        "PptxFontSample-Bold",
+        `PptxFontSample-${italic}`,
+        `PptxFontSample-Bold${italic}`,
+      ].sort(),
+      actual.stdout,
+    );
     for (const line of embeddedStyles)
       assert.match(line, /TrueType\s+\w+\s+yes\s+yes/);
   },

@@ -61,7 +61,7 @@ Run the existing export command with `--config export.json`. File paths must be 
 
 Embedding validates the font's actual embedding flags. Restricted, preview/print-only and bitmap-only fonts are rejected for editable embedding. Variable fonts, collections and WOFF/WOFF2 are not supported by this embedding path; supply static TTF/OTF faces. No Office, Python or font-conversion service is required. Screenshot mode can use supplied fonts to render its images but contains no editable text or embedded-font list.
 
-Applications must support PowerPoint embedded fonts to use them. Check the receiving application; this feature packages the fonts without installing them on that system. The HTML source and all font files stay unchanged.
+Applications must support PowerPoint embedded fonts to use them. LibreOffice added PPTX embedded-font import in [version 25.8](https://whatsnew.libreoffice.org/25.8/); earlier versions substitute local fonts even when the PPTX contains valid embedded font parts. Use LibreOffice 25.8 or newer with EOT support, or install the corresponding fonts when using an older receiver. Check the receiving application; this feature packages the fonts without installing them on that system. The HTML source and all font files stay unchanged.
 
 ## Verify and deliver
 
