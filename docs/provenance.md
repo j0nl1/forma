@@ -8,6 +8,7 @@ The watercolor kit includes public pigment names, RGB transmittance values and o
 
 | Package | Purpose | Source |
 | --- | --- | --- |
+| pptxgenjs | Native PowerPoint objects, notes and OOXML packaging | [PptxGenJS](https://github.com/gitbrent/PptxGenJS) |
 | esbuild | JSX/TSX and module bundling | [esbuild](https://github.com/evanw/esbuild) |
 | kiwi-schema | Binary schema and ByteBuffer primitives | [Kiwi](https://github.com/evanw/kiwi) |
 | fflate | ZIP decoding | [fflate](https://github.com/101arrowz/fflate) |

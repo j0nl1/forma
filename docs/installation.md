@@ -47,6 +47,8 @@ npx playwright install chromium
 
 Use the project installation folder instead when applicable. Keep npm workspace installation enabled: the packaged `runtimes/react18` workspace installs the matched React/ReactDOM 18.3.1 pair separately from the native 19.2.4 pair. Do not pass `--workspaces=false`, force peer dependencies, or install a second React version over the primary pair. Both the checkout and installed copy include pinned lockfiles for this graph. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio.
 
+PowerPoint export uses pinned PptxGenJS and Chromium, with no Office installation or external service required. Both lockfiles pin the patched image-size 2.0.4 dependency through an override. Keep that override when updating packages. Editable text uses the recipient's installed fonts. See the [PowerPoint guide](../skills/studio-design/references/powerpoint.md).
+
 For macOS-specific operations in the maintained workspace, use `ssh sirius`. Other users should follow their own host instructions.
 
 The design-system compiler, public module entries and read-only `scripts/adherence.mjs` checker use these same installed dependencies. They require no host service, project compiler plugin or model API key. See the [design-system usage](usage.md#design-systems) for compilation, imports and advisory checks.

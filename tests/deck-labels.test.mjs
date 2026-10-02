@@ -170,8 +170,7 @@ test("source editing preserves authored graphical names across duplicate, move, 
     saved = await fs.readFile(file, "utf8");
     assert.ok(saved.includes('data-screen-label="09 Revenue"'));
     assert.ok(!saved.includes("data-deck-skip"));
-    const artifact =
-      "/home/cerberus/.codex-artifacts/home/cerberus/Projects/studio-design/screenshots/deck-labels";
+    const artifact = path.join(path.dirname(file), "screenshots");
     await fs.mkdir(artifact, { recursive: true });
     await page.screenshot({
       path: path.join(artifact, "persisted-labels.png"),

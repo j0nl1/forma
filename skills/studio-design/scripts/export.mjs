@@ -8,6 +8,7 @@ import { inlineHtml } from "./lib/inline.mjs";
 import { withPage } from "./lib/browser.mjs";
 import { videoOptions, renderVideo } from "./lib/video.mjs";
 import { renderPdf } from "./lib/pdf.mjs";
+import { pptxOptions, renderPptx } from "./lib/pptx.mjs";
 
 export async function exportArtifact(mode, input, output, options = {}) {
   output = path.resolve(output);
@@ -17,9 +18,16 @@ export async function exportArtifact(mode, input, output, options = {}) {
     await write(output, await inlineHtml(path.resolve(input)));
     return { output };
   }
-  if (!["pdf", "png", "video"].includes(mode))
+  if (!["pdf", "png", "video", "pptx"].includes(mode))
     throw new Error(`Unknown export mode: ${mode}`);
-  const config = mode === "video" ? videoOptions(options) : {};
+  if (mode === "pptx" && path.extname(output).toLowerCase() !== ".pptx")
+    throw new Error("PowerPoint output must use the .pptx extension.");
+  const config =
+    mode === "video"
+      ? videoOptions(options)
+      : mode === "pptx"
+        ? pptxOptions(options)
+        : {};
   if (mode === "video") {
     const url = new URL(input);
     url.searchParams.set(config.captureParam, "");
@@ -47,6 +55,7 @@ export async function exportArtifact(mode, input, output, options = {}) {
           await renderPdf(page, temporary, options);
           return {};
         }
+        if (mode === "pptx") return renderPptx(page, temporary, options);
         if (mode === "png") {
           await page.screenshot({
             path: temporary,
@@ -81,10 +90,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--audio": "value",
       "--paper": "value",
       "--orientation": "value",
+      "--pptx-mode": "value",
     });
     if (positional.length !== 3)
       throw new Error(
-        "Usage: node export.mjs html|pdf|png|video <input-path-or-loopback-url> <output> [--config video.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none] [--paper letter|a4|legal] [--orientation portrait|landscape]",
+        "Usage: node export.mjs html|pdf|png|video|pptx <input-path-or-loopback-url> <output> [--config export.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none] [--paper letter|a4|legal] [--orientation portrait|landscape] [--pptx-mode editable|screenshots]",
       );
     const config = flags.config
       ? await readJson(path.resolve(flags.config))
@@ -99,6 +109,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       audio: "audio",
       paper: "paper",
       orientation: "orientation",
+      "pptx-mode": "pptxMode",
     }))
       if (flags[flag] !== undefined) config[key] = flags[flag];
     console.log(JSON.stringify(await exportArtifact(...positional, config)));

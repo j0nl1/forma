@@ -16,7 +16,7 @@
 
 ## Imports and output
 
-- PowerPoint creation/export is not included. HTML presentations and PDF output are supported.
+- PowerPoint exports use native text/shapes and individual pictures, with explicit raster fallbacks for complex CSS. Screenshot mode preserves the rendered artwork as one image per slide. Fonts must be available in the recipient's application; HTML animations export as finished static artwork, and playable video/audio is not embedded. See the [PowerPoint guide](powerpoint.md).
 - Figma import reports unsupported and approximate paints, masks, typography, variable wiring and instance properties. Inspect its warnings and compare a real design export when exact fidelity matters.
 - Design-system checks are advisory source analysis, not complete type checking or brand certification. External/ambient types, package export maps and unsupported legacy formats can require manual conversion.
 - HTML email requires testing in the actual target clients. Browser preview does not establish Outlook, Gmail or Apple Mail compatibility.

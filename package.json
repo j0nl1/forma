@@ -16,5 +16,11 @@
   },
   "devDependencies": {
     "prettier": "3.9.9"
+  },
+  "overrides": {
+    "image-size": "2.0.4"
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
   }
 }

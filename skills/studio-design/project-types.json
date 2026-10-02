@@ -3,7 +3,7 @@
   "projectTypes": [
     {
       "id": "slides",
-      "name": "HTML presentations",
+      "name": "Presentations",
       "reference": "references/slides.md",
       "starters": [
         "assets/starters/deck.js",

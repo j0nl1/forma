@@ -1,11 +1,11 @@
 ---
 name: studio-design
-description: "Create and refine local HTML design artifacts in Codex: product mockups, interactive prototypes, wireframes, mobile screens, design systems, diagrams, documents, campaigns, and motion pieces. Use for visual design exploration or design-system import and authoring."
+description: "Create and refine local HTML design artifacts in Codex: product mockups, interactive prototypes, wireframes, mobile screens, design systems, diagrams, documents, campaigns, PowerPoint presentations, and motion pieces. Use for visual design exploration or design-system import and authoring."
 ---
 
 # Studio Design
 
-Produce local, inspectable design artifacts with Codex. Read [methodology](references/methodology.md) and [Codex workflow](references/codex.md) once, then load only the relevant recipes below. Use the user's existing project and authorized scope. PowerPoint export is outside this skill.
+Produce local, inspectable design artifacts with Codex. Read [methodology](references/methodology.md) and [Codex workflow](references/codex.md) once, then load only the relevant recipes below. Use the user's existing project and authorized scope. PowerPoint presentations use the HTML deck workflow and local editable or screenshot export.
 
 Read [known limitations](references/limitations.md) when choosing an export or integration. Preserve existing functions and state when editing a design, and disclose any limitation that affects the requested result.
 
@@ -29,7 +29,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Working flow or prototype | [prototype](references/prototype.md) | `controls.js` |
 | Mobile app | [mobile](references/mobile.md), prototype | `frames.js` |
 | Wireframe or divergent options | [wireframe](references/wireframe.md) | `canvas.js` |
-| HTML presentation and speaker notes | [slides](references/slides.md) | `deck.js` |
+| HTML/PowerPoint presentation and speaker notes | [slides](references/slides.md), [PowerPoint](references/powerpoint.md) | `deck.js` |
 | Document, resume, flier, brochure | [documents](references/documents.md) | `document.js` |
 | HTML email | [email](references/email.md) | `email.html` |
 | Social content and campaign layouts | [campaigns](references/campaigns.md) | `social.js` |
@@ -39,7 +39,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | 3D object or scene | [three-dimensional](references/three-dimensional.md) | `three-stage.js` |
 | Create, import, or consume a design system | [design systems](references/design-systems.md) | `controls.js` |
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |
-| PDF, standalone HTML, video, Figma/Canva handoff | [exports](references/exports.md) | Local export helpers |
+| PowerPoint, PDF, standalone HTML, video, Figma/Canva handoff | [exports](references/exports.md) | Local export helpers |
 | Generated sound effects or ambient audio | [sound effects](references/sound-effects.md) | `scripts/sound-effects.mjs` |
 | Generated images or AI interactions | [assets and AI](references/assets-ai.md) | `image-slot.js` |
 | Feedback, experiments, variants, tweaks | [review](references/review.md), [typed tweaks](references/tweaks.md) | `data-overlay.js`, `canvas.js`, `tweaks-components.jsx`, `tweaks-store.js`, `controls.js` |
