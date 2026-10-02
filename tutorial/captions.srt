@@ -123,37 +123,41 @@ Stretch a section or change speed without cutting its choreography.
 This tutorial uses that same engine.
 
 32
-00:01:37,413 --> 00:01:38,725
+00:01:37,413 --> 00:01:38,841
 Serve over loopback.
 
 33
-00:01:38,725 --> 00:01:42,662
+00:01:38,841 --> 00:01:43,122
 Exercise the flow, inspect screenshots, and check the console.
 
 34
-00:01:42,662 --> 00:01:46,598
-Export HTML, PNG, PDF, or MP4 with local helpers.
+00:01:43,122 --> 00:01:47,880
+Export HTML, PNG, PDF, PowerPoint, or MP4 with local helpers.
 
 35
-00:01:46,598 --> 00:01:48,348
+00:01:47,880 --> 00:01:49,783
 Keep the source folder:
 
 36
-00:01:48,348 --> 00:01:51,847
+00:01:49,783 --> 00:01:53,589
 the HTML and code remain editable after export.
 
 37
-00:01:52,613 --> 00:01:54,159
-PowerPoint is not included.
+00:01:54,347 --> 00:01:58,501
+PowerPoint supports editable slides with native builds and local media.
 
 38
-00:01:54,159 --> 00:01:57,638
-External generation and transfers need real providers or connectors.
+00:01:58,501 --> 00:02:00,993
+Complex CSS can need image layers.
 
 39
-00:01:57,638 --> 00:02:01,503
-An intermittent first-frame export issue with nested video remains unresolved.
+00:02:00,993 --> 00:02:05,147
+Check fonts, animation, and media playback in the receiving application.
 
 40
-00:02:01,503 --> 00:02:06,142
+00:02:05,147 --> 00:02:09,301
+External generation and transfers need configured providers or authorized connectors.
+
+41
+00:02:09,301 --> 00:02:14,285
 Give a concrete brief, verify the result, and keep the editable artifact.
