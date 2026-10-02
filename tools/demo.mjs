@@ -9,6 +9,7 @@ import { bundle } from "../skills/codex-design/scripts/build.mjs";
 import {
   compile,
   importSystem,
+  preview,
 } from "../skills/codex-design/scripts/design-system.mjs";
 import { exists } from "../skills/codex-design/scripts/lib/files.mjs";
 export async function prepareDemo(destination) {
@@ -114,6 +115,7 @@ export async function prepareDemo(destination) {
     ["design-system-secondary", "trail"],
   ]) {
     await compile(path.join(destination, folder));
+    await preview(path.join(destination, folder));
     await importSystem(path.join(destination, folder), destination, {
       update: await exists(path.join(destination, "_ds", slug)),
     });

@@ -4,6 +4,8 @@ import path from "node:path";
 import { build } from "esbuild";
 import postcss from "postcss";
 import { inlineHtml } from "./lib/inline.mjs";
+import { readSystemSource } from "./lib/system-source.mjs";
+import { systemReview } from "./lib/system-review.mjs";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import {
   namespaceFor,
@@ -22,21 +24,13 @@ export {
   discoverSystems,
   setPrimary,
 } from "./lib/system-bindings.mjs";
-import {
-  args,
-  main,
-  html,
-  slug,
-  readJson,
-  write,
-  writeJson,
-  safeFile,
-} from "./lib/files.mjs";
+import { args, main, slug, write, writeJson, safeFile } from "./lib/files.mjs";
 const identifier = /^[A-Za-z_$][\w$]*$/;
 export async function inspect(root) {
   root = await fs.realpath(root);
-  const spec = await readJson(await safeFile(root, "system.json"));
-  const issues = [];
+  const source = await readSystemSource(root);
+  const { spec } = source;
+  const issues = [...source.issues];
   if (spec.schemaVersion !== 1) issues.push("schemaVersion must be 1");
   if (typeof spec.name !== "string" || !spec.name.trim())
     issues.push("name is required");
@@ -131,8 +125,12 @@ export async function inspect(root) {
     )
       issues.push(`Component props must be an object: ${c.name}`);
   }
-  if ((spec.components ?? []).length && !spec.entry)
-    issues.push("React components require an entry");
+  for (const component of spec.components ?? [])
+    try {
+      await safeFile(root, component.sourcePath ?? spec.entry);
+    } catch (error) {
+      issues.push(error.message);
+    }
   if (spec.entry)
     try {
       await safeFile(root, spec.entry);
@@ -142,6 +140,7 @@ export async function inspect(root) {
   for (const start of spec.startingPoints ?? [])
     try {
       await safeFile(root, start.path);
+      if (start.previewPath) await safeFile(root, start.previewPath);
     } catch (e) {
       issues.push(e.message);
     }
@@ -150,6 +149,9 @@ export async function inspect(root) {
     tokens,
     files: [...files.keys()].map((f) => path.relative(root, f)),
     issues: [...new Set(issues)],
+    cards: source.cards,
+    declarations: source.declarations,
+    sourceFiles: source.sourceFiles,
   };
 }
 const nodePaths = [
@@ -192,16 +194,25 @@ export async function compile(root) {
   });
   const css = cssResult.outputFiles[0].text;
   let bundle = null;
-  if (spec.entry) {
-    const validateImports = (spec.components ?? []).map(
-      (c, i) => `${c.export ?? c.name} as __checked${i}`,
-    );
-    const validation = validateImports.length
-      ? `import{${validateImports.join(",")}}from ${JSON.stringify("./" + spec.entry)};export const checked=[${validateImports.map((_, i) => "__checked" + i).join(",")}];`
-      : "";
+  if (spec.entry || spec.components.length) {
+    const imports = spec.components
+      .map(
+        (component, index) =>
+          `import{${component.export ?? component.name} as __component${index}}from ${JSON.stringify("./" + (component.sourcePath ?? spec.entry))};`,
+      )
+      .join("\n");
+    const base = spec.entry
+      ? `import*as Base from ${JSON.stringify("./" + spec.entry)};`
+      : "const Base={};";
+    const componentMap = spec.components
+      .map(
+        (component, index) =>
+          `${JSON.stringify(component.name)}:__component${index}`,
+      )
+      .join(",");
     const result = await build({
       stdin: {
-        contents: `${validation}import React from 'react';import{createRoot}from'react-dom/client';import*as Components from ${JSON.stringify("./" + spec.entry)};export{React,createRoot,Components};`,
+        contents: `${imports}import React from 'react';import{createRoot}from'react-dom/client';${base}const Components={...Base,${componentMap}};export{React,createRoot,Components};`,
         resolveDir: root,
         loader: "jsx",
       },
@@ -222,9 +233,34 @@ export async function compile(root) {
     });
     bundle = result.outputFiles[0].text;
   }
-  const seeds = [];
-  const seedNames = new Set();
+  const generated = new Map([
+    ["_ds_tokens.css", css],
+    ...(bundle ? [["_ds_bundle.js", bundle]] : []),
+  ]);
+  const seeds = [],
+    cards = [],
+    startingPoints = [],
+    seedNames = new Set();
+  for (const [index, card] of model.cards.entries()) {
+    const name = "_ds_card_" + index + "_" + slug(card.name) + ".html";
+    const content = await inlineHtml(await safeFile(root, card.path), {
+      root,
+      generated,
+    });
+    seeds.push({ name, content });
+    cards.push({ ...card, sourcePath: card.path, path: name });
+  }
   for (const seed of spec.startingPoints ?? []) {
+    if (seed.kind === "component") {
+      startingPoints.push({
+        ...seed,
+        sourcePath: seed.path,
+        previewPath:
+          cards.find((card) => card.sourcePath === seed.previewPath)?.path ??
+          null,
+      });
+      continue;
+    }
     const name =
       "_ds_seed_" +
       slug(seed.name ?? path.basename(seed.path, ".html")) +
@@ -232,12 +268,34 @@ export async function compile(root) {
     if (seedNames.has(name))
       throw new Error("Duplicate starting-point filename");
     seedNames.add(name);
-    const content = await inlineHtml(await safeFile(root, seed.path), { root });
-    seeds.push({ name, title: seed.name ?? name, content });
+    const content = await inlineHtml(await safeFile(root, seed.path), {
+      root,
+      generated,
+    });
+    seeds.push({ name, content });
+    startingPoints.push({
+      ...seed,
+      sourcePath: seed.path,
+      path: name,
+      previewPath: name,
+    });
   }
+  const contracts =
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        declarations: model.declarations,
+        components: spec.components.filter(
+          (component) => component.contract || component.usage,
+        ),
+      },
+      null,
+      2,
+    ) + "\n";
   const artifacts = {
     ...Object.fromEntries(seeds.map((s) => [s.name, hash(s.content)])),
     "_ds_tokens.css": hash(css),
+    "_ds_contracts.json": hash(contracts),
     ...(bundle ? { "_ds_bundle.js": hash(bundle) } : {}),
   };
   const manifest = {
@@ -248,7 +306,9 @@ export async function compile(root) {
     tokens,
     components: spec.components ?? [],
     examples: spec.examples ?? [],
-    startingPoints: seeds.map((s) => ({ name: s.title, path: s.name })),
+    startingPoints,
+    cards,
+    contracts: "_ds_contracts.json",
     guidance: spec.guidance ?? "",
     css: "_ds_tokens.css",
     bundle: bundle ? "_ds_bundle.js" : null,
@@ -257,6 +317,7 @@ export async function compile(root) {
   for (const seed of seeds)
     await write(path.join(root, seed.name), seed.content);
   await write(path.join(root, "_ds_tokens.css"), css);
+  await write(path.join(root, "_ds_contracts.json"), contracts);
   if (bundle) await write(path.join(root, "_ds_bundle.js"), bundle);
   else await fs.rm(path.join(root, "_ds_bundle.js"), { force: true });
   await writeJson(path.join(root, "_ds_manifest.json"), manifest);
@@ -264,17 +325,7 @@ export async function compile(root) {
 }
 export async function preview(root) {
   const { manifest: m } = await compiledSystem(root);
-  const json = JSON.stringify(m.components).replace(/</g, "\\u003c");
-  const tokens = Object.entries(m.tokens)
-    .map(
-      ([name, value]) =>
-        `<tr><th>${html(name)}</th><td>${html(value)}</td><td><span style="display:inline-block;width:3rem;height:1rem;background:var(${html(name)})"></span></td></tr>`,
-    )
-    .join("");
-  const examples = (m.examples ?? [])
-    .map((e) => `<article><h2>${html(e.name)}</h2>${e.html ?? ""}</article>`)
-    .join("");
-  const content = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${html(m.name)}</title><link rel="stylesheet" href="./_ds_tokens.css"><style>body{margin:0;padding:clamp(20px,4vw,64px);font:16px/1.5 system-ui;color:#18202c;background:#f7f8fa}main{max-width:1100px;margin:auto}article{padding:24px;margin:16px 0;background:white;border:1px solid #d9dfe8;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}h1{font-size:clamp(32px,5vw,56px)}button:focus-visible,a:focus-visible{outline:3px solid #4169e1}</style><main><h1>${html(m.name)}</h1><p>${html(m.guidance)}</p><h2>Tokens</h2><table><thead><tr><th>Name</th><th>Value</th><th>Preview</th></tr></thead><tbody>${tokens}</tbody></table><h2>Components</h2>${examples}<div id="components"></div><h2>Starting points</h2>${m.startingPoints.map((s) => `<p><a href="${html(s.path)}">${html(s.name ?? s.path)}</a></p>`).join("")}</main>${m.bundle ? `<script src="./_ds_bundle.js"></script><script>const ds=window[${JSON.stringify(m.namespace ?? "CodexDesignSystem")}];for(const c of ${json}){const card=document.createElement('article');const heading=document.createElement('h3');heading.textContent=c.name;card.append(heading);const mount=document.createElement('div');card.append(mount);document.getElementById('components').append(card);const Component=ds.Components[c.export||c.name];if(!Component)throw new Error('Missing component export: '+c.name);ds.createRoot(mount).render(ds.React.createElement(Component,c.props||{}));}</script>` : ""}</html>`;
+  const content = systemReview(m);
   await write(path.join(root, "preview.html"), content);
   return path.join(root, "preview.html");
 }
@@ -309,6 +360,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
           ok: !m.issues.length,
           issues: m.issues,
           tokens: Object.keys(m.tokens).length,
+          components: m.spec.components,
+          cards: m.cards,
+          startingPoints: m.spec.startingPoints,
         }),
       );
       if (m.issues.length) process.exitCode = 1;

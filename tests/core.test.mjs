@@ -275,7 +275,12 @@ test("compiled starting points remain self-contained after system import", async
     recursive: true,
   });
   const manifest = await compile(source);
-  assert.equal(manifest.startingPoints.length, 1);
+  assert.equal(manifest.startingPoints.length, 2);
+  assert.ok(
+    manifest.startingPoints.some(
+      (start) => start.kind === "component" && start.component === "Button",
+    ),
+  );
   const project = path.join(dir, "project");
   await importSystem(source, project);
   const seed = path.join(

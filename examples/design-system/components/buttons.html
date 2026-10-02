@@ -1,0 +1,56 @@
+<!-- @dsCard group="Components" viewport="700x180" name="Editorial actions" subtitle="Primary, quiet and disabled controls" -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="codex-fixed-sheet" content="off" />
+    <title>Editorial actions</title>
+    <link rel="stylesheet" href="../_ds_tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 32px;
+        font: 16px system-ui;
+        background: var(--color-paper);
+      }
+      .row {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      p {
+        color: var(--color-ink);
+      }
+    </style>
+    <script src="../_ds_bundle.js"></script>
+  </head>
+  <body>
+    <div id="actions"></div>
+    <p id="status" role="status">Choose an available action.</p>
+    <script>
+      const ds = window.CodexDesignSystems.harbor;
+      const element = ds.React.createElement;
+      const button = (label, props) =>
+        element(
+          ds.Components.Button,
+          {
+            ...props,
+            onClick: () =>
+              (document.getElementById("status").textContent =
+                label + " selected."),
+          },
+          label,
+        );
+      ds.createRoot(document.getElementById("actions")).render(
+        element(
+          "div",
+          { className: "row" },
+          button("Create a reading room", {}),
+          button("Browse the library", { variant: "quiet" }),
+          button("Unavailable", { disabled: true }),
+        ),
+      );
+    </script>
+  </body>
+</html>

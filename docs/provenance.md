@@ -21,6 +21,7 @@ Research snapshots stay outside the repository. Components and schemas are indep
 | playwright | Chromium verification and capture | [Playwright](https://github.com/microsoft/playwright) |
 | react / react-dom | Optional component systems | [React](https://github.com/facebook/react) |
 | three | Optional 3D | [Three.js](https://github.com/mrdoob/three.js) |
+| typescript | Read-only source/declaration syntax trees for system contracts | [TypeScript](https://github.com/microsoft/TypeScript) |
 | prettier | Development source formatting | [Prettier](https://github.com/prettier/prettier) |
 
 Versions and integrity hashes are locked. Use `npm ci --ignore-scripts`; explicit Chromium installation is separate. FFmpeg comes from the OS. Dependencies remain a supply-chain boundary.

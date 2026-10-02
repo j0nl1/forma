@@ -4,7 +4,7 @@ import { parse, serialize } from "parse5";
 import postcss from "postcss";
 import { injectPlainCanvas } from "./plain-canvas.mjs";
 import { injectFixedSheet } from "./fixed-sheet.mjs";
-import { safeFile } from "./files.mjs";
+import { safeFile, contained } from "./files.mjs";
 import {
   IMAGE_STATE_FILE,
   IMAGE_LEGACY_FILE,
@@ -39,18 +39,36 @@ function localReference(root, base, value) {
     throw new Error(`Use a relative dependency path: ${value}`);
   return path.relative(root, path.resolve(base, decodeURIComponent(name)));
 }
-export async function inlineHtml(input, { root: scope } = {}) {
+export async function inlineHtml(
+  input,
+  { root: scope, generated = new Map() } = {},
+) {
   const pageBase = path.dirname(path.resolve(input));
   const root = scope ? path.resolve(scope) : pageBase;
-  const local = (base, value) =>
-    safeFile(root, localReference(root, base, value));
+  const virtual = new Map(
+    [...generated].map(([name, value]) => [
+      contained(root, path.resolve(root, name)),
+      Buffer.from(value),
+    ]),
+  );
+  const read = async (file, encoding) =>
+    virtual.has(file)
+      ? encoding
+        ? virtual.get(file).toString(encoding)
+        : virtual.get(file)
+      : fs.readFile(file, encoding);
+  const local = (base, value) => {
+    const relative = localReference(root, base, value),
+      full = contained(root, path.resolve(root, relative));
+    return virtual.has(full) ? Promise.resolve(full) : safeFile(root, relative);
+  };
   async function data(base, value) {
     if (!value || embedded(value)) return value;
     const file = await local(base, value);
     const suffix = value.includes("#")
       ? "#" + value.split("#").slice(1).join("#")
       : "";
-    return `data:${MIME[path.extname(file).toLowerCase()] ?? "application/octet-stream"};base64,${(await fs.readFile(file)).toString("base64")}${suffix}`;
+    return `data:${MIME[path.extname(file).toLowerCase()] ?? "application/octet-stream"};base64,${(await read(file)).toString("base64")}${suffix}`;
   }
   async function css(text, base, ancestry = []) {
     const tree = postcss.parse(text);
@@ -64,7 +82,7 @@ export async function inlineHtml(input, { root: scope } = {}) {
       const file = await local(base, match[1]);
       if (ancestry.includes(file)) throw new Error("CSS import cycle");
       const child = postcss.parse(
-        await css(await fs.readFile(file, "utf8"), path.dirname(file), [
+        await css(await read(file, "utf8"), path.dirname(file), [
           ...ancestry,
           file,
         ]),
@@ -106,10 +124,7 @@ export async function inlineHtml(input, { root: scope } = {}) {
       const src = attr(n, "src");
       if (src) {
         const f = await local(pageBase, src.value);
-        text(
-          n,
-          (await fs.readFile(f, "utf8")).replace(/<\/script/gi, "<\\/script"),
-        );
+        text(n, (await read(f, "utf8")).replace(/<\/script/gi, "<\\/script"));
         remove(n, "src");
         remove(n, "integrity");
         remove(n, "crossorigin");
@@ -122,7 +137,7 @@ export async function inlineHtml(input, { root: scope } = {}) {
       n.attrs = n.attrs.filter((a) => a.name === "media");
       text(
         n,
-        (await css(await fs.readFile(f, "utf8"), path.dirname(f), [f])).replace(
+        (await css(await read(f, "utf8"), path.dirname(f), [f])).replace(
           /<\/style/gi,
           "<\\/style",
         ),
