@@ -103,6 +103,8 @@ The state has a `sections` object, keyed by source section identity. Each sectio
 
 The actions menu downloads the card at its natural dimensions, independently of canvas zoom. PNG renders at 3× resolution. HTML is a styled snapshot with images, background assets and font faces embedded. Canvas paintings become images, and current form values are preserved. Script elements are excluded; inline handlers already authored in the page are retained in HTML. React event closures and JavaScript application bundles are not exported by this snapshot action. Use the full application bundle when delivering an interactive React artifact.
 
+Inline SVG snapshots preserve attribute namespaces, including local `<use xlink:href="#id">` and SVG2 `<use href="#id">` references. Both forms retain their defined geometry in PNG and portable HTML. Tests download actual 3× PNGs at different canvas zoom levels and compare every solid pixel, then decode the portable SVG after deleting the copied source and runtime.
+
 Assets are local by default. An explicit native `allow-external-assets` attribute or React `allowExternalAssets` prop allows browser fetches of external assets and inaccessible stylesheet/font rules; those servers must permit the fetch. An unresolved asset reports an export error. Font, image and shadow-component edge cases still require broader visual comparisons; a successful download alone does not prove reference fidelity.
 
 ## Verification status

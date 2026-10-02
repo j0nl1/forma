@@ -149,8 +149,11 @@ export async function exportRegion(
       source.localName.includes("-") ? "div" : source.localName,
     );
     for (const attr of source.attributes)
-      if (!["style", "src", "srcset"].includes(attr.name))
-        target.setAttribute(attr.name, attr.value);
+      if (!["style", "src", "srcset"].includes(attr.name)) {
+        if (attr.namespaceURI)
+          target.setAttributeNS(attr.namespaceURI, attr.name, attr.value);
+        else target.setAttribute(attr.name, attr.value);
+      }
     for (const property of style)
       target.style.setProperty(
         property,

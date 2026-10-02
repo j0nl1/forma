@@ -158,6 +158,8 @@ node skills/codex-design/scripts/export.mjs video http://127.0.0.1:4311/animatio
 
 Standalone export rejects unresolved/remote assets and module scripts. Bundle ES modules first. Dynamic fetches need explicit embedding. Browser exports use local resources by default. The [portable font contract](../skills/codex-design/references/motion.md#portable-fonts) explains the packaged Inter caption font, SVG font embedding and optional `fontOrigins` configuration for read-only font providers. Connected editor exports receive that configuration from the preview server's `--font-origins` option. Existing outputs are refused. MP4/WebM can retain marked media audio; `--audio none` and GIF are silent. Inspect PDF pages for print fidelity.
 
+Video duplicate-frame warnings require at least eight captured frames and more than 85% of the total frame count to match the preceding frame. Short static sub-ranges and normal held beats remain valid. A warning is advisory: check the bridge and intended timing against the encoded output.
+
 ## Build React or 3D source
 
 ```sh

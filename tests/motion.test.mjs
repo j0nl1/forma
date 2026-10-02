@@ -392,7 +392,7 @@ test("video ranges, custom bridges, supersampling and diagnostics render real fr
       endMs: 400,
     },
   );
-  assert.ok(held.flags.some((flag) => flag.kind === "duplicate_frames"));
+  assert.ok(!held.flags.some((flag) => flag.kind === "duplicate_frames"));
   await assert.rejects(
     exportArtifact(
       "video",
@@ -402,6 +402,59 @@ test("video ranges, custom bridges, supersampling and diagnostics render real fr
     ),
     /interval/,
   );
+});
+
+test("video duplicate warnings allow short holds and the reference threshold", async (t) => {
+  const dir = await temporary(t);
+  await fs.writeFile(
+    path.join(dir, "holds.html"),
+    '<html><body style="margin:0"><script>const changes=Number(new URLSearchParams(location.search).get("changes"));window.holdClock={duration:1,setPlaying(){},setTime(t){document.body.style.background=changes&&t>=0.5?(changes===2&&t>=0.75?"lime":"blue"):"red";}};</script></body></html>',
+  );
+  const { server, url } = await serve(dir, 0);
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  for (const [fps, changes, warned] of [
+    [7, 0, false],
+    [8, 0, true],
+    [20, 2, false],
+    [20, 1, true],
+  ]) {
+    const output = path.join(dir, `holds-${fps}-${changes}.mp4`);
+    const result = await exportArtifact(
+      "video",
+      `${url}holds.html?changes=${changes}`,
+      output,
+      {
+        bridgeGlobal: "holdClock",
+        width: 32,
+        height: 32,
+        fps,
+        deviceScaleFactor: 1,
+        audio: "none",
+      },
+    );
+    assert.equal(result.frames, fps);
+    assert.equal(
+      result.flags.some((flag) => flag.kind === "duplicate_frames"),
+      warned,
+      `${fps} frames with ${changes} color changes`,
+    );
+    const raw = execFileSync("ffmpeg", [
+      "-v",
+      "error",
+      "-i",
+      output,
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgb24",
+      "pipe:1",
+    ]);
+    const pixel = (frame) =>
+      Array.from(raw.subarray(frame * 32 * 32 * 3, frame * 32 * 32 * 3 + 3));
+    assert.ok(pixel(0)[0] > 200);
+    if (changes) assert.ok(pixel(10)[2] > 200);
+    if (changes === 2) assert.ok(pixel(15)[1] > 200);
+  }
 });
 
 // Numeric samples independently calculated from the reference's mathematical

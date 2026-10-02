@@ -31,7 +31,7 @@ For a project-only installation:
 node tools/install.mjs --project /absolute/path/to/project
 ```
 
-The installer copies inspected local files. It does not fetch a remote project, install packages, change Codex configuration, or overwrite an existing skill. Review [installation](docs/installation.md) for optional runtime setup, updates, and removal.
+The installer copies inspected local files. It does not fetch a remote project, install packages, change Codex configuration, or overwrite an existing skill. Run `npm ci --ignore-scripts` in the installed skill before using preview, build, verification, export or design-system helpers. Review [installation](docs/installation.md) for runtime setup, updates, and removal.
 
 ## What is included
 

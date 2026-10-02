@@ -336,7 +336,7 @@ export async function renderVideo(page, errors, output, temporary, options) {
     await audioJob.dispose();
     await mediaState?.dispose();
   }
-  if (frames > 1 && duplicates / (frames - 1) >= 0.8)
+  if (frames >= 8 && duplicates > frames * 0.85)
     flags.push({
       kind: "duplicate_frames",
       message:
