@@ -5,6 +5,7 @@ import { Decompress } from "fzstd";
 import { ByteBuffer, decodeBinarySchema } from "kiwi-schema";
 import { html } from "./files.mjs";
 import { nodeEffects } from "./figma-effects.mjs";
+import { nodePaints, visiblePaints } from "./figma-paints.mjs";
 const LIMIT = 128 * 1024 * 1024;
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
@@ -185,13 +186,6 @@ const finite = (v, fallback = 0) =>
 export function color(c, opacity = 1) {
   return `rgba(${["r", "g", "b"].map((k) => Math.round(Math.min(1, Math.max(0, finite(c?.[k]))) * 255)).join(",")},${Math.min(1, Math.max(0, finite(c?.a, 1) * opacity))})`;
 }
-function mime(bytes) {
-  if (bytes[0] === 137) return "image/png";
-  if (bytes[0] === 255) return "image/jpeg";
-  if (bytes.toString("ascii", 0, 3) === "GIF") return "image/gif";
-  if (bytes.toString("ascii", 0, 4) === "RIFF") return "image/webp";
-  return "application/octet-stream";
-}
 function pathData(bytes) {
   const view = new DataView(Uint8Array.from(bytes).buffer);
   let offset = 0;
@@ -244,29 +238,9 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     css.push(`border-radius:${finite(node.cornerRadius)}px`);
   if (node.type === "ELLIPSE") css.push("border-radius:50%");
   if (node.clipsContent) css.push("overflow:hidden");
-  const fills = (node.fillPaints ?? []).filter((f) => f.visible !== false);
-  const fill = fills[0];
   const vector = !!node.fillGeometry?.length;
-  let textColor = "inherit";
-  if (fill?.type === "SOLID") {
-    const c = color(fill.color, finite(fill.opacity, 1));
-    if (node.type === "TEXT") textColor = c;
-    else if (!vector) css.push(`background:${c}`);
-  }
-  if (fill?.type === "IMAGE") {
-    const key = Buffer.from(fill.image?.hash ?? []).toString("hex");
-    const image = doc.images[key];
-    if (image)
-      css.push(
-        `background-image:url(data:${mime(image)};base64,${image.toString("base64")})`,
-        "background-size:cover",
-        "background-position:center",
-      );
-    else warnings.push(`${id}: image asset missing`);
-  }
-  for (const paint of fills)
-    if (!["SOLID", "IMAGE"].includes(paint.type))
-      warnings.push(`${id}: unsupported fill ${paint.type}`);
+  const paints = nodePaints(doc, node, { id, w, h, color, vector, warnings });
+  css.push(...paints.declarations);
   for (const key of ["mask", "isMask", "derivedSymbolData", "symbolData"])
     if (
       node[key] &&
@@ -283,7 +257,7 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   let content = "";
   if (node.type === "TEXT") {
     css.push(
-      `color:${textColor}`,
+      `color:${paints.textColor}`,
       `font-size:${finite(node.fontSize, 16)}px`,
       `font-family:${JSON.stringify(node.fontName?.family ?? "sans-serif")}`,
       `font-weight:${finite(node.fontWeight, 400)}`,
@@ -300,13 +274,13 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
         const blob = doc.blobs[g.commandsBlob]?.bytes;
         if (blob)
           paths.push(
-            `<path d="${html(pathData(blob))}" fill="${html(fill?.color ? color(fill.color, finite(fill.opacity, 1)) : "currentColor")}"/>`,
+            `<path d="${html(pathData(blob))}"${g.windingRule === "EVENODD" ? ' fill-rule="evenodd"' : ""}/>`,
           );
       } catch (e) {
         warnings.push(`${id}: ${e.message}`);
       }
     }
-    content = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${paths.join("")}</svg>`;
+    content = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="isolation:isolate">${paints.defs}${paints.layers.map((layer) => `<g fill="${html(layer.svg)}" style="mix-blend-mode:${layer.blend}">${paths.join("")}</g>`).join("")}</svg>`;
   }
   if (node.stackMode) {
     warnings.push(`${id}: auto-layout rendered from saved geometry`);
@@ -329,11 +303,19 @@ export function extractedTokens(doc) {
   const tokens = {};
   let count = 0;
   for (const n of doc.nodes.values())
-    for (const f of n.fillPaints ?? [])
-      if (f.type === "SOLID") {
-        const value = color(f.color, finite(f.opacity, 1));
+    for (const f of visiblePaints(n)) {
+      const stops = f.stops ?? f.gradientStops;
+      const colors =
+        f.type === "SOLID"
+          ? [f.color]
+          : String(f.type).startsWith("GRADIENT_")
+            ? (Array.isArray(stops) ? stops : []).map((s) => s?.color)
+            : [];
+      for (const c of colors) {
+        const value = color(c, finite(f.opacity, 1));
         if (!Object.values(tokens).includes(value))
           tokens[`--figma-color-${++count}`] = value;
       }
+    }
   return tokens;
 }
