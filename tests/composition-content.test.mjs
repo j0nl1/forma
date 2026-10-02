@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
@@ -394,10 +395,32 @@ test("shot gates retain numeric boundary semantics and never discard hidden deco
     pixels[0] > 200 && pixels[1] > 200 && pixels[2] > 200,
     "The hidden media frame shows the stage background",
   );
-  assert.ok(
-    pixels[3] > pixels[5] + 100,
-    "The shot opens with decoded red media",
-  );
+  const redEntry = pixels[3] > pixels[5] + 100;
+  if (!redEntry) {
+    const archive = path.join(
+      os.homedir(),
+      ".codex-artifacts",
+      root.replace(/^[/\\]+/, ""),
+      "research",
+      "shot-entry-failures",
+    );
+    try {
+      await fs.mkdir(archive, { recursive: true });
+      const run = await fs.mkdtemp(path.join(archive, "capture-"));
+      await Promise.all([
+        fs.copyFile(output, path.join(run, "shots.mp4")),
+        fs.copyFile(path.join(dir, "clip.mp4"), path.join(run, "source.mp4")),
+        fs.writeFile(
+          path.join(run, "pixels.json"),
+          JSON.stringify({ fps: 10, startMs: 1900, pixels: [...pixels] }),
+        ),
+      ]);
+      t.diagnostic(`Incorrect video entry evidence retained at ${run}`);
+    } catch (error) {
+      t.diagnostic(`Could not retain video entry evidence: ${error.message}`);
+    }
+  }
+  assert.ok(redEntry, "The shot opens with decoded red media");
   assert.ok(
     pixels[20] > pixels[18] + 100,
     "The blue media frame is decoded inside the visible shot",
