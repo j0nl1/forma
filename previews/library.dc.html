@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+  <head><script data-codex-fixed-sheet-runtime>(() => {
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __esm = (fn, res, err) => function __init() {
+    if (err) throw err[0];
+    try {
+      return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+    } catch (e) {
+      throw err = [e], e;
+    }
+  };
+
+  // skills/studio-design/assets/starters/document-model.js
+  function length(value, fallback = null) {
+    value = String(value ?? "").trim();
+    return value === "0" ? "0px" : /^\d+(?:\.\d+)?(?:px|in|mm|cm|pt|pc)$/.test(value) ? value : fallback;
+  }
+  function pixels(value) {
+    const match = /^(\d+(?:\.\d+)?)(px|in|mm|cm|pt|pc)$/.exec(
+      length(value) || ""
+    );
+    return match ? Number(match[1]) * units[match[2]] : NaN;
+  }
+  var papers, units;
+  var init_document_model = __esm({
+    "skills/studio-design/assets/starters/document-model.js"() {
+      papers = Object.freeze({
+        letter: ["8.5in", "11in"],
+        a4: ["210mm", "297mm"],
+        legal: ["8.5in", "14in"]
+      });
+      units = {
+        px: 1,
+        in: 96,
+        mm: 96 / 25.4,
+        cm: 96 / 2.54,
+        pt: 96 / 72,
+        pc: 16
+      };
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-model.js
+  function absolute(value, element, seen = /* @__PURE__ */ new Set()) {
+    const direct = pixels(length(value));
+    if (Number.isFinite(direct)) return direct;
+    const variable = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value.trim());
+    if (!variable || seen.has(variable[1])) return NaN;
+    seen.add(variable[1]);
+    return absolute(
+      getComputedStyle(element).getPropertyValue(variable[1]),
+      element,
+      seen
+    );
+  }
+  function rules(sheets, visit, seen = /* @__PURE__ */ new Set(), includeInactive = false) {
+    for (const sheet of sheets) {
+      if (!sheet || seen.has(sheet) || sheet.ownerNode?.hasAttribute("data-codex-injected") || sheet.disabled)
+        continue;
+      seen.add(sheet);
+      if (!includeInactive && sheet.media?.mediaText && !matchMedia(sheet.media.mediaText).matches)
+        continue;
+      let list;
+      try {
+        list = sheet.cssRules;
+      } catch {
+        continue;
+      }
+      walk(list);
+    }
+    function walk(list) {
+      for (const rule of list) {
+        if (rule.type === CSSRule.IMPORT_RULE)
+          rules([rule.styleSheet], visit, seen, includeInactive);
+        else if (rule.type === CSSRule.MEDIA_RULE) {
+          if (includeInactive || matchMedia(rule.conditionText).matches)
+            walk(rule.cssRules);
+        } else if (rule.type === CSSRule.SUPPORTS_RULE) {
+          if (CSS.supports(rule.conditionText)) walk(rule.cssRules);
+        } else {
+          visit(rule);
+          if (rule.cssRules) walk(rule.cssRules);
+        }
+      }
+    }
+  }
+  function fixedWidth(element) {
+    const used = parseFloat(getComputedStyle(element).width);
+    const matches = (value) => {
+      const px = absolute(value, element);
+      return px > 0 && Math.abs(px - used) < 0.1;
+    };
+    if (matches(element.style.width)) return true;
+    if (["svg", "canvas", "img", "table"].includes(element.localName)) {
+      const attribute = element.getAttribute("width") || "";
+      if (matches(/^\d+(?:\.\d+)?$/.test(attribute) ? `${attribute}px` : attribute))
+        return true;
+    }
+    let found = false;
+    rules(document.styleSheets, (rule) => {
+      try {
+        if (rule.selectorText && element.matches(rule.selectorText) && matches(rule.style.width))
+          found = true;
+      } catch {
+      }
+    });
+    return found;
+  }
+  function authoredPageRule() {
+    let found = false;
+    rules(
+      document.styleSheets,
+      (rule) => {
+        if (rule.type === CSSRule.PAGE_RULE && (rule.style.size || rule.style.margin))
+          found = true;
+      },
+      /* @__PURE__ */ new Set(),
+      true
+    );
+    return found;
+  }
+  function findFixedSheet() {
+    if (document.querySelector(sheetOwners) || document.querySelector(
+      'meta[name="design_doc_mode"][content="canvas"],meta[name="codex-fixed-sheet"][content="off"]'
+    ) || window.codexTimeline || window.__animStage)
+      return { reason: "owned", root: null };
+    const visible = [...document.body.children].filter(
+      (node) => !node.matches(sheetChrome) && getComputedStyle(node).display !== "none"
+    );
+    const marked = visible.filter(
+      (node) => node.hasAttribute("data-fixed-sheet")
+    );
+    const root = marked.length === 1 ? marked[0] : visible.length === 1 ? visible[0] : null;
+    if (root && fixedWidth(root)) return { reason: "fixed", root };
+    if (!marked.length && fixedWidth(document.body))
+      return { reason: "fixed", root: document.body };
+    return { reason: visible.length > 1 ? "ambiguous" : "fluid", root: null };
+  }
+  function sheetBox(element) {
+    const style = getComputedStyle(element);
+    const extra = (names) => names.reduce((sum, name) => sum + (parseFloat(style[name]) || 0), 0);
+    const borderBox = style.boxSizing === "border-box";
+    const width = parseFloat(style.width) + (borderBox ? 0 : extra([
+      "paddingLeft",
+      "paddingRight",
+      "borderLeftWidth",
+      "borderRightWidth"
+    ]));
+    const height = parseFloat(style.height) + (borderBox ? 0 : extra([
+      "paddingTop",
+      "paddingBottom",
+      "borderTopWidth",
+      "borderBottomWidth"
+    ]));
+    const zoom = Number(style.zoom) || 1;
+    return width > 0 && height > 0 && [width, height, zoom].every(Number.isFinite) ? { width, height, zoom } : null;
+  }
+  var sheetOwners, sheetChrome;
+  var init_fixed_sheet_model = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-model.js"() {
+      init_document_model();
+      sheetOwners = "doc-page,design-canvas,deck-stage,motion-stage,three-d-stage,three-stage,chart-stage,social-frames,file-window,ios-shell,chrome-shell,post-card,instagram-story,x-shell,instagram-shell,tiktok-shell,facebook-shell,linkedin-shell,pinterest-shell,reddit-shell,youtube-shell";
+      sheetChrome = "script,style,link,meta,template,[hidden],[data-doc-controls],[data-codex-chrome],text-editor";
+    }
+  });
+
+  // skills/studio-design/assets/starters/document-style.js
+  var printHygiene;
+  var init_document_style = __esm({
+    "skills/studio-design/assets/starters/document-style.js"() {
+      printHygiene = `
+@media print{
+html,body{margin:0!important;padding:0!important;background:none!important;height:auto!important;overflow:visible!important}
+h1,h2,h3,h4,h5,h6{break-after:avoid}figure,pre,blockquote,img,svg,tr{break-inside:avoid}p,li{orphans:3;widows:3}
+*{print-color-adjust:exact;-webkit-print-color-adjust:exact;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+*,*::before,*::after{animation-delay:-99s!important;animation-duration:.001s!important;animation-iteration-count:1!important;animation-fill-mode:both!important;animation-play-state:running!important;transition-duration:0s!important}
+[data-doc-controls],design-controls{display:none!important}
+}
+`;
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-runtime.js
+  var fixed_sheet_runtime_exports = {};
+  var init_fixed_sheet_runtime = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-runtime.js"() {
+      init_fixed_sheet_model();
+      init_document_style();
+      if (!window.CodexFixedSheet) {
+        let schedule = function() {
+          if (!frame)
+            frame = requestAnimationFrame(() => {
+              frame = void 0;
+              refresh();
+            });
+        }, selector = function() {
+          return root === document.body ? "body" : `body>:nth-child(${[...document.body.children].indexOf(root) + 1})`;
+        }, restoreOverlays = function() {
+          if (!document.documentElement.hasAttribute("data-codex-plain-canvas"))
+            for (const overlay of overlays) {
+              if (overlay.parentNode === document.documentElement)
+                document.body.append(overlay);
+            }
+          overlays.clear();
+        }, refresh = function() {
+          if (refreshing || printing || media.matches || !document.body) return;
+          refreshing = true;
+          screen.textContent = "";
+          print.textContent = "";
+          screen.remove();
+          print.remove();
+          const found = findFixedSheet();
+          reason = found.reason;
+          if (found.root !== root) {
+            restoreOverlays();
+            resize.disconnect();
+            root = found.root;
+            if (root) {
+              resize.observe(root);
+              if (root.parentElement) resize.observe(root.parentElement);
+            }
+          }
+          box = root && sheetBox(root);
+          scale = 1;
+          if (box) {
+            document.head.append(screen, print);
+            const own = selector();
+            const width = box.width * box.zoom, height = box.height * box.zoom;
+            if (mode === "fit") {
+              const bodyStyle = getComputedStyle(document.body);
+              const horizontal = [
+                "marginLeft",
+                "marginRight",
+                "paddingLeft",
+                "paddingRight"
+              ].reduce((sum, name) => sum + (parseFloat(bodyStyle[name]) || 0), 0);
+              const top = root.getBoundingClientRect().top + scrollY;
+              const leading = top >= 0 && top < innerHeight ? top : 0;
+              scale = Math.min(
+                Math.max(1, innerWidth - horizontal) / width,
+                Math.max(
+                  1,
+                  innerHeight - leading - (parseFloat(bodyStyle.paddingBottom) || 0)
+                ) / height
+              );
+              screen.textContent = `@media screen{${own}{zoom:${box.zoom * scale}}}`;
+            }
+            const page = authoredPageRule() ? "" : `@page{size:${width}px ${height}px;margin:0}`;
+            const siblings = root === document.body ? "" : `body>:not(:nth-child(${[...document.body.children].indexOf(root) + 1})){display:none!important}`;
+            const padding = root === document.body ? `padding:${getComputedStyle(root).padding}!important;` : "";
+            const block = {
+              inline: "block",
+              "inline-block": "flow-root",
+              "inline-flex": "flex",
+              "inline-grid": "grid",
+              "inline-table": "table"
+            }[getComputedStyle(root).display];
+            const display = block ? `display:${block}!important;` : "";
+            const hygiene = printHygiene.replace("background:none!important;", "");
+            print.textContent = `${page}${hygiene}@media print{html,body{margin:0!important;padding:0!important}${siblings}${own}{box-sizing:border-box!important;width:${box.width}px!important;height:${box.height}px!important;margin:0!important;overflow:hidden!important;contain:strict!important;${padding}${display}}}`;
+            if (root === document.body)
+              for (const overlay of document.body.querySelectorAll(
+                ":scope > text-editor[data-codex-injected],:scope > [data-codex-tweaks-chrome]"
+              )) {
+                overlays.add(overlay);
+                document.documentElement.append(overlay);
+              }
+          } else restoreOverlays();
+          mutation.takeRecords();
+          refreshing = false;
+        };
+        const screen = document.createElement("style"), print = document.createElement("style");
+        for (const node of [screen, print]) node.dataset.codexInjected = "";
+        screen.dataset.codexSheetPreview = "";
+        print.dataset.codexSheetPrint = "";
+        let frame, root, box, reason = "fluid", scale = 1, mode = "fit", printing = false, refreshing = false;
+        const media = matchMedia("print");
+        const events = new AbortController();
+        const resize = new ResizeObserver(schedule);
+        const mutation = new MutationObserver((records) => {
+          if (records.some(
+            (record) => record.target !== screen && record.target !== print && record.target.parentNode !== screen && record.target.parentNode !== print
+          ))
+            schedule();
+        });
+        const overlays = /* @__PURE__ */ new Set();
+        const api = {
+          get root() {
+            return root;
+          },
+          get reason() {
+            return reason;
+          },
+          get dimensions() {
+            return box ? { width: box.width * box.zoom, height: box.height * box.zoom } : null;
+          },
+          get previewScale() {
+            return printing || media.matches ? 1 : scale;
+          },
+          setPreview(value) {
+            if (!["fit", "actual-size"].includes(value))
+              throw new Error("Preview must be fit or actual-size.");
+            mode = value;
+            refresh();
+          },
+          refresh,
+          async preparePrint() {
+            await document.fonts?.ready;
+            refresh();
+            printing = true;
+            return !!box && !authoredPageRule();
+          },
+          restorePrint() {
+            printing = false;
+            schedule();
+          },
+          destroy() {
+            events.abort();
+            resize.disconnect();
+            mutation.disconnect();
+            cancelAnimationFrame(frame);
+            screen.remove();
+            print.remove();
+            restoreOverlays();
+            delete window.CodexFixedSheet;
+          }
+        };
+        window.CodexFixedSheet = api;
+        window.addEventListener("resize", schedule, { signal: events.signal });
+        window.addEventListener(
+          "beforeprint",
+          () => {
+            refresh();
+            printing = true;
+          },
+          { signal: events.signal }
+        );
+        window.addEventListener("afterprint", () => api.restorePrint(), {
+          signal: events.signal
+        });
+        media.addEventListener(
+          "change",
+          () => {
+            if (!media.matches) api.restorePrint();
+          },
+          { signal: events.signal }
+        );
+        document.fonts?.addEventListener("loadingdone", schedule, {
+          signal: events.signal
+        });
+        mutation.observe(document.documentElement, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+          characterData: true
+        });
+      }
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet.js
+  window.CodexFixedSheetReady = Promise.resolve().then(() => (init_fixed_sheet_runtime(), fixed_sheet_runtime_exports)).then(
+    async () => {
+      if (document.readyState === "loading")
+        await new Promise(
+          (resolve) => document.addEventListener("DOMContentLoaded", resolve, { once: true })
+        );
+      await document.fonts?.ready;
+      window.CodexFixedSheet.refresh();
+    }
+  );
+})();
+</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Component gallery study</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f5ef;
+        color: #263c34;
+        font: 20px/1.6 system-ui;
+        padding: 60px 70px;
+      }
+      h1 {
+        font:
+          60px/1.15 Georgia,
+          serif;
+        font-weight: 400;
+        margin: 0 0 36px;
+      }
+      .eyebrow {
+        font-size: 14px;
+        letter-spacing: 0.08em;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .card {
+        padding: 32px;
+        background: #fffdf7;
+        border: 1px solid #ccd5c5;
+        border-radius: 18px;
+      }
+      button {
+        font: inherit;
+        color: #fffdf7;
+        background: #263c34;
+        padding: 14px 24px;
+        border: 0;
+        border-radius: 9px;
+      }
+      input {
+        font: inherit;
+        max-width: 100%;
+        padding: 12px;
+        border: 1px solid #9dad9c;
+        border-radius: 8px;
+      }
+      .palette {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .palette span {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #269d80;
+      }
+      .palette span:nth-child(2) {
+        background: #e4b754;
+      }
+      .palette span:nth-child(3) {
+        background: #365bcf;
+      }
+      footer {
+        margin-top: 70px;
+        padding-top: 30px;
+        border-top: 1px solid #ccd5c5;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">LOCAL DESIGN SYSTEM / STUDY</p>
+    <h1 id="title">A quiet library.</h1>
+    <div class="cards">
+      <section class="card">
+        <h2>Actions</h2>
+        <button>Save to library</button>
+      </section>
+      <section class="card">
+        <h2>Fields</h2>
+        <input aria-label="Library title" placeholder="Your collection" />
+      </section>
+      <section class="card">
+        <h2>Materials</h2>
+        <div class="palette"><span></span><span></span><span></span></div>
+      </section>
+      <section class="card">
+        <h2>Typography</h2>
+        <p>One clear idea.<br />Room to breathe.</p>
+      </section>
+    </div>
+    <footer>
+      This gallery accepts native local title updates while preserving its live
+      content.
+    </footer>
+    <script>
+      window.CodexFileUpdate = (name, kind, content) => {
+        if (name === "library" && typeof content === "string")
+          document.getElementById("title").textContent = content;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "name": "Harbor",
+  "slug": "harbor",
+  "css": "tokens.css",
+  "entry": "components/index.jsx",
+  "components": [
+    {
+      "name": "Button",
+      "export": "Button",
+      "props": {
+        "children": "Create project"
+      }
+    },
+    {
+      "name": "Status",
+      "export": "Status",
+      "props": {
+        "children": "Ready to review"
+      }
+    }
+  ],
+  "startingPoints": [
+    {
+      "name": "Reading room",
+      "path": "seeds/reading-room.html"
+    }
+  ],
+  "guidance": "Use warm paper surfaces, dark ink, and a single blue accent. Favor compact editorial layouts and quiet borders."
+}

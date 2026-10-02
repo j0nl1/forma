@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "designSystems": [
+    {
+      "name": "Harbor",
+      "slug": "harbor",
+      "namespace": "CodexDS_harbor_2588e00d4db7",
+      "reactVersion": "19.2.4",
+      "moduleEntry": "_ds_entry.js",
+      "adherence": "_ds_adherence.json",
+      "path": "_ds/harbor/_ds_manifest.json",
+      "sourcePath": "/home/cerberus/.codex-artifacts/home/cerberus/Projects/codex-design/deployments/github-pages/site/design-system",
+      "manifestHash": "6026633b3fb7413d4f6b1b4051e68d93ddc7ed68b6c69bca56437e12aa0a22d4"
+    },
+    {
+      "name": "Trail",
+      "slug": "trail",
+      "namespace": "CodexDS_trail_d8e9324cb83f",
+      "reactVersion": "19.2.4",
+      "moduleEntry": "_ds_entry.js",
+      "adherence": "_ds_adherence.json",
+      "path": "_ds/trail/_ds_manifest.json",
+      "sourcePath": "/home/cerberus/.codex-artifacts/home/cerberus/Projects/codex-design/deployments/github-pages/site/design-system-secondary",
+      "manifestHash": "d20a4f71323e9a5421abdad4df7f72472884a827f045cd54fa613aa7a89688cf"
+    }
+  ],
+  "assets": [],
+  "primaryDesignSystem": "harbor"
+}

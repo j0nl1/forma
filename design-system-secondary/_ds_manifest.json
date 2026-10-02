@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "name": "Trail",
+  "slug": "trail",
+  "namespace": "CodexDS_trail_d8e9324cb83f",
+  "sourceNamespaces": [],
+  "reactVersion": "19.2.4",
+  "runtimeDeclarations": [],
+  "tokens": {
+    "--color-accent": "#276e51",
+    "--color-on-accent": "#ffffff",
+    "--trail-radius": "999px"
+  },
+  "tokenDetails": [
+    {
+      "name": "--color-accent",
+      "value": "#276e51",
+      "definedIn": "tokens.css",
+      "line": 2,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#276e51"
+    },
+    {
+      "name": "--color-on-accent",
+      "value": "#ffffff",
+      "definedIn": "tokens.css",
+      "line": 3,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#ffffff"
+    },
+    {
+      "name": "--trail-radius",
+      "value": "999px",
+      "definedIn": "tokens.css",
+      "line": 4,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "annotation": "radius",
+      "kind": "radius",
+      "resolvedValue": "999px"
+    }
+  ],
+  "tokenKinds": {
+    "color": 2,
+    "radius": 1
+  },
+  "unclassified": [],
+  "fonts": [],
+  "brandFonts": [],
+  "warnings": [],
+  "globalCssPaths": [
+    "tokens.css"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "export": "Button",
+      "local": "Button",
+      "kind": "component",
+      "sourcePath": "components.jsx",
+      "props": {
+        "children": "Explore a trail"
+      }
+    }
+  ],
+  "examples": [],
+  "startingPoints": [],
+  "cards": [],
+  "contracts": "_ds_contracts.json",
+  "adherence": "_ds_adherence.json",
+  "moduleEntry": "_ds_entry.js",
+  "guidance": "Use rounded controls and the forest accent. Prefer concise action labels.",
+  "css": "_ds_tokens.css",
+  "bundle": "_ds_bundle.js",
+  "artifacts": {
+    "_ds_tokens.css": "c9f4c8b12b64488ebd02518331e611b3c97b34481c0838e6ab61be3a9824c564",
+    "_ds_contracts.json": "dff2d55a21635bf7f38acb81476e290d80ff834ac87a7a3f6c715453143b4505",
+    "_ds_adherence.json": "bd18b3412bc5fbda29bfdac5cc54118f9391e80d31c5e3697bb9faec58828163",
+    "_ds_entry.js": "b9581454f51e9efbe62ed2503a8d3485f9ee176ba194649032caecd47086b2cb",
+    "_ds_bundle.js": "5710326c999ae053e492ff2c97166e021c216a5bff38b31059b912d1d8441968",
+    "_ds_review.json": "76567c25f500ddd82c75ef91481f471d81d856f6d0892515f751d8cacd251cba"
+  },
+  "review": "_ds_review.json"
+}

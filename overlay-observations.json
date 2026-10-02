@@ -1,0 +1,26 @@
+{
+  "synthetic": true,
+  "description": "Explicit synthetic aggregate fixture; independent unique-user action counts, not a sequential funnel.",
+  "observations": [
+    {
+      "window": "last 28 days",
+      "start": "2026-09-04",
+      "end": "2026-10-01",
+      "active": 100,
+      "composer": 37,
+      "templates": 28,
+      "share": 12,
+      "export": 8
+    },
+    {
+      "window": "last 7 days",
+      "start": "2026-09-25",
+      "end": "2026-10-01",
+      "active": 40,
+      "composer": 12,
+      "templates": 14,
+      "share": 4,
+      "export": 6
+    }
+  ]
+}

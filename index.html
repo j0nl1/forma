@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+  <head><script data-codex-fixed-sheet-runtime>(() => {
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __esm = (fn, res, err) => function __init() {
+    if (err) throw err[0];
+    try {
+      return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+    } catch (e) {
+      throw err = [e], e;
+    }
+  };
+
+  // skills/studio-design/assets/starters/document-model.js
+  function length(value, fallback = null) {
+    value = String(value ?? "").trim();
+    return value === "0" ? "0px" : /^\d+(?:\.\d+)?(?:px|in|mm|cm|pt|pc)$/.test(value) ? value : fallback;
+  }
+  function pixels(value) {
+    const match = /^(\d+(?:\.\d+)?)(px|in|mm|cm|pt|pc)$/.exec(
+      length(value) || ""
+    );
+    return match ? Number(match[1]) * units[match[2]] : NaN;
+  }
+  var papers, units;
+  var init_document_model = __esm({
+    "skills/studio-design/assets/starters/document-model.js"() {
+      papers = Object.freeze({
+        letter: ["8.5in", "11in"],
+        a4: ["210mm", "297mm"],
+        legal: ["8.5in", "14in"]
+      });
+      units = {
+        px: 1,
+        in: 96,
+        mm: 96 / 25.4,
+        cm: 96 / 2.54,
+        pt: 96 / 72,
+        pc: 16
+      };
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-model.js
+  function absolute(value, element, seen = /* @__PURE__ */ new Set()) {
+    const direct = pixels(length(value));
+    if (Number.isFinite(direct)) return direct;
+    const variable = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value.trim());
+    if (!variable || seen.has(variable[1])) return NaN;
+    seen.add(variable[1]);
+    return absolute(
+      getComputedStyle(element).getPropertyValue(variable[1]),
+      element,
+      seen
+    );
+  }
+  function rules(sheets, visit, seen = /* @__PURE__ */ new Set(), includeInactive = false) {
+    for (const sheet of sheets) {
+      if (!sheet || seen.has(sheet) || sheet.ownerNode?.hasAttribute("data-codex-injected") || sheet.disabled)
+        continue;
+      seen.add(sheet);
+      if (!includeInactive && sheet.media?.mediaText && !matchMedia(sheet.media.mediaText).matches)
+        continue;
+      let list;
+      try {
+        list = sheet.cssRules;
+      } catch {
+        continue;
+      }
+      walk(list);
+    }
+    function walk(list) {
+      for (const rule of list) {
+        if (rule.type === CSSRule.IMPORT_RULE)
+          rules([rule.styleSheet], visit, seen, includeInactive);
+        else if (rule.type === CSSRule.MEDIA_RULE) {
+          if (includeInactive || matchMedia(rule.conditionText).matches)
+            walk(rule.cssRules);
+        } else if (rule.type === CSSRule.SUPPORTS_RULE) {
+          if (CSS.supports(rule.conditionText)) walk(rule.cssRules);
+        } else {
+          visit(rule);
+          if (rule.cssRules) walk(rule.cssRules);
+        }
+      }
+    }
+  }
+  function fixedWidth(element) {
+    const used = parseFloat(getComputedStyle(element).width);
+    const matches = (value) => {
+      const px = absolute(value, element);
+      return px > 0 && Math.abs(px - used) < 0.1;
+    };
+    if (matches(element.style.width)) return true;
+    if (["svg", "canvas", "img", "table"].includes(element.localName)) {
+      const attribute = element.getAttribute("width") || "";
+      if (matches(/^\d+(?:\.\d+)?$/.test(attribute) ? `${attribute}px` : attribute))
+        return true;
+    }
+    let found = false;
+    rules(document.styleSheets, (rule) => {
+      try {
+        if (rule.selectorText && element.matches(rule.selectorText) && matches(rule.style.width))
+          found = true;
+      } catch {
+      }
+    });
+    return found;
+  }
+  function authoredPageRule() {
+    let found = false;
+    rules(
+      document.styleSheets,
+      (rule) => {
+        if (rule.type === CSSRule.PAGE_RULE && (rule.style.size || rule.style.margin))
+          found = true;
+      },
+      /* @__PURE__ */ new Set(),
+      true
+    );
+    return found;
+  }
+  function findFixedSheet() {
+    if (document.querySelector(sheetOwners) || document.querySelector(
+      'meta[name="design_doc_mode"][content="canvas"],meta[name="codex-fixed-sheet"][content="off"]'
+    ) || window.codexTimeline || window.__animStage)
+      return { reason: "owned", root: null };
+    const visible = [...document.body.children].filter(
+      (node) => !node.matches(sheetChrome) && getComputedStyle(node).display !== "none"
+    );
+    const marked = visible.filter(
+      (node) => node.hasAttribute("data-fixed-sheet")
+    );
+    const root = marked.length === 1 ? marked[0] : visible.length === 1 ? visible[0] : null;
+    if (root && fixedWidth(root)) return { reason: "fixed", root };
+    if (!marked.length && fixedWidth(document.body))
+      return { reason: "fixed", root: document.body };
+    return { reason: visible.length > 1 ? "ambiguous" : "fluid", root: null };
+  }
+  function sheetBox(element) {
+    const style = getComputedStyle(element);
+    const extra = (names) => names.reduce((sum, name) => sum + (parseFloat(style[name]) || 0), 0);
+    const borderBox = style.boxSizing === "border-box";
+    const width = parseFloat(style.width) + (borderBox ? 0 : extra([
+      "paddingLeft",
+      "paddingRight",
+      "borderLeftWidth",
+      "borderRightWidth"
+    ]));
+    const height = parseFloat(style.height) + (borderBox ? 0 : extra([
+      "paddingTop",
+      "paddingBottom",
+      "borderTopWidth",
+      "borderBottomWidth"
+    ]));
+    const zoom = Number(style.zoom) || 1;
+    return width > 0 && height > 0 && [width, height, zoom].every(Number.isFinite) ? { width, height, zoom } : null;
+  }
+  var sheetOwners, sheetChrome;
+  var init_fixed_sheet_model = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-model.js"() {
+      init_document_model();
+      sheetOwners = "doc-page,design-canvas,deck-stage,motion-stage,three-d-stage,three-stage,chart-stage,social-frames,file-window,ios-shell,chrome-shell,post-card,instagram-story,x-shell,instagram-shell,tiktok-shell,facebook-shell,linkedin-shell,pinterest-shell,reddit-shell,youtube-shell";
+      sheetChrome = "script,style,link,meta,template,[hidden],[data-doc-controls],[data-codex-chrome],text-editor";
+    }
+  });
+
+  // skills/studio-design/assets/starters/document-style.js
+  var printHygiene;
+  var init_document_style = __esm({
+    "skills/studio-design/assets/starters/document-style.js"() {
+      printHygiene = `
+@media print{
+html,body{margin:0!important;padding:0!important;background:none!important;height:auto!important;overflow:visible!important}
+h1,h2,h3,h4,h5,h6{break-after:avoid}figure,pre,blockquote,img,svg,tr{break-inside:avoid}p,li{orphans:3;widows:3}
+*{print-color-adjust:exact;-webkit-print-color-adjust:exact;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+*,*::before,*::after{animation-delay:-99s!important;animation-duration:.001s!important;animation-iteration-count:1!important;animation-fill-mode:both!important;animation-play-state:running!important;transition-duration:0s!important}
+[data-doc-controls],design-controls{display:none!important}
+}
+`;
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-runtime.js
+  var fixed_sheet_runtime_exports = {};
+  var init_fixed_sheet_runtime = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-runtime.js"() {
+      init_fixed_sheet_model();
+      init_document_style();
+      if (!window.CodexFixedSheet) {
+        let schedule = function() {
+          if (!frame)
+            frame = requestAnimationFrame(() => {
+              frame = void 0;
+              refresh();
+            });
+        }, selector = function() {
+          return root === document.body ? "body" : `body>:nth-child(${[...document.body.children].indexOf(root) + 1})`;
+        }, restoreOverlays = function() {
+          if (!document.documentElement.hasAttribute("data-codex-plain-canvas"))
+            for (const overlay of overlays) {
+              if (overlay.parentNode === document.documentElement)
+                document.body.append(overlay);
+            }
+          overlays.clear();
+        }, refresh = function() {
+          if (refreshing || printing || media.matches || !document.body) return;
+          refreshing = true;
+          screen.textContent = "";
+          print.textContent = "";
+          screen.remove();
+          print.remove();
+          const found = findFixedSheet();
+          reason = found.reason;
+          if (found.root !== root) {
+            restoreOverlays();
+            resize.disconnect();
+            root = found.root;
+            if (root) {
+              resize.observe(root);
+              if (root.parentElement) resize.observe(root.parentElement);
+            }
+          }
+          box = root && sheetBox(root);
+          scale = 1;
+          if (box) {
+            document.head.append(screen, print);
+            const own = selector();
+            const width = box.width * box.zoom, height = box.height * box.zoom;
+            if (mode === "fit") {
+              const bodyStyle = getComputedStyle(document.body);
+              const horizontal = [
+                "marginLeft",
+                "marginRight",
+                "paddingLeft",
+                "paddingRight"
+              ].reduce((sum, name) => sum + (parseFloat(bodyStyle[name]) || 0), 0);
+              const top = root.getBoundingClientRect().top + scrollY;
+              const leading = top >= 0 && top < innerHeight ? top : 0;
+              scale = Math.min(
+                Math.max(1, innerWidth - horizontal) / width,
+                Math.max(
+                  1,
+                  innerHeight - leading - (parseFloat(bodyStyle.paddingBottom) || 0)
+                ) / height
+              );
+              screen.textContent = `@media screen{${own}{zoom:${box.zoom * scale}}}`;
+            }
+            const page = authoredPageRule() ? "" : `@page{size:${width}px ${height}px;margin:0}`;
+            const siblings = root === document.body ? "" : `body>:not(:nth-child(${[...document.body.children].indexOf(root) + 1})){display:none!important}`;
+            const padding = root === document.body ? `padding:${getComputedStyle(root).padding}!important;` : "";
+            const block = {
+              inline: "block",
+              "inline-block": "flow-root",
+              "inline-flex": "flex",
+              "inline-grid": "grid",
+              "inline-table": "table"
+            }[getComputedStyle(root).display];
+            const display = block ? `display:${block}!important;` : "";
+            const hygiene = printHygiene.replace("background:none!important;", "");
+            print.textContent = `${page}${hygiene}@media print{html,body{margin:0!important;padding:0!important}${siblings}${own}{box-sizing:border-box!important;width:${box.width}px!important;height:${box.height}px!important;margin:0!important;overflow:hidden!important;contain:strict!important;${padding}${display}}}`;
+            if (root === document.body)
+              for (const overlay of document.body.querySelectorAll(
+                ":scope > text-editor[data-codex-injected],:scope > [data-codex-tweaks-chrome]"
+              )) {
+                overlays.add(overlay);
+                document.documentElement.append(overlay);
+              }
+          } else restoreOverlays();
+          mutation.takeRecords();
+          refreshing = false;
+        };
+        const screen = document.createElement("style"), print = document.createElement("style");
+        for (const node of [screen, print]) node.dataset.codexInjected = "";
+        screen.dataset.codexSheetPreview = "";
+        print.dataset.codexSheetPrint = "";
+        let frame, root, box, reason = "fluid", scale = 1, mode = "fit", printing = false, refreshing = false;
+        const media = matchMedia("print");
+        const events = new AbortController();
+        const resize = new ResizeObserver(schedule);
+        const mutation = new MutationObserver((records) => {
+          if (records.some(
+            (record) => record.target !== screen && record.target !== print && record.target.parentNode !== screen && record.target.parentNode !== print
+          ))
+            schedule();
+        });
+        const overlays = /* @__PURE__ */ new Set();
+        const api = {
+          get root() {
+            return root;
+          },
+          get reason() {
+            return reason;
+          },
+          get dimensions() {
+            return box ? { width: box.width * box.zoom, height: box.height * box.zoom } : null;
+          },
+          get previewScale() {
+            return printing || media.matches ? 1 : scale;
+          },
+          setPreview(value) {
+            if (!["fit", "actual-size"].includes(value))
+              throw new Error("Preview must be fit or actual-size.");
+            mode = value;
+            refresh();
+          },
+          refresh,
+          async preparePrint() {
+            await document.fonts?.ready;
+            refresh();
+            printing = true;
+            return !!box && !authoredPageRule();
+          },
+          restorePrint() {
+            printing = false;
+            schedule();
+          },
+          destroy() {
+            events.abort();
+            resize.disconnect();
+            mutation.disconnect();
+            cancelAnimationFrame(frame);
+            screen.remove();
+            print.remove();
+            restoreOverlays();
+            delete window.CodexFixedSheet;
+          }
+        };
+        window.CodexFixedSheet = api;
+        window.addEventListener("resize", schedule, { signal: events.signal });
+        window.addEventListener(
+          "beforeprint",
+          () => {
+            refresh();
+            printing = true;
+          },
+          { signal: events.signal }
+        );
+        window.addEventListener("afterprint", () => api.restorePrint(), {
+          signal: events.signal
+        });
+        media.addEventListener(
+          "change",
+          () => {
+            if (!media.matches) api.restorePrint();
+          },
+          { signal: events.signal }
+        );
+        document.fonts?.addEventListener("loadingdone", schedule, {
+          signal: events.signal
+        });
+        mutation.observe(document.documentElement, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+          characterData: true
+        });
+      }
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet.js
+  window.CodexFixedSheetReady = Promise.resolve().then(() => (init_fixed_sheet_runtime(), fixed_sheet_runtime_exports)).then(
+    async () => {
+      if (document.readyState === "loading")
+        await new Promise(
+          (resolve) => document.addEventListener("DOMContentLoaded", resolve, { once: true })
+        );
+      await document.fonts?.ready;
+      window.CodexFixedSheet.refresh();
+    }
+  );
+})();
+</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Studio Design · Local studio</title>
+    <link rel="stylesheet" href="studio.css" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="index.html"
+        ><span class="mark">S</span> STUDIO DESIGN</a
+      ><span class="local"><i></i> A local design studio</span
+      ><a href="#examples">Browse examples ↓</a>
+    </header>
+    <main class="home">
+      <div class="intro">
+        <p class="eyebrow">01 / INDEPENDENT TOOLS</p>
+        <h1>Design it.<br />Make it <em>work.</em></h1>
+        <p class="lead">
+          Editable artifacts, useful interactions, and a clear path from the
+          first sketch to the finished file. Built for Codex. Kept on your
+          machine.
+        </p>
+        <div class="intro-actions">
+          <a class="primary" href="prototype.html"
+            >Explore the reading app <span>↗</span></a
+          ><a href="#examples">Browse by category ↓</a>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-bar">
+          <span>HARBOR / READING ROOM</span><span>LOCAL PROTOTYPE</span>
+        </div>
+        <div class="feature-content">
+          <p class="eyebrow">A quieter place for your ideas</p>
+          <h2>Keep what<br />stays with you.</h2>
+          <div class="sample-item">
+            <div class="sample-art">Aa</div>
+            <div>
+              <span>DESIGN · 8 MIN</span>
+              <h3>Attention is a design material</h3>
+              <p>Read, collect, and come back with fresh eyes.</p>
+            </div>
+          </div>
+          <span class="feature-caption">Featured example: the reading app</span>
+        </div>
+        <div class="feature-foot">
+          <span>Responsive · Keyboard accessible</span><span>01 — 03</span>
+        </div>
+      </div>
+      <section
+        class="collection"
+        id="examples"
+        aria-labelledby="examples-title"
+      >
+        <div class="section-title">
+          <h2 id="examples-title">Explore by category</h2>
+          <span
+            >11 categories. Open a main example or explore its variants.</span
+          >
+        </div>
+        <div class="cards">
+          <article class="example-group">
+            <a class="example-main" href="prototype.html">
+              <span>01 / INTERFACES &amp; DESIGN</span>
+              <h3>Interfaces &amp; design</h3>
+              <p>
+                A working reading app with onboarding, validation, search and
+                saved articles.
+              </p>
+              <b>Open prototype ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (6)</summary>
+              <ul>
+                <li>
+                  <a href="canvas-react.html"
+                    >Comparison canvas with notes and persistent edits</a
+                  >
+                </li>
+                <li>
+                  <a href="canvas-html.html"
+                    >HTML comparison canvas with three directions</a
+                  >
+                </li>
+                <li><a href="canvas.html">Simple two-direction canvas</a></li>
+                <li>
+                  <a href="tweaks.html">Live design controls and palettes</a>
+                </li>
+                <li>
+                  <a href="editing.html">Text editing and draft recovery</a>
+                </li>
+                <li><a href="systems.html">Design-system comparison</a></li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="deck.html">
+              <span>02 / PRESENTATIONS</span>
+              <h3>Presentations</h3>
+              <p>HTML slides with builds, speaker view and print output.</p>
+              <b>Open presentation ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (1)</summary>
+              <ul>
+                <li>
+                  <a href="deck-effects.html"
+                    >Gallery of 44 slide transition effects</a
+                  >
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="animation.html">
+              <span>03 / ANIMATION &amp; PAINTING</span>
+              <h3>Animation &amp; painting</h3>
+              <p>
+                A continuous composition with scrubbing, timing edits and
+                export.
+              </p>
+              <b>Open motion study ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (2)</summary>
+              <ul>
+                <li>
+                  <a href="scenes.html"
+                    >Scene cuts and sprites on a shared clock</a
+                  >
+                </li>
+                <li>
+                  <a href="watercolor.html"
+                    >Watercolor layers, brushstrokes and replay</a
+                  >
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="charts.html">
+              <span>04 / CHARTS &amp; DATA</span>
+              <h3>Charts &amp; data</h3>
+              <p>
+                Interactive charts with exact values, zoom and SVG or PNG
+                downloads.
+              </p>
+              <b>Open chart laboratory ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (2)</summary>
+              <ul>
+                <li>
+                  <a href="data.html">Simple SVG chart with source data</a>
+                </li>
+                <li>
+                  <a href="overlay.html">Metric overlays and pinned findings</a>
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="documents.html">
+              <span>05 / DOCUMENTS &amp; PRINT</span>
+              <h3>Documents &amp; print</h3>
+              <p>
+                Reports, fliers and trifolds with format controls and physical
+                page sizes.
+              </p>
+              <b>Open paper laboratory ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (2)</summary>
+              <ul>
+                <li>
+                  <a href="document.html">Simple printable design record</a>
+                </li>
+                <li>
+                  <a href="sheet.html"
+                    >Fixed-size HTML sheet and one-page PDF</a
+                  >
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="campaign.html">
+              <span>06 / SOCIAL CAMPAIGNS</span>
+              <h3>Social campaigns</h3>
+              <p>
+                One campaign across fourteen placements, with carousel controls.
+              </p>
+              <b>Open campaign ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (3)</summary>
+              <ul>
+                <li>
+                  <a href="social.html"
+                    >Social assets with PNG and ZIP downloads</a
+                  >
+                </li>
+                <li>
+                  <a href="social-shells.html"
+                    >Post details, photo feeds and video viewers</a
+                  >
+                </li>
+                <li>
+                  <a href="social-feeds.html">Five social feed layouts</a>
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="platforms.html">
+              <span>07 / DEVICES &amp; FILE PREVIEWS</span>
+              <h3>Devices &amp; file previews</h3>
+              <p>Device and window frames for showing designs in context.</p>
+              <b>Open platform laboratory ↗</b>
+            </a>
+            <details class="example-variants">
+              <summary>More examples (1)</summary>
+              <ul>
+                <li>
+                  <a href="files.html">File crops and expanded previews</a>
+                </li>
+              </ul>
+            </details>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="images.html">
+              <span>08 / IMAGES &amp; CROPS</span>
+              <h3>Images &amp; crops</h3>
+              <p>
+                Image masks, movable crops, attribution and replacement
+                controls.
+              </p>
+              <b>Open image laboratory ↗</b>
+            </a>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="objects.html">
+              <span>09 / 3D OBJECTS</span>
+              <h3>3D objects</h3>
+              <p>Orbit controls, studio lighting and GLB or OBJ exports.</p>
+              <b>Open object studio ↗</b>
+            </a>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="starters/email.html">
+              <span>10 / EMAIL</span>
+              <h3>Email</h3>
+              <p>
+                A responsive HTML email with inline styling and table-based
+                content.
+              </p>
+              <b>Open email template ↗</b>
+            </a>
+          </article>
+          <article class="example-group">
+            <a class="example-main" href="maps.html">
+              <span>11 / MAPS &amp; GEOGRAPHY</span>
+              <h3>Maps &amp; geography</h3>
+              <p>
+                Country geometry, interactive street maps and vector exports.
+              </p>
+              <b>Open geography laboratory ↗</b>
+            </a>
+          </article>
+        </div>
+      </section>
+      <footer>
+        <span>Original source. Explicit dependencies. Local output.</span
+        ><span>STUDIO DESIGN / 2026</span>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "slug": "trail",
+  "namespace": "CodexDS_trail_d8e9324cb83f",
+  "sourceNamespaces": [],
+  "severity": "warning",
+  "alwaysAllowedProps": [
+    "key",
+    "ref",
+    "className",
+    "style",
+    "children"
+  ],
+  "sourceDirectories": [],
+  "publicEntries": [
+    "_ds_entry.js",
+    "index.js"
+  ],
+  "components": [],
+  "tokens": [
+    "--color-accent",
+    "--color-on-accent",
+    "--trail-radius"
+  ],
+  "tokenKinds": {
+    "--color-accent": "color",
+    "--color-on-accent": "color",
+    "--trail-radius": "radius"
+  },
+  "fontFamilies": []
+}

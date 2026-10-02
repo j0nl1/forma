@@ -1,0 +1,143 @@
+{
+  "suggest": {
+    "cohort": ["new sample users only"],
+    "window": ["last 24 hours", "weekends only"]
+  },
+  "views": [
+    {
+      "id": "reach-28d",
+      "label": "Action reach",
+      "asOf": "2026-10-01",
+      "basis": "100 active synthetic users in the same window",
+      "source": "Read overlay-observations.json (synthetic fixture). Select window = 'last 28 days'. For each action, divide its distinct sample-user count by active. Help has no matching measurement. This fixture is not production telemetry.",
+      "refreshable": true,
+      "sentence": {
+        "metric": "action reach",
+        "cohort": "all sample users",
+        "window": "last 28 days"
+      },
+      "finding": "In this synthetic 28-day fixture, the composer reaches 37% of active users and templates reach 28%.",
+      "meta": {
+        "range": "2026-09-04 - 2026-10-01",
+        "n": 100,
+        "unit": "active sample users",
+        "about": "independent action reach among active synthetic users"
+      },
+      "spectrum": {
+        "hue": "#376E53",
+        "domain": [0, 0.4],
+        "fmt": "pct"
+      },
+      "legend": true,
+      "dim": 0.25,
+      "elements": [
+        {
+          "id": "composer",
+          "value": 0.37,
+          "callout": {
+            "head": "Creation starts here",
+            "body": "37 of 100 active sample users used the composer."
+          }
+        },
+        {
+          "id": "templates",
+          "value": 0.28,
+          "callout": {
+            "head": "Templates are a second entry",
+            "body": "28 of 100 active sample users selected a template."
+          }
+        },
+        {
+          "id": "share",
+          "value": 0.12
+        },
+        {
+          "id": "export",
+          "value": 0.08
+        },
+        {
+          "id": "help",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "reach-7d",
+      "label": "Action reach",
+      "asOf": "2026-10-01",
+      "basis": "40 active synthetic users in the same window",
+      "source": "Read overlay-observations.json (synthetic fixture). Select window = 'last 7 days'. For each action, divide its distinct sample-user count by active. Help has no matching measurement. This fixture is not production telemetry.",
+      "refreshable": true,
+      "sentence": {
+        "metric": "action reach",
+        "cohort": "all sample users",
+        "window": "last 7 days"
+      },
+      "finding": "In this synthetic 7-day fixture, templates reach 35% of active users and the composer reaches 30%.",
+      "meta": {
+        "range": "2026-09-25 - 2026-10-01",
+        "n": 40,
+        "unit": "active sample users",
+        "about": "independent action reach among active synthetic users"
+      },
+      "spectrum": {
+        "hue": "#376E53",
+        "domain": [0, 0.4],
+        "fmt": "pct"
+      },
+      "legend": true,
+      "dim": 0.25,
+      "elements": [
+        {
+          "id": "composer",
+          "value": 0.3
+        },
+        {
+          "id": "templates",
+          "value": 0.35
+        },
+        {
+          "id": "share",
+          "value": 0.1
+        },
+        {
+          "id": "export",
+          "value": 0.15
+        },
+        {
+          "id": "help",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "output-28d",
+      "label": "Output actions",
+      "basis": "100 active synthetic users in the same window",
+      "asOf": "2026-10-01",
+      "source": "Read the last 28 days row of overlay-observations.json (synthetic fixture). Divide share and export distinct sample-user counts by active. These are independent counts, not a funnel.",
+      "sentence": {
+        "metric": "output actions",
+        "cohort": "all sample users",
+        "window": "last 28 days"
+      },
+      "finding": "In the synthetic 28-day fixture, 12% shared and 8% exported; these independent counts do not establish a conversion funnel.",
+      "spectrum": {
+        "colors": ["#F6F4EF", "#4E698D"],
+        "domain": [0, 0.15]
+      },
+      "legend": true,
+      "refreshable": true,
+      "elements": [
+        {
+          "id": "share",
+          "value": 0.12
+        },
+        {
+          "id": "export",
+          "value": 0.08
+        }
+      ]
+    }
+  ]
+}

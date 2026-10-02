@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "harbor",
+  "namespace": "CodexDS_harbor_2588e00d4db7",
+  "sourceNamespaces": [],
+  "severity": "warning",
+  "alwaysAllowedProps": [
+    "key",
+    "ref",
+    "className",
+    "style",
+    "children"
+  ],
+  "sourceDirectories": [
+    "components"
+  ],
+  "publicEntries": [
+    "_ds_entry.js",
+    "index.js"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "sourcePath": "components/index.jsx",
+      "sourceExport": "Button",
+      "props": [
+        {
+          "name": "children",
+          "optional": false,
+          "type": "ReactNode",
+          "resolvedType": "ReactNode",
+          "description": "",
+          "definedIn": "components/index.d.ts",
+          "line": 7
+        },
+        {
+          "name": "variant",
+          "optional": true,
+          "type": "Variant",
+          "resolvedType": "\"primary\" | \"quiet\" | undefined",
+          "description": "Visual emphasis.",
+          "values": [
+            "primary",
+            "quiet"
+          ],
+          "default": "primary",
+          "definedIn": "components/actions.d.ts",
+          "line": 5
+        },
+        {
+          "name": "disabled",
+          "optional": true,
+          "type": "boolean",
+          "resolvedType": "boolean | undefined",
+          "description": "",
+          "default": false,
+          "definedIn": "components/actions.d.ts",
+          "line": 7
+        },
+        {
+          "name": "onClick",
+          "optional": true,
+          "type": "onClick?(): void;",
+          "resolvedType": "(() => void) | undefined",
+          "description": "",
+          "definedIn": "components/actions.d.ts",
+          "line": 8
+        }
+      ],
+      "signatures": [],
+      "alternatives": [],
+      "openProps": false
+    },
+    {
+      "name": "Status",
+      "sourcePath": "components/index.jsx",
+      "sourceExport": "Status",
+      "props": [
+        {
+          "name": "children",
+          "optional": false,
+          "type": "ReactNode",
+          "resolvedType": "ReactNode",
+          "description": "",
+          "definedIn": "components/index.d.ts",
+          "line": 10
+        }
+      ],
+      "signatures": [],
+      "alternatives": [],
+      "openProps": false
+    }
+  ],
+  "tokens": [
+    "--color-accent",
+    "--color-ink",
+    "--color-on-accent",
+    "--color-paper",
+    "--font-body",
+    "--radius-control",
+    "--space-medium",
+    "--space-small"
+  ],
+  "tokenKinds": {
+    "--color-paper": "color",
+    "--color-ink": "color",
+    "--color-accent": "color",
+    "--color-on-accent": "color",
+    "--space-small": "spacing",
+    "--space-medium": "spacing",
+    "--radius-control": "radius",
+    "--font-body": "font"
+  },
+  "fontFamilies": []
+}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "declarations": {
+    "components/actions.d.ts": "export interface ActionProps<Variant extends string = \"primary\"> {\n  /** Visual emphasis.\n   * @default \"primary\"\n   */\n  variant?: Variant;\n  /** @default false */\n  disabled?: boolean;\n  onClick?(): void;\n}\n",
+    "components/index.d.ts": "import type { ReactNode } from \"react\";\nimport type { ActionProps } from \"./actions.js\";\n/** A deliberate reading-room action.\n * @startingPoint section=\"Actions\" subtitle=\"A reusable editorial control\" viewport=\"700x180\"\n */\nexport interface ButtonProps extends ActionProps<\"primary\" | \"quiet\"> {\n  children: ReactNode;\n}\nexport interface StatusProps {\n  children: ReactNode;\n}\n"
+  },
+  "components": [
+    {
+      "name": "Button",
+      "export": "Button",
+      "local": "Button",
+      "kind": "component",
+      "sourcePath": "components/index.jsx",
+      "contract": {
+        "name": "ButtonProps",
+        "description": "A deliberate reading-room action.",
+        "props": [
+          {
+            "name": "children",
+            "optional": false,
+            "type": "ReactNode",
+            "resolvedType": "ReactNode",
+            "description": "",
+            "definedIn": "components/index.d.ts",
+            "line": 7
+          },
+          {
+            "name": "variant",
+            "optional": true,
+            "type": "Variant",
+            "resolvedType": "\"primary\" | \"quiet\" | undefined",
+            "description": "Visual emphasis.",
+            "values": [
+              "primary",
+              "quiet"
+            ],
+            "default": "primary",
+            "definedIn": "components/actions.d.ts",
+            "line": 5
+          },
+          {
+            "name": "disabled",
+            "optional": true,
+            "type": "boolean",
+            "resolvedType": "boolean | undefined",
+            "description": "",
+            "default": false,
+            "definedIn": "components/actions.d.ts",
+            "line": 7
+          },
+          {
+            "name": "onClick",
+            "optional": true,
+            "type": "onClick?(): void;",
+            "resolvedType": "(() => void) | undefined",
+            "description": "",
+            "definedIn": "components/actions.d.ts",
+            "line": 8
+          }
+        ],
+        "signatures": [],
+        "declaration": "import type { ReactNode } from \"react\";\nimport type { ActionProps } from \"./actions.js\";\n/** A deliberate reading-room action.\n * @startingPoint section=\"Actions\" subtitle=\"A reusable editorial control\" viewport=\"700x180\"\n */\nexport interface ButtonProps extends ActionProps<\"primary\" | \"quiet\"> {\n  children: ReactNode;\n}\nexport interface StatusProps {\n  children: ReactNode;\n}\n",
+        "dependencies": [
+          "components/actions.d.ts"
+        ],
+        "path": "components/index.d.ts"
+      },
+      "usage": "Use Button for a deliberate action and Status for a short progress label.\n\nChoose `primary` for the main action and `quiet` for a supporting action. Set `disabled` when the action is unavailable. Provide meaningful children and an optional `onClick` callback. Use Status for concise, non-interactive feedback.\n",
+      "usagePath": "components/index.prompt.md",
+      "props": {
+        "children": "Create project"
+      }
+    },
+    {
+      "name": "Status",
+      "export": "Status",
+      "local": "Status",
+      "kind": "component",
+      "sourcePath": "components/index.jsx",
+      "contract": {
+        "name": "StatusProps",
+        "description": "",
+        "props": [
+          {
+            "name": "children",
+            "optional": false,
+            "type": "ReactNode",
+            "resolvedType": "ReactNode",
+            "description": "",
+            "definedIn": "components/index.d.ts",
+            "line": 10
+          }
+        ],
+        "signatures": [],
+        "declaration": "import type { ReactNode } from \"react\";\nimport type { ActionProps } from \"./actions.js\";\n/** A deliberate reading-room action.\n * @startingPoint section=\"Actions\" subtitle=\"A reusable editorial control\" viewport=\"700x180\"\n */\nexport interface ButtonProps extends ActionProps<\"primary\" | \"quiet\"> {\n  children: ReactNode;\n}\nexport interface StatusProps {\n  children: ReactNode;\n}\n",
+        "dependencies": [
+          "components/actions.d.ts"
+        ],
+        "path": "components/index.d.ts"
+      },
+      "usage": "Use Button for a deliberate action and Status for a short progress label.\n\nChoose `primary` for the main action and `quiet` for a supporting action. Set `disabled` when the action is unavailable. Provide meaningful children and an optional `onClick` callback. Use Status for concise, non-interactive feedback.\n",
+      "usagePath": "components/index.prompt.md",
+      "props": {
+        "children": "Ready to review"
+      }
+    }
+  ]
+}

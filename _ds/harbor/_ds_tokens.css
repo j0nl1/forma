@@ -1,0 +1,11 @@
+/* ../../.codex-artifacts/home/cerberus/Projects/codex-design/deployments/github-pages/site/design-system/tokens.css */
+:root {
+  --color-paper: #f6f4ee;
+  --color-ink: #202c39;
+  --color-accent: #275dad;
+  --color-on-accent: #ffffff;
+  --space-small: 8px;
+  --space-medium: 16px;
+  --radius-control: 6px;
+  --font-body: system-ui, sans-serif;
+}

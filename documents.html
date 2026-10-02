@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+  <head><script data-codex-fixed-sheet-runtime>(() => {
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __esm = (fn, res, err) => function __init() {
+    if (err) throw err[0];
+    try {
+      return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+    } catch (e) {
+      throw err = [e], e;
+    }
+  };
+
+  // skills/studio-design/assets/starters/document-model.js
+  function length(value, fallback = null) {
+    value = String(value ?? "").trim();
+    return value === "0" ? "0px" : /^\d+(?:\.\d+)?(?:px|in|mm|cm|pt|pc)$/.test(value) ? value : fallback;
+  }
+  function pixels(value) {
+    const match = /^(\d+(?:\.\d+)?)(px|in|mm|cm|pt|pc)$/.exec(
+      length(value) || ""
+    );
+    return match ? Number(match[1]) * units[match[2]] : NaN;
+  }
+  var papers, units;
+  var init_document_model = __esm({
+    "skills/studio-design/assets/starters/document-model.js"() {
+      papers = Object.freeze({
+        letter: ["8.5in", "11in"],
+        a4: ["210mm", "297mm"],
+        legal: ["8.5in", "14in"]
+      });
+      units = {
+        px: 1,
+        in: 96,
+        mm: 96 / 25.4,
+        cm: 96 / 2.54,
+        pt: 96 / 72,
+        pc: 16
+      };
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-model.js
+  function absolute(value, element, seen = /* @__PURE__ */ new Set()) {
+    const direct = pixels(length(value));
+    if (Number.isFinite(direct)) return direct;
+    const variable = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value.trim());
+    if (!variable || seen.has(variable[1])) return NaN;
+    seen.add(variable[1]);
+    return absolute(
+      getComputedStyle(element).getPropertyValue(variable[1]),
+      element,
+      seen
+    );
+  }
+  function rules(sheets, visit, seen = /* @__PURE__ */ new Set(), includeInactive = false) {
+    for (const sheet of sheets) {
+      if (!sheet || seen.has(sheet) || sheet.ownerNode?.hasAttribute("data-codex-injected") || sheet.disabled)
+        continue;
+      seen.add(sheet);
+      if (!includeInactive && sheet.media?.mediaText && !matchMedia(sheet.media.mediaText).matches)
+        continue;
+      let list;
+      try {
+        list = sheet.cssRules;
+      } catch {
+        continue;
+      }
+      walk(list);
+    }
+    function walk(list) {
+      for (const rule of list) {
+        if (rule.type === CSSRule.IMPORT_RULE)
+          rules([rule.styleSheet], visit, seen, includeInactive);
+        else if (rule.type === CSSRule.MEDIA_RULE) {
+          if (includeInactive || matchMedia(rule.conditionText).matches)
+            walk(rule.cssRules);
+        } else if (rule.type === CSSRule.SUPPORTS_RULE) {
+          if (CSS.supports(rule.conditionText)) walk(rule.cssRules);
+        } else {
+          visit(rule);
+          if (rule.cssRules) walk(rule.cssRules);
+        }
+      }
+    }
+  }
+  function fixedWidth(element) {
+    const used = parseFloat(getComputedStyle(element).width);
+    const matches = (value) => {
+      const px = absolute(value, element);
+      return px > 0 && Math.abs(px - used) < 0.1;
+    };
+    if (matches(element.style.width)) return true;
+    if (["svg", "canvas", "img", "table"].includes(element.localName)) {
+      const attribute = element.getAttribute("width") || "";
+      if (matches(/^\d+(?:\.\d+)?$/.test(attribute) ? `${attribute}px` : attribute))
+        return true;
+    }
+    let found = false;
+    rules(document.styleSheets, (rule) => {
+      try {
+        if (rule.selectorText && element.matches(rule.selectorText) && matches(rule.style.width))
+          found = true;
+      } catch {
+      }
+    });
+    return found;
+  }
+  function authoredPageRule() {
+    let found = false;
+    rules(
+      document.styleSheets,
+      (rule) => {
+        if (rule.type === CSSRule.PAGE_RULE && (rule.style.size || rule.style.margin))
+          found = true;
+      },
+      /* @__PURE__ */ new Set(),
+      true
+    );
+    return found;
+  }
+  function findFixedSheet() {
+    if (document.querySelector(sheetOwners) || document.querySelector(
+      'meta[name="design_doc_mode"][content="canvas"],meta[name="codex-fixed-sheet"][content="off"]'
+    ) || window.codexTimeline || window.__animStage)
+      return { reason: "owned", root: null };
+    const visible = [...document.body.children].filter(
+      (node) => !node.matches(sheetChrome) && getComputedStyle(node).display !== "none"
+    );
+    const marked = visible.filter(
+      (node) => node.hasAttribute("data-fixed-sheet")
+    );
+    const root = marked.length === 1 ? marked[0] : visible.length === 1 ? visible[0] : null;
+    if (root && fixedWidth(root)) return { reason: "fixed", root };
+    if (!marked.length && fixedWidth(document.body))
+      return { reason: "fixed", root: document.body };
+    return { reason: visible.length > 1 ? "ambiguous" : "fluid", root: null };
+  }
+  function sheetBox(element) {
+    const style = getComputedStyle(element);
+    const extra = (names) => names.reduce((sum, name) => sum + (parseFloat(style[name]) || 0), 0);
+    const borderBox = style.boxSizing === "border-box";
+    const width = parseFloat(style.width) + (borderBox ? 0 : extra([
+      "paddingLeft",
+      "paddingRight",
+      "borderLeftWidth",
+      "borderRightWidth"
+    ]));
+    const height = parseFloat(style.height) + (borderBox ? 0 : extra([
+      "paddingTop",
+      "paddingBottom",
+      "borderTopWidth",
+      "borderBottomWidth"
+    ]));
+    const zoom = Number(style.zoom) || 1;
+    return width > 0 && height > 0 && [width, height, zoom].every(Number.isFinite) ? { width, height, zoom } : null;
+  }
+  var sheetOwners, sheetChrome;
+  var init_fixed_sheet_model = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-model.js"() {
+      init_document_model();
+      sheetOwners = "doc-page,design-canvas,deck-stage,motion-stage,three-d-stage,three-stage,chart-stage,social-frames,file-window,ios-shell,chrome-shell,post-card,instagram-story,x-shell,instagram-shell,tiktok-shell,facebook-shell,linkedin-shell,pinterest-shell,reddit-shell,youtube-shell";
+      sheetChrome = "script,style,link,meta,template,[hidden],[data-doc-controls],[data-codex-chrome],text-editor";
+    }
+  });
+
+  // skills/studio-design/assets/starters/document-style.js
+  var printHygiene;
+  var init_document_style = __esm({
+    "skills/studio-design/assets/starters/document-style.js"() {
+      printHygiene = `
+@media print{
+html,body{margin:0!important;padding:0!important;background:none!important;height:auto!important;overflow:visible!important}
+h1,h2,h3,h4,h5,h6{break-after:avoid}figure,pre,blockquote,img,svg,tr{break-inside:avoid}p,li{orphans:3;widows:3}
+*{print-color-adjust:exact;-webkit-print-color-adjust:exact;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+*,*::before,*::after{animation-delay:-99s!important;animation-duration:.001s!important;animation-iteration-count:1!important;animation-fill-mode:both!important;animation-play-state:running!important;transition-duration:0s!important}
+[data-doc-controls],design-controls{display:none!important}
+}
+`;
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet-runtime.js
+  var fixed_sheet_runtime_exports = {};
+  var init_fixed_sheet_runtime = __esm({
+    "skills/studio-design/assets/starters/fixed-sheet-runtime.js"() {
+      init_fixed_sheet_model();
+      init_document_style();
+      if (!window.CodexFixedSheet) {
+        let schedule = function() {
+          if (!frame)
+            frame = requestAnimationFrame(() => {
+              frame = void 0;
+              refresh();
+            });
+        }, selector = function() {
+          return root === document.body ? "body" : `body>:nth-child(${[...document.body.children].indexOf(root) + 1})`;
+        }, restoreOverlays = function() {
+          if (!document.documentElement.hasAttribute("data-codex-plain-canvas"))
+            for (const overlay of overlays) {
+              if (overlay.parentNode === document.documentElement)
+                document.body.append(overlay);
+            }
+          overlays.clear();
+        }, refresh = function() {
+          if (refreshing || printing || media.matches || !document.body) return;
+          refreshing = true;
+          screen.textContent = "";
+          print.textContent = "";
+          screen.remove();
+          print.remove();
+          const found = findFixedSheet();
+          reason = found.reason;
+          if (found.root !== root) {
+            restoreOverlays();
+            resize.disconnect();
+            root = found.root;
+            if (root) {
+              resize.observe(root);
+              if (root.parentElement) resize.observe(root.parentElement);
+            }
+          }
+          box = root && sheetBox(root);
+          scale = 1;
+          if (box) {
+            document.head.append(screen, print);
+            const own = selector();
+            const width = box.width * box.zoom, height = box.height * box.zoom;
+            if (mode === "fit") {
+              const bodyStyle = getComputedStyle(document.body);
+              const horizontal = [
+                "marginLeft",
+                "marginRight",
+                "paddingLeft",
+                "paddingRight"
+              ].reduce((sum, name) => sum + (parseFloat(bodyStyle[name]) || 0), 0);
+              const top = root.getBoundingClientRect().top + scrollY;
+              const leading = top >= 0 && top < innerHeight ? top : 0;
+              scale = Math.min(
+                Math.max(1, innerWidth - horizontal) / width,
+                Math.max(
+                  1,
+                  innerHeight - leading - (parseFloat(bodyStyle.paddingBottom) || 0)
+                ) / height
+              );
+              screen.textContent = `@media screen{${own}{zoom:${box.zoom * scale}}}`;
+            }
+            const page = authoredPageRule() ? "" : `@page{size:${width}px ${height}px;margin:0}`;
+            const siblings = root === document.body ? "" : `body>:not(:nth-child(${[...document.body.children].indexOf(root) + 1})){display:none!important}`;
+            const padding = root === document.body ? `padding:${getComputedStyle(root).padding}!important;` : "";
+            const block = {
+              inline: "block",
+              "inline-block": "flow-root",
+              "inline-flex": "flex",
+              "inline-grid": "grid",
+              "inline-table": "table"
+            }[getComputedStyle(root).display];
+            const display = block ? `display:${block}!important;` : "";
+            const hygiene = printHygiene.replace("background:none!important;", "");
+            print.textContent = `${page}${hygiene}@media print{html,body{margin:0!important;padding:0!important}${siblings}${own}{box-sizing:border-box!important;width:${box.width}px!important;height:${box.height}px!important;margin:0!important;overflow:hidden!important;contain:strict!important;${padding}${display}}}`;
+            if (root === document.body)
+              for (const overlay of document.body.querySelectorAll(
+                ":scope > text-editor[data-codex-injected],:scope > [data-codex-tweaks-chrome]"
+              )) {
+                overlays.add(overlay);
+                document.documentElement.append(overlay);
+              }
+          } else restoreOverlays();
+          mutation.takeRecords();
+          refreshing = false;
+        };
+        const screen = document.createElement("style"), print = document.createElement("style");
+        for (const node of [screen, print]) node.dataset.codexInjected = "";
+        screen.dataset.codexSheetPreview = "";
+        print.dataset.codexSheetPrint = "";
+        let frame, root, box, reason = "fluid", scale = 1, mode = "fit", printing = false, refreshing = false;
+        const media = matchMedia("print");
+        const events = new AbortController();
+        const resize = new ResizeObserver(schedule);
+        const mutation = new MutationObserver((records) => {
+          if (records.some(
+            (record) => record.target !== screen && record.target !== print && record.target.parentNode !== screen && record.target.parentNode !== print
+          ))
+            schedule();
+        });
+        const overlays = /* @__PURE__ */ new Set();
+        const api = {
+          get root() {
+            return root;
+          },
+          get reason() {
+            return reason;
+          },
+          get dimensions() {
+            return box ? { width: box.width * box.zoom, height: box.height * box.zoom } : null;
+          },
+          get previewScale() {
+            return printing || media.matches ? 1 : scale;
+          },
+          setPreview(value) {
+            if (!["fit", "actual-size"].includes(value))
+              throw new Error("Preview must be fit or actual-size.");
+            mode = value;
+            refresh();
+          },
+          refresh,
+          async preparePrint() {
+            await document.fonts?.ready;
+            refresh();
+            printing = true;
+            return !!box && !authoredPageRule();
+          },
+          restorePrint() {
+            printing = false;
+            schedule();
+          },
+          destroy() {
+            events.abort();
+            resize.disconnect();
+            mutation.disconnect();
+            cancelAnimationFrame(frame);
+            screen.remove();
+            print.remove();
+            restoreOverlays();
+            delete window.CodexFixedSheet;
+          }
+        };
+        window.CodexFixedSheet = api;
+        window.addEventListener("resize", schedule, { signal: events.signal });
+        window.addEventListener(
+          "beforeprint",
+          () => {
+            refresh();
+            printing = true;
+          },
+          { signal: events.signal }
+        );
+        window.addEventListener("afterprint", () => api.restorePrint(), {
+          signal: events.signal
+        });
+        media.addEventListener(
+          "change",
+          () => {
+            if (!media.matches) api.restorePrint();
+          },
+          { signal: events.signal }
+        );
+        document.fonts?.addEventListener("loadingdone", schedule, {
+          signal: events.signal
+        });
+        mutation.observe(document.documentElement, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+          characterData: true
+        });
+      }
+    }
+  });
+
+  // skills/studio-design/assets/starters/fixed-sheet.js
+  window.CodexFixedSheetReady = Promise.resolve().then(() => (init_fixed_sheet_runtime(), fixed_sheet_runtime_exports)).then(
+    async () => {
+      if (document.readyState === "loading")
+        await new Promise(
+          (resolve) => document.addEventListener("DOMContentLoaded", resolve, { once: true })
+        );
+      await document.fonts?.ready;
+      window.CodexFixedSheet.refresh();
+    }
+  );
+})();
+</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Paper laboratory — Studio Design</title>
+    <style>
+      body {
+        margin: 0;
+        color: #263c34;
+        background: #f5f5f4;
+        font: 15px/1.6 system-ui;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .controls {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 20px;
+        background: #fffdf8;
+        border-bottom: 1px solid #d1d7ce;
+      }
+      .controls a {
+        color: inherit;
+        margin-right: auto;
+      }
+      .controls label {
+        font-size: 12px;
+      }
+      .controls select,
+      .controls button {
+        padding: 7px 10px;
+        border: 1px solid #b2bdb2;
+        border-radius: 5px;
+        background: white;
+        color: inherit;
+        font: inherit;
+      }
+      .instructions {
+        margin: 0;
+        padding: 18px 24px 0;
+        max-width: 70em;
+        font-size: 13px;
+      }
+      doc-page {
+        font:
+          15px/1.65 Georgia,
+          serif;
+        color: #243c34;
+      }
+      h1 {
+        font:
+          42px/1.08 Georgia,
+          serif;
+        font-weight: 400;
+      }
+      h2 {
+        font:
+          24px/1.2 Georgia,
+          serif;
+        font-weight: 400;
+      }
+      p {
+        margin: 1em 0;
+      }
+      .eyebrow {
+        font: 11px/1.5 system-ui;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .running {
+        font: 11px/1.5 system-ui;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid #c7d2c6;
+      }
+      .footer {
+        font: 11px/1.5 system-ui;
+        color: #647263;
+      }
+      .page {
+        padding: 5%;
+        font-family: system-ui;
+      }
+      .flier {
+        background: #e4efd7;
+        color: #264638;
+      }
+      .flier h1 {
+        font-size: 10cqh;
+        line-height: 1;
+      }
+      .flier .event {
+        font-size: 3cqh;
+      }
+      .flier .circle {
+        width: 24cqh;
+        height: 24cqh;
+        border-radius: 50%;
+        background: #d5ab65;
+        margin: 4cqh 0;
+      }
+      .brochure {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 0;
+        background: #faf7ed;
+      }
+      .brochure article {
+        position: relative;
+        padding: 8%;
+        border-right: 1px dashed #8e9d90;
+      }
+      .brochure article:last-child {
+        border: 0;
+        background: #234b3d;
+        color: #faf7ed;
+      }
+      .brochure h1 {
+        font-size: 7cqh;
+      }
+      .brochure h2 {
+        font-size: 5cqh;
+      }
+      .brochure p {
+        font-size: 2.7cqh;
+      }
+      .poster {
+        padding: 6%;
+        background: #234b3d;
+        color: #fffaf0;
+      }
+      .poster h1 {
+        font-size: 14cqh;
+      }
+      .poster p {
+        font-size: 4cqh;
+      }
+      .fit-design {
+        position: relative;
+        width: 1400px;
+        height: 990px;
+        padding: 80px;
+        background: #e4efd7;
+      }
+      .fit-design h1 {
+        font-size: 120px;
+        max-width: 7em;
+      }
+      .fit-design .bottom {
+        position: absolute;
+        left: 80px;
+        bottom: 60px;
+        font: 28px system-ui;
+      }
+      @media print {
+        .brochure article {
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="controls"
+      data-doc-controls
+      aria-label="Document preview controls"
+    >
+      <a href="index.html">← All studies</a>
+      <label
+        >Layout
+        <select id="mode">
+          <option value="flow">Flowing report</option>
+          <option value="flier">One-page flier</option>
+          <option value="brochure">Two-sided trifold</option>
+          <option value="poster">True-size poster</option>
+          <option value="fit">Fit a fixed design</option>
+        </select></label
+      >
+      <label
+        >Paper
+        <select id="paper">
+          <option value="letter">Letter</option>
+          <option value="a4">A4</option>
+          <option value="legal">Legal</option>
+        </select></label
+      >
+      <button id="print">Print / Save PDF</button>
+      <label id="preview-choice" hidden
+        ><input id="actual-size" type="checkbox" /> Actual-size preview</label
+      >
+    </nav>
+    <p class="instructions" data-doc-controls id="instructions">
+      Flowing text uses your chosen paper at print. Running headers and footers
+      repeat on every sheet. Sample content describes a fictional study.
+    </p>
+    <doc-page></doc-page>
+    <template id="flow">
+      <header class="running" slot="header">
+        HARBOR / DESIGN RECORD · SYNTHETIC STUDY
+      </header>
+      <h1>A clearer place to return.</h1>
+      <p class="eyebrow">15 / Paper laboratory</p>
+      <p>
+        This fictional reading-product study demonstrates a flowing document.
+        Its content is illustrative, not research evidence or a claim about real
+        users.
+      </p>
+      <h2>The purpose</h2>
+      <p>
+        Help a reader save an article, give it a useful name and find it again.
+        The product's main screen should make the next action visible without
+        competing with the collection itself.
+      </p>
+      <h2>Content and structure</h2>
+      <p>
+        Each saved item includes its title, source, reading state and a short
+        note. An explicit empty state explains how to begin, and errors retain
+        the user's input. The layout should accommodate long titles and larger
+        text.
+      </p>
+      <h2>Interaction</h2>
+      <p>
+        Keyboard focus follows the visible reading order. Filters expose their
+        selected state, and clearing them restores the full collection. A reader
+        can return from an article to the same place in the list.
+      </p>
+      <h2>Review the complete flow</h2>
+      <p>
+        Exercise creation, validation, editing, search and recovery before
+        evaluating individual screens. An attractive first screen does not
+        establish that the whole experience works.
+      </p>
+      <h2>Print as a real document</h2>
+      <p>
+        Paragraphs flow across sheets using the selected physical paper. Running
+        content stays separate from the body. Tables need header rows, figures
+        need captions and short grouped notes should stay together.
+      </p>
+      <h2 style="break-before: page">Verification appendix</h2>
+      <p>
+        This section intentionally starts a new page. Check that its running
+        header and footer remain visible, and that the preceding text is not
+        duplicated or truncated.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th align="left">Scenario</th>
+            <th align="left">Expected result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Empty collection</td>
+            <td>One clear first action</td>
+          </tr>
+          <tr>
+            <td>Invalid input</td>
+            <td>Retained text and a precise error</td>
+          </tr>
+          <tr>
+            <td>Long title</td>
+            <td>Readable wrapping</td>
+          </tr>
+          <tr>
+            <td>Keyboard return</td>
+            <td>Restored focus</td>
+          </tr>
+        </tbody>
+      </table>
+      <footer class="footer" slot="footer">
+        Illustrative content · Local HTML · Original scale
+      </footer>
+    </template>
+    <template id="flier"
+      ><section class="page flier">
+        <p class="eyebrow">Fictional community event</p>
+        <h1>Bring a book.<br />Leave with a story.</h1>
+        <div class="circle" aria-hidden="true"></div>
+        <p class="event">
+          Reading exchange<br />Saturday · 11:00–14:00<br />Harbor Hall · Free
+          entry
+        </p>
+        <p>Demonstration copy only. No real event or booking is advertised.</p>
+      </section></template
+    >
+    <template id="brochure"
+      ><section class="page brochure">
+        <article>
+          <p class="eyebrow">Outside / Inside flap</p>
+          <h2>Start with one good article.</h2>
+          <p>
+            Keep its source, add a short note and return when you have time.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Outside / Back cover</p>
+          <h2>A fictional reading room.</h2>
+          <p>
+            Illustrative product content. This brochure demonstrates panel
+            order, page geometry and print-safe design.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Outside / Front cover</p>
+          <h1>Keep what stays with you.</h1>
+          <p>Harbor / Reading room</p>
+        </article>
+      </section>
+      <section class="page brochure">
+        <article>
+          <p class="eyebrow">Inside / Left</p>
+          <h2>Collect.</h2>
+          <p>
+            Save an article with its original source and a title that remains
+            readable.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Inside / Middle</p>
+          <h2>Connect.</h2>
+          <p>Add a note explaining what you want to remember.</p>
+        </article>
+        <article>
+          <p class="eyebrow">Inside / Right</p>
+          <h2>Return.</h2>
+          <p>Find the idea again through a quiet, useful collection.</p>
+        </article>
+      </section></template
+    >
+    <template id="poster"
+      ><section class="page poster">
+        <p class="eyebrow">Explicit 22 × 30 in design</p>
+        <h1>Room<br />to read.</h1>
+        <p>A fictional poster.<br />Printed at its actual dimensions.</p>
+      </section></template
+    >
+    <template id="fit"
+      ><div class="fit-design">
+        <p class="eyebrow">Authored at 1400 × 990 px</p>
+        <h1>One design.<br />A different sheet.</h1>
+        <p class="bottom">
+          Scaled to the printable area · Full composition retained
+        </p>
+      </div></template
+    >
+    <script src="starters/document.js"></script>
+    <script src="documents.js"></script>
+  </body>
+</html>

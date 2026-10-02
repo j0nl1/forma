@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "name": "Harbor",
+  "slug": "harbor",
+  "namespace": "CodexDS_harbor_2588e00d4db7",
+  "sourceNamespaces": [],
+  "reactVersion": "19.2.4",
+  "runtimeDeclarations": [],
+  "tokens": {
+    "--color-paper": "#f6f4ee",
+    "--color-ink": "#202c39",
+    "--color-accent": "#275dad",
+    "--color-on-accent": "#ffffff",
+    "--space-small": "8px",
+    "--space-medium": "16px",
+    "--radius-control": "6px",
+    "--font-body": "system-ui, sans-serif"
+  },
+  "tokenDetails": [
+    {
+      "name": "--color-paper",
+      "value": "#f6f4ee",
+      "definedIn": "tokens.css",
+      "line": 2,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#f6f4ee"
+    },
+    {
+      "name": "--color-ink",
+      "value": "#202c39",
+      "definedIn": "tokens.css",
+      "line": 3,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#202c39"
+    },
+    {
+      "name": "--color-accent",
+      "value": "#275dad",
+      "definedIn": "tokens.css",
+      "line": 4,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#275dad"
+    },
+    {
+      "name": "--color-on-accent",
+      "value": "#ffffff",
+      "definedIn": "tokens.css",
+      "line": 5,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "color",
+      "resolvedValue": "#ffffff"
+    },
+    {
+      "name": "--space-small",
+      "value": "8px",
+      "definedIn": "tokens.css",
+      "line": 6,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "spacing",
+      "resolvedValue": "8px"
+    },
+    {
+      "name": "--space-medium",
+      "value": "16px",
+      "definedIn": "tokens.css",
+      "line": 7,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "kind": "spacing",
+      "resolvedValue": "16px"
+    },
+    {
+      "name": "--radius-control",
+      "value": "6px",
+      "definedIn": "tokens.css",
+      "line": 8,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "annotation": "radius",
+      "kind": "radius",
+      "resolvedValue": "6px"
+    },
+    {
+      "name": "--font-body",
+      "value": "system-ui, sans-serif",
+      "definedIn": "tokens.css",
+      "line": 9,
+      "column": 3,
+      "selector": ":root",
+      "conditions": [],
+      "annotation": "font",
+      "kind": "font",
+      "resolvedValue": "system-ui, sans-serif"
+    }
+  ],
+  "tokenKinds": {
+    "color": 4,
+    "spacing": 2,
+    "radius": 1,
+    "font": 1
+  },
+  "unclassified": [],
+  "fonts": [],
+  "brandFonts": [],
+  "warnings": [
+    "External type dependency is unavailable: react (in components/index.d.ts). Localize its declarations to resolve the full contract.",
+    "components/index.d.ts:1:32: Cannot find module 'react' or its corresponding type declarations."
+  ],
+  "globalCssPaths": [
+    "tokens.css"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "export": "Button",
+      "local": "Button",
+      "kind": "component",
+      "sourcePath": "components/index.jsx",
+      "contract": {
+        "name": "ButtonProps",
+        "description": "A deliberate reading-room action.",
+        "props": [
+          {
+            "name": "children",
+            "optional": false,
+            "type": "ReactNode",
+            "resolvedType": "ReactNode",
+            "description": "",
+            "definedIn": "components/index.d.ts",
+            "line": 7
+          },
+          {
+            "name": "variant",
+            "optional": true,
+            "type": "Variant",
+            "resolvedType": "\"primary\" | \"quiet\" | undefined",
+            "description": "Visual emphasis.",
+            "values": [
+              "primary",
+              "quiet"
+            ],
+            "default": "primary",
+            "definedIn": "components/actions.d.ts",
+            "line": 5
+          },
+          {
+            "name": "disabled",
+            "optional": true,
+            "type": "boolean",
+            "resolvedType": "boolean | undefined",
+            "description": "",
+            "default": false,
+            "definedIn": "components/actions.d.ts",
+            "line": 7
+          },
+          {
+            "name": "onClick",
+            "optional": true,
+            "type": "onClick?(): void;",
+            "resolvedType": "(() => void) | undefined",
+            "description": "",
+            "definedIn": "components/actions.d.ts",
+            "line": 8
+          }
+        ],
+        "signatures": [],
+        "declaration": "import type { ReactNode } from \"react\";\nimport type { ActionProps } from \"./actions.js\";\n/** A deliberate reading-room action.\n * @startingPoint section=\"Actions\" subtitle=\"A reusable editorial control\" viewport=\"700x180\"\n */\nexport interface ButtonProps extends ActionProps<\"primary\" | \"quiet\"> {\n  children: ReactNode;\n}\nexport interface StatusProps {\n  children: ReactNode;\n}\n",
+        "dependencies": [
+          "components/actions.d.ts"
+        ],
+        "path": "components/index.d.ts"
+      },
+      "usage": "Use Button for a deliberate action and Status for a short progress label.\n\nChoose `primary` for the main action and `quiet` for a supporting action. Set `disabled` when the action is unavailable. Provide meaningful children and an optional `onClick` callback. Use Status for concise, non-interactive feedback.\n",
+      "usagePath": "components/index.prompt.md",
+      "props": {
+        "children": "Create project"
+      }
+    },
+    {
+      "name": "Status",
+      "export": "Status",
+      "local": "Status",
+      "kind": "component",
+      "sourcePath": "components/index.jsx",
+      "contract": {
+        "name": "StatusProps",
+        "description": "",
+        "props": [
+          {
+            "name": "children",
+            "optional": false,
+            "type": "ReactNode",
+            "resolvedType": "ReactNode",
+            "description": "",
+            "definedIn": "components/index.d.ts",
+            "line": 10
+          }
+        ],
+        "signatures": [],
+        "declaration": "import type { ReactNode } from \"react\";\nimport type { ActionProps } from \"./actions.js\";\n/** A deliberate reading-room action.\n * @startingPoint section=\"Actions\" subtitle=\"A reusable editorial control\" viewport=\"700x180\"\n */\nexport interface ButtonProps extends ActionProps<\"primary\" | \"quiet\"> {\n  children: ReactNode;\n}\nexport interface StatusProps {\n  children: ReactNode;\n}\n",
+        "dependencies": [
+          "components/actions.d.ts"
+        ],
+        "path": "components/index.d.ts"
+      },
+      "usage": "Use Button for a deliberate action and Status for a short progress label.\n\nChoose `primary` for the main action and `quiet` for a supporting action. Set `disabled` when the action is unavailable. Provide meaningful children and an optional `onClick` callback. Use Status for concise, non-interactive feedback.\n",
+      "usagePath": "components/index.prompt.md",
+      "props": {
+        "children": "Ready to review"
+      }
+    }
+  ],
+  "examples": [],
+  "startingPoints": [
+    {
+      "name": "Reading room",
+      "path": "_ds_seed_reading-room.html",
+      "kind": "screen",
+      "sourcePath": "seeds/reading-room.html",
+      "previewPath": "_ds_seed_reading-room.html"
+    },
+    {
+      "name": "Button",
+      "component": "Button",
+      "path": "components/index.jsx",
+      "kind": "component",
+      "section": "Actions",
+      "subtitle": "A reusable editorial control",
+      "viewport": "700x180",
+      "previewPath": "_ds_card_0_editorial-actions.html",
+      "sourcePath": "components/index.jsx"
+    }
+  ],
+  "cards": [
+    {
+      "path": "_ds_card_0_editorial-actions.html",
+      "group": "Components",
+      "name": "Editorial actions",
+      "subtitle": "Primary, quiet and disabled controls",
+      "viewport": "700x180",
+      "sourcePath": "components/buttons.html"
+    }
+  ],
+  "contracts": "_ds_contracts.json",
+  "adherence": "_ds_adherence.json",
+  "moduleEntry": "_ds_entry.js",
+  "guidance": "Use warm paper surfaces, dark ink, and a single blue accent. Favor compact editorial layouts and quiet borders.",
+  "css": "_ds_tokens.css",
+  "bundle": "_ds_bundle.js",
+  "artifacts": {
+    "_ds_card_0_editorial-actions.html": "eb3a61245849fdd799638f5dbafa945c9cc2d4124535e8f0f30af95d80d40c24",
+    "_ds_seed_reading-room.html": "3bd6082761e62d738b526e49a98944e301f79346d7215389e550748be4ae8ed3",
+    "_ds_tokens.css": "81e0e145dd7f94c5c475f9bbff8ddde9fe1a86154cbe581f2014945cca55fdab",
+    "_ds_contracts.json": "c8963a207f1a57806a75176aa0d624aebda7fc3f9e53974233dda9b405fb447f",
+    "_ds_adherence.json": "5330b2a540ce708908ef4853092b332b0b684974747bbdc4e5dfde4cf2ee7b46",
+    "_ds_entry.js": "30ce33656e1d0a4fd67d7477c88aefbe69159bf52c0b9f919fec6c3259c86092",
+    "_ds_bundle.js": "d6f24f1c4bce5e3c51db136075e2ba7f695a1065da8e35c136ca91216859e1da",
+    "_ds_review.json": "36e2b03812f1305e2bfa51e815d01ac61e465319254db1153fe3c955bfa31b2b"
+  },
+  "review": "_ds_review.json"
+}
