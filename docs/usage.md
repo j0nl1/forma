@@ -135,11 +135,12 @@ Run `adherence.mjs <compiled-system-or-bound-project> <source-file-or-folder>` t
 node skills/codex-design/scripts/figma.mjs outline /path/to/reference.fig
 node skills/codex-design/scripts/figma.mjs mount /path/to/reference.fig /tmp/fig-reference
 node skills/codex-design/scripts/figma.mjs render /path/to/reference.fig /tmp/frame.html --node 1:2
-node skills/codex-design/scripts/figma.mjs materialize /path/to/reference.fig /tmp/fig-components --node "Button"
+node skills/codex-design/scripts/figma.mjs materialize /path/to/reference.fig /tmp/fig-node --node "Button"
+node skills/codex-design/scripts/figma.mjs components /path/to/reference.fig /tmp/fig-components --node "Button"
 node skills/codex-design/scripts/figma.mjs design-system /path/to/reference.fig /tmp/fig-system
 ```
 
-Use exact names or node ids. Ambiguous names and existing destinations fail. Inventory and mount preserve raw properties; render supports a documented subset. Read returned warnings and compare a real Figma export when fidelity matters.
+Use exact names or node ids. Ambiguous names and existing destinations fail. Inventory and mount preserve raw properties; materialize writes selected HTML and tokens. The components command emits editable React JSX and sibling declarations; design-system includes these modules alongside static examples. Read components.json for names, defaults and variant props, then import the emitted JSX into a local React build. Render and component geometry support the contracts and limitations in the [Figma import guide](../skills/codex-design/references/imports.md). Read returned warnings and compare a real Figma export when fidelity matters.
 
 ## Exports
 

@@ -118,8 +118,9 @@ function shapes(doc, node, parent, warnings, depth = 0) {
       node.type,
     )
   ) {
-    warn("vector mask has no saved fill geometry; visual review required");
-    return [];
+    warn(
+      "vector mask has no saved fill geometry; using source box contour fallback when size is positive",
+    );
   }
   const w = finite(node.size?.x),
     h = finite(node.size?.y);

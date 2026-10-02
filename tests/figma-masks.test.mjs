@@ -43,12 +43,12 @@ function fixtureBytes() {
     struct Guid{uint sessionID;uint localID;} struct Vec{float x;float y;}
     struct Parent{Guid guid;string position;} struct Color{float r;float g;float b;float a;}
     struct Matrix{float m00;float m01;float m02;float m10;float m11;float m12;}
-    message Paint{string type=1;Color color=2;}
+    message Paint{string type=1;Color color=2;float opacity=3;}
     message Geometry{uint commandsBlob=1;string windingRule=2;}
     message Glyph{uint commandsBlob=1;Vec position=2;float fontSize=3;float rotation=4;}
     message TextData{Glyph[] glyphs=1;}
     message Blob{byte[] bytes=1;}
-    message Node{Guid guid=1;Parent parentIndex=2;NodeType type=3;string name=4;Vec size=5;Matrix transform=6;Paint[] fillPaints=7;Geometry[] fillGeometry=8;bool mask=9;bool visible=10;float cornerRadius=11;TextData derivedTextData=12;bool isMask=13;string maskType=14;}
+    message Node{Guid guid=1;Parent parentIndex=2;NodeType type=3;string name=4;Vec size=5;Matrix transform=6;Paint[] fillPaints=7;Geometry[] fillGeometry=8;bool mask=9;bool visible=10;float cornerRadius=11;TextData derivedTextData=12;bool isMask=13;string maskType=14;float opacity=15;}
     message Message{Node[] nodeChanges=1;Blob[] blobs=2;}
   `);
   const guid = (id) => ({ sessionID: 1, localID: id });
@@ -79,9 +79,18 @@ function fixtureBytes() {
       size: { x: 580, y: 380 },
       fillPaints: [{ type: "SOLID", color: color(1, 1, 1) }],
     },
-    mask(2, 20, 20, { type: "ELLIPSE" }),
+    mask(2, 20, 20, {
+      type: "ELLIPSE",
+      maskType: "ALPHA",
+      opacity: 0,
+      fillPaints: [{ type: "SOLID", color: red, opacity: 0 }],
+    }),
     paint(3, blue),
-    mask(4, 120, 20, { cornerRadius: 16 }),
+    mask(4, 120, 20, {
+      cornerRadius: 16,
+      maskType: "LUMINANCE",
+      fillPaints: [{ type: "SOLID", color: color(0, 0, 0) }],
+    }),
     paint(5, red),
     mask(6, 220, 20, { type: "VECTOR", fillGeometry: [{ commandsBlob: 0 }] }),
     paint(7, blue),
@@ -117,12 +126,17 @@ function fixtureBytes() {
     mask(16, 320, 150, { type: "VECTOR" }),
     paint(17, red, {
       transform: { ...identity, m02: 320, m12: 150 },
-      size: { x: 80, y: 80 },
+      size: { x: 120, y: 80 },
     }),
     mask(18, 420, 150, { type: "ELLIPSE" }),
     paint(19, green),
     mask(20, 420, 250, { isMask: true, mask: false }),
     paint(21, blue),
+    mask(24, 20, 250, { type: "VECTOR", size: { x: 0, y: 0 } }),
+    paint(25, yellow, {
+      transform: { ...identity, m02: 20, m12: 250 },
+      size: { x: 80, y: 80 },
+    }),
     node(22, 0, 0, {
       parentIndex: { guid: guid(8), position: "a" },
       size: { x: 20, y: 40 },
@@ -208,7 +222,7 @@ function reference() {
   for (const [i, [shape, fill]] of groups.entries())
     content += `<svg width="0" height="0" style="position:absolute"><defs><clipPath id="r${i}" clipPathUnits="userSpaceOnUse">${shape}</clipPath></defs></svg><div style="position:absolute;inset:0;clip-path:url(#r${i})"><div style="position:absolute;width:580px;height:380px;background:${fill}"></div></div>`;
   content +=
-    '<div style="position:absolute;left:220px;top:150px;width:80px;height:80px;background:yellow"></div><div style="position:absolute;left:320px;top:150px;width:80px;height:80px;background:red"></div>';
+    '<div style="position:absolute;left:220px;top:150px;width:80px;height:80px;background:yellow"></div><div style="position:absolute;left:320px;top:150px;width:80px;height:80px;background:red"></div><div style="position:absolute;left:20px;top:250px;width:80px;height:80px;background:yellow"></div>';
   return (
     '<!doctype html><html lang="en"><meta name="codex-fixed-sheet" content="off"><style>body{margin:24px;background:#edf0f4}#board{position:relative;width:580px;height:380px;background:white}</style><div id="board">' +
     content +
@@ -237,7 +251,7 @@ test("sibling mask grouping preserves hidden boundaries and reports missing cont
     before = await fs.readFile(file),
     doc = await loadFig(file),
     result = renderDocument(doc, select(doc, "1:1"));
-  assert.equal((result.html.match(/data-figma-mask-group=/g) || []).length, 8);
+  assert.equal((result.html.match(/data-figma-mask-group=/g) || []).length, 9);
   assert.ok(!result.html.includes('data-figma-id="1:2"'));
   assert.ok(!result.html.includes('data-figma-id="1:14"'));
   assert.ok(result.html.includes('data-figma-id="1:15"'));
@@ -247,6 +261,15 @@ test("sibling mask grouping preserves hidden boundaries and reports missing cont
     /mask has no usable geometry; rendering siblings unmasked/,
   );
   assert.ok(!result.warnings.some((w) => /mask needs visual review/.test(w)));
+  assert.match(
+    result.warnings.join("\n"),
+    /1:16: vector mask.*box contour fallback/,
+  );
+  assert.match(result.warnings.join("\n"), /1:24: mask has no usable geometry/);
+  assert.match(
+    result.warnings.join("\n"),
+    /LUMINANCE mask mode.*contour fallback/,
+  );
   select(doc, "1:2").maskType = "ALPHA";
   assert.match(
     renderDocument(doc, select(doc, "1:1")).warnings.join("\n"),
@@ -355,6 +378,8 @@ test("raw and ZIP ellipse, rounded box, vector holes, glyph and transformed comp
           [230, 160],
           [330, 160],
           [430, 260],
+          [410, 160],
+          [30, 260],
         ]),
         [
           [255, 255, 255, 255],
@@ -363,6 +388,8 @@ test("raw and ZIP ellipse, rounded box, vector holes, glyph and transformed comp
           [255, 255, 0, 255],
           [255, 0, 0, 255],
           [0, 0, 255, 255],
+          [255, 255, 255, 255],
+          [255, 255, 0, 255],
         ],
       );
       if (process.env.CODEX_CAPTURE_FIGMA_MASKS) {
@@ -413,6 +440,8 @@ test("materialized sibling masks survive compiled shadow-root reviews and portab
         [230, 160],
         [330, 160],
         [430, 260],
+        [410, 160],
+        [30, 260],
       ].map(([x, y]) => [Math.floor(x * scale), Math.floor(y * scale)]);
       assert.deepEqual(
         await pixels(page, shot, points),
@@ -423,6 +452,8 @@ test("materialized sibling masks survive compiled shadow-root reviews and portab
           [255, 255, 0, 255],
           [255, 0, 0, 255],
           [0, 0, 255, 255],
+          [255, 255, 255, 255],
+          [255, 255, 0, 255],
         ],
         name,
       );
@@ -435,9 +466,13 @@ test("materialized sibling masks survive compiled shadow-root reviews and portab
         [84, 84],
         [184, 214],
         [254, 184],
+        [434, 184],
+        [54, 284],
       ]),
       [
         [0, 0, 255, 255],
+        [255, 255, 255, 255],
+        [255, 255, 0, 255],
         [255, 255, 255, 255],
         [255, 255, 0, 255],
       ],

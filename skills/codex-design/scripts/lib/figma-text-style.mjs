@@ -95,16 +95,20 @@ export function typography(node, warn, defaults = true) {
     );
     if (valid.length !== features.length)
       warn("invalid OpenType feature tag; ignored");
-    if (valid.length)
+    const direct = valid.filter((tag) => tag !== "SUPS");
+    if (direct.length)
       css.push(
-        `font-feature-settings:${valid.map((tag) => `"${tag.toLowerCase()}" 1`).join(",")}`,
+        `font-feature-settings:${direct.map((tag) => `"${tag.toLowerCase()}" 1`).join(",")}`,
       );
   } else if (features != null) warn("OpenType features must be an array");
   if (node.fontVariantCaps === "SMALL" || features?.includes?.("SMCP"))
     css.push("font-variant-caps:small-caps");
-  if (["SUPER", "SUB"].includes(node.fontVariantPosition))
+  if (
+    ["SUPER", "SUB"].includes(node.fontVariantPosition) ||
+    (Array.isArray(features) && features.includes("SUPS"))
+  )
     css.push(
-      `vertical-align:${node.fontVariantPosition === "SUPER" ? "super" : "sub"}`,
+      `vertical-align:${node.fontVariantPosition === "SUPER" || (Array.isArray(features) && features.includes("SUPS")) ? "super" : "sub"}`,
       "font-size:0.72em",
     );
   if (node.fontVariations != null) {

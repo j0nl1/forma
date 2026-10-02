@@ -91,7 +91,7 @@ async function fixture(t) {
     message Derived{Glyph[] glyphs=1;FontMeta[] fontMetaData=2;Vec layoutSize=3;}
     message Variation{uint axisTag=1;float value=2;}
     message Style{uint styleID=1;Font fontName=2;float fontSize=3;Paint[] fillPaints=4;string textDecoration=5;string textCase=6;string fontVariantCaps=7;string fontVariantPosition=8;Variation[] fontVariations=9;string[] toggledOnOTFeatures=10;}
-    message Text{string characters=1;uint[] characterStyleIDs=2;Style[] styleOverrideTable=3;}
+    message TextLine{string lineType=1;uint indentationLevel=2;} message Text{string characters=1;uint[] characterStyleIDs=2;Style[] styleOverrideTable=3;TextLine[] lines=4;}
     message Effect{string type=1;Color color=2;Vec offset=3;float radius=4;}
     message Blob{byte[] bytes=1;}
     message Node{Guid guid=1;Parent parentIndex=2;NodeType type=3;string name=4;Vec size=5;Matrix transform=6;Paint[] fillPaints=7;Paint[] strokePaints=8;float strokeWeight=9;string strokeAlign=10;Text textData=11;Derived derivedTextData=12;Font fontName=13;float fontSize=14;float fontWeight=15;Metric lineHeight=16;Metric letterSpacing=17;string textAlignHorizontal=18;string textDecoration=19;string textCase=20;Effect[] effects=21;bool clipsContent=22;}
@@ -132,7 +132,7 @@ async function fixture(t) {
       parentIndex: { guid: { sessionID: 0, localID: 0 }, position: "a" },
       type: "SYMBOL",
       name: "Typography laboratory",
-      size: { x: 700, y: 380 },
+      size: { x: 700, y: 720 },
       fillPaints: [solid(white)],
     },
     node(2, 20, 20, {
@@ -282,6 +282,73 @@ async function fixture(t) {
     }),
   );
 
+  const richLines = [
+    "Alpha",
+    "Beta",
+    "Gamma",
+    "Delta",
+    "Plain",
+    "Reset",
+    "Sub",
+    "Caps",
+  ];
+  const richIds = richLines.flatMap((line, index) => [
+    ...Array(line.length).fill([0, 7, 8, 9, 0, 0, 10, 11][index]),
+    ...(index < richLines.length - 1 ? [0] : []),
+  ]);
+  nodes.push(
+    node(18, 20, 400, {
+      size: { x: 340, y: 280 },
+      fontName: { family: "Arial", style: "Regular" },
+      lineHeight: { value: 30, units: "PIXELS" },
+      textData: {
+        characters: richLines.join("\n"),
+        characterStyleIDs: richIds,
+        styleOverrideTable: [
+          {
+            styleID: 7,
+            fontName: { family: "Arial", style: "Bold" },
+            fillPaints: [solid(blue)],
+            textDecoration: "UNDERLINE",
+          },
+          {
+            styleID: 8,
+            fillPaints: [solid(green)],
+            textDecoration: "STRIKETHROUGH",
+            textCase: "UPPER",
+          },
+          { styleID: 9, toggledOnOTFeatures: ["SUPS"] },
+          { styleID: 10, fontVariantPosition: "SUB" },
+          { styleID: 11, toggledOnOTFeatures: ["SMCP"] },
+        ],
+        lines: [
+          { lineType: "ORDERED_LIST", indentationLevel: 1 },
+          { lineType: "ORDERED_LIST", indentationLevel: 2 },
+          { lineType: "UNORDERED_LIST", indentationLevel: 2 },
+          { lineType: "ORDERED_LIST", indentationLevel: 1 },
+          { lineType: "NONE" },
+          { lineType: "ORDERED_LIST", indentationLevel: 1 },
+          { lineType: "NONE" },
+          { lineType: "NONE" },
+        ],
+      },
+    }),
+  );
+  nodes.push(
+    node(19, 400, 400, {
+      size: { x: 260, y: 150 },
+      fontName: { family: "Arial", style: "Regular" },
+      lineHeight: { value: 30, units: "PIXELS" },
+      textData: {
+        characters: "One\nTwo\nPlain",
+        lines: [
+          { lineType: "UNORDERED_LIST", indentationLevel: 1 },
+          { lineType: "ORDERED_LIST", indentationLevel: 3 },
+          { lineType: "NONE" },
+        ],
+      },
+    }),
+  );
   // The square ring is a deliberately non-font outline: installed fonts cannot reproduce it.
   const blob = pathBytes([
     [1, 0.1, 0.1],
@@ -423,6 +490,44 @@ test("offline text styling retains literal input, saved glyph contracts and advi
   assert.match(
     renderDocument(doc, literal).warnings.join("\n"),
     /mapping incomplete/,
+  );
+  literal.textData = {
+    characters: "A\n😀B",
+    characterStyleIDs: [0, 0, 7, 7],
+    styleOverrideTable: [{ styleID: 7, textDecoration: "UNDERLINE" }],
+    lines: [
+      { lineType: "ORDERED_LIST", indentationLevel: 1 },
+      { lineType: "ORDERED_LIST", indentationLevel: 2 },
+    ],
+  };
+  const partial = renderDocument(doc, literal);
+  assert.match(partial.html, /1\. A\n  2\. <span[^>]+>😀<\/span>B/);
+  assert.match(partial.warnings.join("\n"), /mapping incomplete/);
+  literal.textData.lines[0].indentationLevel = 900;
+  assert.match(
+    renderDocument(doc, literal).warnings.join("\n"),
+    /invalid list indentation/,
+  );
+  literal.textData.lines = {};
+  assert.match(
+    renderDocument(doc, literal).warnings.join("\n"),
+    /line metadata must be an array/,
+  );
+  node.derivedTextData.glyphs[0] = {
+    commandsBlob: 0,
+    position: { x: 10, y: 50 },
+    fontSize: 40,
+  };
+  doc.blobs[0].bytes = [...pathBytes([[1, 0, 0], [2, 1, 0], [2, 1, 1], [0]])];
+  node.textData.styleOverrideTable = [{ styleID: 7, fillPaints: [solid(red)] }];
+  node.textDecoration = "UNDERLINE";
+  assert.match(
+    renderDocument(doc, node).warnings.join("\n"),
+    /per-glyph style resolution/,
+  );
+  assert.match(
+    renderDocument(doc, node).warnings.join("\n"),
+    /resolved decoration geometry/,
   );
 });
 
@@ -682,13 +787,16 @@ test("materialized typography and saved glyph masks survive copied review, HTML 
   await withPage(
     url + "review.html",
     async (page) => {
-      const imagePng = await page
+      const example = page.locator(
+        'article[data-card-name="Typography laboratory"]',
+      );
+      const imagePng = await example
         .locator('[data-figma-id="1:13"]')
         .screenshot();
       assert.deepEqual(await pixels(page, imagePng, [[30, 10]]), [
         [0, 0, 255, 255],
       ]);
-      const glyph = page.locator('[data-figma-id="1:6"]');
+      const glyph = example.locator('[data-figma-id="1:6"]');
       assert.equal(await glyph.count(), 1);
       const png = await glyph.screenshot();
       assert.deepEqual(
@@ -725,4 +833,226 @@ test("materialized typography and saved glyph masks survive copied review, HTML 
     },
     { width: 900, height: 600 },
   );
+});
+
+function richReference() {
+  return `<!doctype html><html lang="en"><meta name="codex-fixed-sheet" content="off"><style>body{margin:24px;background:#edf0f4}#board{position:relative;width:700px;height:720px;background:white}.rich{position:absolute;top:400px;font:20px Arial,sans-serif;line-height:30px;color:red;white-space:pre-wrap;box-sizing:border-box}</style><div id="board"><div id="rich" class="rich" style="left:20px;width:340px;height:280px">1. Alpha\n  2. <span style="font-weight:700;color:blue;text-decoration:underline">Beta</span>\n  • <span style="color:lime;text-decoration:line-through;text-transform:uppercase">Gamma</span>\n1. <span style="vertical-align:super;font-size:.72em">Delta</span>\nPlain\n1. Reset\n<span style="vertical-align:sub;font-size:.72em">Sub</span>\n<span style="font-variant-caps:small-caps;font-feature-settings:'smcp' 1">Caps</span></div><div id="plain-list" class="rich" style="left:400px;width:260px;height:150px">• One\n    1. Two\nPlain</div></div></html>`;
+}
+
+test("source-supported literal list prefixes, newline style offsets, decorations and SUPS fallback match owned CSS and remain portable", async (t) => {
+  const { dir, file, raw } = await fixture(t);
+  await fs.writeFile(path.join(dir, "rich-reference.html"), richReference());
+  for (const [name, input] of [
+    ["rich-raw.html", raw],
+    ["rich-zip.html", file],
+  ]) {
+    await importFig("render", input, path.join(dir, name), "1:1");
+    await fs.writeFile(
+      path.join(dir, name),
+      noFit(await fs.readFile(path.join(dir, name), "utf8")),
+    );
+  }
+  const material = path.join(dir, "rich-material"),
+    system = path.join(dir, "rich-system");
+  await importFig("materialize", file, material, "1:1");
+  await fs.writeFile(
+    path.join(material, "index.html"),
+    noFit(await fs.readFile(path.join(material, "index.html"), "utf8")),
+  );
+  await exportArtifact(
+    "html",
+    path.join(material, "index.html"),
+    path.join(dir, "rich-portable.html"),
+  );
+  await importFig("design-system", file, system);
+  await compile(system);
+  await preview(system);
+  await fs.copyFile(
+    path.join(system, "preview.html"),
+    path.join(dir, "rich-review.html"),
+  );
+  await fs.rm(file);
+  await fs.rm(raw);
+  await fs.rm(material, { recursive: true });
+  await fs.rm(system, { recursive: true });
+  const { server, url } = await serve(dir, 0);
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const expected = [];
+  await withPage(
+    url + "rich-reference.html",
+    async (page) => {
+      expected.push(
+        await page.locator("#rich").screenshot(),
+        await page.locator("#plain-list").screenshot(),
+      );
+    },
+    { width: 1440, height: 1000 },
+  );
+  if (process.env.CODEX_CAPTURE_FIGMA_TEXT) {
+    await fs.mkdir(process.env.CODEX_CAPTURE_FIGMA_TEXT, { recursive: true });
+    await fs.writeFile(
+      path.join(process.env.CODEX_CAPTURE_FIGMA_TEXT, "rich-reference.png"),
+      expected[0],
+    );
+  }
+  for (const name of [
+    "rich-raw.html",
+    "rich-zip.html",
+    "rich-portable.html",
+    "rich-review.html",
+  ]) {
+    await withPage(
+      url + name,
+      async (page) => {
+        const scope =
+          name === "rich-review.html"
+            ? page.locator('article[data-card-name="Typography laboratory"]')
+            : page;
+        if (name === "rich-review.html") {
+          // Align only the review host's layout origin for nominal pixel comparison.
+          await scope.locator('[data-figma-id="1:1"]').evaluate((el) => {
+            const host = el.getRootNode().host,
+              r = host.getBoundingClientRect();
+            host.style.left = `${Math.round(r.left) - r.left}px`;
+            host.style.top = `${Math.round(r.top) - r.top}px`;
+          });
+        }
+        for (const [index, id] of [18, 19].entries()) {
+          const actual = await scope
+            .locator(`[data-figma-id="1:${id}"]`)
+            .screenshot();
+          if (name !== "rich-review.html")
+            assert.deepEqual(actual, expected[index], `${name} list ${id}`);
+          else {
+            // Fractional review placement can add one white screenshot row. Compare every nominal pixel.
+            const equality = await page.evaluate(
+              async ({ actual, expected }) => {
+                async function decode(base64) {
+                  const image = new Image();
+                  image.src = "data:image/png;base64," + base64;
+                  await image.decode();
+                  const canvas = document.createElement("canvas");
+                  canvas.width = image.width;
+                  canvas.height = image.height;
+                  const ctx = canvas.getContext("2d");
+                  ctx.drawImage(image, 0, 0);
+                  return {
+                    width: image.width,
+                    height: image.height,
+                    data: ctx.getImageData(0, 0, image.width, image.height)
+                      .data,
+                  };
+                }
+                const [a, b] = await Promise.all([
+                  decode(actual),
+                  decode(expected),
+                ]);
+                if (
+                  a.width !== b.width ||
+                  a.height < b.height ||
+                  a.height > b.height + 1
+                )
+                  return false;
+                for (let i = 0; i < b.data.length; i++)
+                  if (a.data[i] !== b.data[i]) return false;
+                for (let i = b.data.length; i < a.data.length; i++)
+                  if (a.data[i] !== 255) return false;
+                return true;
+              },
+              {
+                actual: actual.toString("base64"),
+                expected: expected[index].toString("base64"),
+              },
+            );
+            assert.equal(
+              equality,
+              true,
+              `${name} exact nominal list region ${id}`,
+            );
+          }
+        }
+        const delta = scope
+          .locator('[data-figma-id="1:18"] span')
+          .filter({ hasText: "Delta" });
+        assert.deepEqual(
+          await delta.evaluate((el) => {
+            const s = getComputedStyle(el);
+            return [s.verticalAlign, s.fontSize];
+          }),
+          ["super", "14.4px"],
+        );
+        if (
+          name === "rich-portable.html" &&
+          process.env.CODEX_CAPTURE_FIGMA_TEXT
+        ) {
+          await fs.mkdir(process.env.CODEX_CAPTURE_FIGMA_TEXT, {
+            recursive: true,
+          });
+          await page.screenshot({
+            path: path.join(
+              process.env.CODEX_CAPTURE_FIGMA_TEXT,
+              "rich-portable.png",
+            ),
+            fullPage: true,
+          });
+          await fs.copyFile(
+            path.join(dir, name),
+            path.join(process.env.CODEX_CAPTURE_FIGMA_TEXT, name),
+          );
+        }
+      },
+      { width: 1440, height: 1000 },
+    );
+  }
+  await exportArtifact(
+    "png",
+    url + "rich-portable.html",
+    path.join(dir, "rich-output.png"),
+  );
+  await withPage(url + "rich-portable.html", async (page) => {
+    const output = await fs.readFile(path.join(dir, "rich-output.png"));
+    const crop = await page.evaluate(async (base64) => {
+      const image = new Image();
+      image.src = "data:image/png;base64," + base64;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = 340;
+      canvas.height = 280;
+      canvas
+        .getContext("2d")
+        .drawImage(image, 44, 424, 340, 280, 0, 0, 340, 280);
+      return canvas.toDataURL("image/png").split(",")[1];
+    }, output.toString("base64"));
+    const mismatches = await page.evaluate(
+      async ({ actual, expected }) => {
+        async function decode(base64) {
+          const image = new Image();
+          image.src = "data:image/png;base64," + base64;
+          await image.decode();
+          const canvas = document.createElement("canvas");
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(image, 0, 0);
+          return {
+            width: image.width,
+            height: image.height,
+            data: ctx.getImageData(0, 0, image.width, image.height).data,
+          };
+        }
+        const [a, b] = await Promise.all([decode(actual), decode(expected)]);
+        if (a.width !== b.width || a.height !== b.height) return -1;
+        let count = 0;
+        for (let i = 0; i < a.data.length; i++)
+          if (a.data[i] !== b.data[i]) count++;
+        return count;
+      },
+      { actual: crop, expected: expected[0].toString("base64") },
+    );
+    assert.equal(
+      mismatches,
+      0,
+      "every exported rich-text pixel matches literal CSS after source deletion",
+    );
+  });
 });

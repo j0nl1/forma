@@ -6,6 +6,7 @@ import {
   paintList,
   paintBlend,
 } from "./figma-paints.mjs";
+import { literalText } from "./figma-text-runs.mjs";
 import { typography } from "./figma-text-style.mjs";
 import { imagePaint } from "./figma-paint-images.mjs";
 import { strokeAlignment } from "./figma-strokes.mjs";
@@ -14,63 +15,6 @@ const finite = (value) => typeof value === "number" && Number.isFinite(value);
 export const hasGlyphOutlines = (node) =>
   Array.isArray(node.derivedTextData?.glyphs) &&
   node.derivedTextData.glyphs.length > 0;
-
-function literalText(doc, node, options, warn) {
-  const characters = String(
-    node.textData?.characters ?? node.characters ?? node.name ?? "",
-  );
-  const ids = node.textData?.characterStyleIDs,
-    table = node.textData?.styleOverrideTable;
-  if (
-    node.textData?.lines?.some?.((line) =>
-      ["ORDERED_LIST", "UNORDERED_LIST"].includes(line.lineType),
-    )
-  )
-    warn("text list metadata needs semantic list layout and visual review");
-  if (ids == null && table == null) return html(characters);
-  if (
-    !Array.isArray(ids) ||
-    !Array.isArray(table) ||
-    ids.length !== characters.length
-  ) {
-    warn(
-      "text character style mapping incomplete; literal base style retained",
-    );
-    return html(characters);
-  }
-  const byId = new Map();
-  for (const style of table) {
-    if (!style || !Number.isInteger(style.styleID)) {
-      warn("invalid text style override");
-      continue;
-    }
-    byId.set(style.styleID, style);
-  }
-  let content = "";
-  for (let start = 0; start < characters.length;) {
-    let end = start + 1;
-    while (end < characters.length && ids[end] === ids[start]) end++;
-    const style = byId.get(ids[start]);
-    if (style) {
-      const declarations = typography(style, warn, false);
-      if (style.fillPaints != null) {
-        const paint = nodePaints(
-          doc,
-          { ...style, type: "TEXT" },
-          { ...options, vector: false },
-        );
-        declarations.push(...paint.declarations, `color:${paint.textColor}`);
-      }
-      content += `<span style="${html(declarations.join(";"))}">${html(characters.slice(start, end))}</span>`;
-    } else {
-      if (ids[start] !== 0)
-        warn(`unresolved character style ${String(ids[start])}`);
-      content += html(characters.slice(start, end));
-    }
-    start = end;
-  }
-  return content;
-}
 
 function glyphShapes(doc, node, warn) {
   const shapes = [];

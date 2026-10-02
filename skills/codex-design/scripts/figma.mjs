@@ -12,6 +12,7 @@ import {
   extractedTokens,
   nodeId,
 } from "./lib/figma.mjs";
+import { emitComponents } from "./lib/figma-components.mjs";
 export async function importFig(mode, input, output, nodeSpec) {
   const doc = await loadFig(input);
   if (mode === "outline") return { version: doc.version, nodes: outline(doc) };
@@ -32,6 +33,17 @@ export async function importFig(mode, input, output, nodeSpec) {
       await writeJson(path.join(output, "warnings.json"), rendered.warnings);
     }
     return { output: path.resolve(output), warnings: rendered.warnings };
+  }
+  if (mode === "components") {
+    const warnings = [];
+    const components = await emitComponents(doc, output, warnings, nodeSpec);
+    await writeJson(path.join(output, "components.json"), components);
+    await writeJson(path.join(output, "warnings.json"), [...new Set(warnings)]);
+    return {
+      output: path.resolve(output),
+      components: components.length,
+      warnings,
+    };
   }
   if (mode === "mount") {
     await fs.mkdir(output, { recursive: true });
@@ -58,6 +70,7 @@ export async function importFig(mode, input, output, nodeSpec) {
     await fs.mkdir(output, { recursive: true });
     await write(path.join(output, "tokens.css"), css);
     const warnings = [];
+    const components = await emitComponents(doc, output, warnings);
     const examples = [...doc.nodes.values()]
       .filter((n) => n.type === "SYMBOL" || n.isStateGroup)
       .map((n) => ({
@@ -69,7 +82,7 @@ export async function importFig(mode, input, output, nodeSpec) {
       name: path.basename(input, ".fig"),
       slug: slug(path.basename(output)),
       css: "tokens.css",
-      components: [],
+      components,
       examples,
       startingPoints: [],
       guidance:
@@ -78,7 +91,7 @@ export async function importFig(mode, input, output, nodeSpec) {
     await writeJson(path.join(output, "warnings.json"), [...new Set(warnings)]);
     return {
       output: path.resolve(output),
-      components: examples.length,
+      components: components.length,
       tokens: Object.keys(tokens).length,
       warnings,
     };
@@ -91,13 +104,18 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--node": "value",
     });
     if (
-      !["outline", "mount", "render", "materialize", "design-system"].includes(
-        p[0],
-      ) ||
+      ![
+        "outline",
+        "mount",
+        "render",
+        "materialize",
+        "design-system",
+        "components",
+      ].includes(p[0]) ||
       p.length !== (p[0] === "outline" ? 2 : 3)
     )
       throw new Error(
-        "Usage: node figma.mjs outline <file.fig> | mount|design-system <file.fig> <folder> | render|materialize <file.fig> <destination> --node <id-or-name>",
+        "Usage: node figma.mjs outline <file.fig> | mount|design-system|components <file.fig> <folder> | render|materialize <file.fig> <destination> --node <id-or-name>",
       );
     console.log(JSON.stringify(await importFig(...p, flags.node), null, 2));
   });

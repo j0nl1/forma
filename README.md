@@ -39,7 +39,7 @@ The installer copies inspected local files. It does not fetch a remote project, 
 - Thirteen routed project types, including HTML slides, mobile, documents, research, email, diagrams, and 3D.
 - Independently written starters with native local controls, continuous composition, scene/sprite authoring, and deterministic watercolor painting.
 - Read-only design-system inspection, compilation, portable imports, and review pages.
-- Offline Figma inventory and materialization with explicit fidelity warnings.
+- Offline Figma inventory, materialization and editable React variant generation with explicit fidelity warnings.
 - A loopback preview server, browser verification, standalone HTML, PDF, PNG, and MP4/WebM/GIF export with optional marked-media audio.
 - Pinned package versions and lockfiles, meaningful tests, and runnable examples.
 
