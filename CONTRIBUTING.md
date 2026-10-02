@@ -10,7 +10,7 @@ npm run format:check
 npm test
 ```
 
-Tests use OS temporary directories for generated files. Browser tests exercise native components, a real prototype flow, responsive rendering, design-system preview, PDF, and deterministic video. The installed copy is also tested with an independent lockfile. FFmpeg is required for video tests. Missing Chromium is a test failure so it cannot silently claim browser verification.
+Tests use OS temporary directories for generated files. Browser tests exercise native components, a real prototype flow, responsive rendering, design-system preview, PDF, and deterministic video. The installed copy is also tested with an independent lockfile. FFmpeg is required for video tests. Poppler's `pdfinfo` and `pdftotext` are required for PDF verification; install them with the OS package manager before running the suite (for example, `sudo apt-get install -y ffmpeg poppler-utils` on Debian/Ubuntu). Missing Chromium is a test failure so it cannot silently claim browser verification.
 
 For optional macOS verification in the maintained environment, transfer a source checkout to `sirius` and run cross-platform checks there through SSH. Do not run macOS-specific commands on the Linux host.
 
