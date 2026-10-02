@@ -4,6 +4,14 @@ A local design skill built specifically for Codex. Create editable HTML mockups,
 
 Studio Design runs inside Codex and keeps generated files local. HTML presentations are supported; PowerPoint export is not included. See [known limitations](docs/limitations.md) for concrete constraints and the current nested-video export issue.
 
+## Watch the tutorial
+
+A narrated walkthrough of installation, design directions, prototyping, motion, and export, with English captions.
+
+[![Watch the Studio Design tutorial in English](https://j0nl1.github.io/studio-design/tutorial/poster.png)](https://j0nl1.github.io/studio-design/tutorial/watch.html)
+
+[Watch the video](https://j0nl1.github.io/studio-design/tutorial/watch.html) · [Download the MP4](https://j0nl1.github.io/studio-design/tutorial/studio-design-tutorial-en.mp4)
+
 ## Quick start
 
 Requires Codex. Node.js 22 or newer is needed for the included helpers; the Markdown skill and basic native HTML starters have no package dependency. General D3 charts, 3D and React runtimes use the pinned local dependencies and build helper.
@@ -54,6 +62,8 @@ See the [capability map](docs/capabilities.md) for supported workflows and outpu
 - [Contributing and validation](CONTRIBUTING.md)
 
 ## Try the examples
+
+Browse the [hosted examples](https://j0nl1.github.io/studio-design/), or run the showcase locally:
 
 ```sh
 npm ci --ignore-scripts
