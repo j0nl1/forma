@@ -1,6 +1,7 @@
 import { transform } from "esbuild";
 import ts from "typescript";
 import { parse } from "parse5";
+import { rewriteCardGlobals } from "./system-authoring.mjs";
 
 export function cardNeedsReact(content) {
   let found = false;
@@ -64,7 +65,25 @@ export function scriptBindings(code) {
   return [...names.values()];
 }
 
-export async function cardScript(code, type, namespace) {
+export async function cardScript(code, type, namespace, sourceNamespaces = []) {
+  if (
+    code.startsWith("/* @codex-ds namespace=") ||
+    ![
+      "",
+      "text/javascript",
+      "application/javascript",
+      "text/babel",
+      "text/jsx",
+      "text/tsx",
+    ].includes(type)
+  )
+    return code;
+  code = rewriteCardGlobals(
+    code,
+    type === "text/tsx" ? "card.tsx" : "card.jsx",
+    namespace,
+    sourceNamespaces,
+  );
   if (!["text/babel", "text/jsx", "text/tsx"].includes(type)) return code;
   const transformed = await transform(code, {
     loader: type === "text/tsx" ? "tsx" : "jsx",
@@ -74,17 +93,6 @@ export async function cardScript(code, type, namespace) {
     target: "es2022",
     legalComments: "inline",
   });
-  const names = new Set(
-    scriptBindings(transformed.code).map((item) => item.name),
-  );
-  const aliases = [
-    !names.has("React")
-      ? `var React=window[${JSON.stringify(namespace)}].React;`
-      : "",
-    !names.has("ReactDOM")
-      ? `var ReactDOM={createRoot:window[${JSON.stringify(namespace)}].createRoot};`
-      : "",
-  ].join("\n");
   const parsed = ts.createSourceFile(
     "card.js",
     transformed.code,
@@ -105,5 +113,5 @@ export async function cardScript(code, type, namespace) {
     throw new Error(
       "Bundle module imports in design-system cards before compilation.",
     );
-  return aliases + "\n" + transformed.code;
+  return transformed.code;
 }

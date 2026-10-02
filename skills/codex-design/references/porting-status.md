@@ -83,3 +83,9 @@ The following source surfaces have been identified. Rows marked partial require 
 ## Completion gate
 
 Every non-excluded row must have an understood contract, an implementation or real configured integration, and verification covering its important interactions and output. Current tests cover the replacement's stated behavior and selected reference contracts. The overall port and animation family must remain incomplete until their outstanding rows are resolved.
+
+## Browser-global design-system authoring verification
+
+Restored safe source namespace translation and browser-global React authoring, including aliases/destructuring and sibling component dependencies. React/ReactDOM 18.3.1 is installed as an independent pinned workspace; native authoring retains 19.2.4. Recognized React 18 CDN/Babel tags become local runtime/build-time declarations without remote execution. Unknown tags, unsupported versions and missing exports fail before generated artifacts are replaced.
+
+Behavioral verification covers actual React 18 legacy rendering/hydration, class callback receivers, DOM lookup, context-aware subtree rendering, modern roots/hydration, portals, synchronous flush and unmount. Independently compiled same-version systems share the full pinned package export surface and compose stateful components in one root; different versions remain separate. Installed-copy tests use its own lockfile and runtime workspace, without checkout dependencies. Managed import and portable HTTP/file reviews keep these behaviors after source deletion. Desktop/narrow captures show both versions with independently updated state. Composed output is compared to an independently authored HTML rendition, allowing at most sixteen glyph-edge pixels to vary by one RGB level. Inert JSON mentioning React APIs remains unchanged and does not select a legacy runtime. This restores these authoring contracts; it does not establish comprehensive design-system or full project parity.

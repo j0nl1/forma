@@ -30,6 +30,16 @@ for (const file of files) {
       issues.push(`Unfinished placeholder: ${file}`);
   }
 }
+const packagedReact18 = await readJson(
+  path.join(skill, "runtimes/react18/package.json"),
+);
+const checkoutReact18 = await readJson(
+  path.join(root, "runtimes/react18/package.json"),
+);
+if (JSON.stringify(packagedReact18) !== JSON.stringify(checkoutReact18))
+  issues.push(
+    "React 18 runtime packaging metadata differs from the checkout workspace",
+  );
 const types = await readJson(path.join(skill, "project-types.json"));
 if (new Set(types.projectTypes.map((t) => t.id)).size !== 13)
   issues.push("Expected 13 unique project types");

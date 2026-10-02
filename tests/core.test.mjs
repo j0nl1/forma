@@ -298,11 +298,10 @@ test("installed skill lockfile and helpers work independently of the checkout", 
     dest = path.join(dir, "installed");
   await install(dest);
   const { execFileSync } = await import("node:child_process");
-  execFileSync(
-    "npm",
-    ["ci", "--ignore-scripts", "--offline", "--workspaces=false"],
-    { cwd: dest, stdio: "pipe" },
-  );
+  execFileSync("npm", ["ci", "--ignore-scripts", "--offline"], {
+    cwd: dest,
+    stdio: "pipe",
+  });
   const source = path.join(dir, "system");
   await fs.cp(path.join(root, "examples/design-system"), source, {
     recursive: true,

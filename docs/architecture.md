@@ -2,7 +2,7 @@
 
 `skills/codex-design/SKILL.md` is the entry point. `agents/openai.yaml` describes Codex UI and invocation. `project-types.json` maps thirteen modes to resources. `references/` holds original task recipes; `assets/starters/` holds editable runtime source. `scripts/` contains deterministic helpers and `scripts/lib/` their shared primitives.
 
-The root contains documentation, tests, examples, and packaging. It is an npm workspace; the skill also has its own lockfile for independent installed-copy setup. Packages are pinned dependencies rather than opaque vendored bundles.
+The root contains documentation, tests, examples, and packaging. It is an npm workspace; the skill also has its own lockfile for independent installed-copy setup. Packages are pinned dependencies rather than opaque vendored bundles. A separate React 18.3.1 workspace preserves legacy component APIs alongside native React 19.2.4; the installed skill includes the same runtime workspace and its own complete lockfile.
 
 ## Contracts
 
@@ -50,3 +50,7 @@ The review payload is a hashed compiled artifact. Review generation reads verifi
 ## Trust boundary
 
 Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaScript. Inspection does not evaluate source. Browser previews execute page scripts, so reviewed source and an appropriate environment remain necessary. Browser exporters require loopback HTTP input and keep subresources local by default. Explicit `fontOrigins` grants allow GET/HEAD font, stylesheet and font-embedding fetch requests from selected HTTP(S) origins, without granting scripts or remote writes. Font/stylesheet requests and configured remote embedding requests validate redirect targets before following them. Ordinary authored browser pages retain their own network behavior; the stage's `fontOrigins` prop governs embedding, not a browser sandbox. Codex browser tools have their own permissions. This package is not a sandbox for arbitrary imported code.
+
+## Design-system runtime selection
+
+Read-only authoring analysis identifies free browser React globals, safe legacy source namespaces, old DOM calls and recognized CDN declarations. Source imports and namespace references are transformed into module dependencies without evaluating design source. A package-export reader parses pinned CJS export assignments as data. Browser facades select one actual React/DOM/JSX pair per exact version through `window.CodexDesignRuntimes`, allowing several independently compiled systems to compose stateful components in one root. Raw React/DOM package internals resolve within their own matched dependency pair; consuming source imports use the shared facades. React 18 cards replace recognized React/Babel declarations with the locally compiled pair and a first-script bootstrap. Unsupported declarations fail compilation before artifacts are written.

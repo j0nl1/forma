@@ -2,12 +2,15 @@ import fs from "node:fs/promises";
 import { createHash, randomBytes } from "node:crypto";
 import { exists, safeFile, slug } from "./files.mjs";
 import path from "node:path";
+import { sourceNamespace } from "./system-authoring.mjs";
 
 export const systemHash = (value) =>
   createHash("sha256").update(value).digest("hex");
 export const systemNamespace = (value) =>
   typeof value === "string" &&
   /^CodexDS_[A-Za-z0-9_]+_[a-f0-9]{12}$/.test(value);
+const newNamespace = (name) =>
+  "CodexDS_" + name.replace(/-/g, "_") + "_" + randomBytes(6).toString("hex");
 export async function namespaceFor(root, name) {
   const file = path.join(root, "_ds_manifest.json");
   if (await exists(file)) {
@@ -15,6 +18,8 @@ export async function namespaceFor(root, name) {
       await fs.readFile(await safeFile(root, "_ds_manifest.json"), "utf8"),
     );
     if (previous.namespace != null) {
+      if (previous.schemaVersion !== 1 && sourceNamespace(previous.namespace))
+        return newNamespace(name);
       if (!systemNamespace(previous.namespace))
         throw new Error("Invalid persisted design-system namespace");
       return previous.namespace;
@@ -32,9 +37,7 @@ export async function namespaceFor(root, name) {
       return header;
     }
   }
-  return (
-    "CodexDS_" + name.replace(/-/g, "_") + "_" + randomBytes(6).toString("hex")
-  );
+  return newNamespace(name);
 }
 export async function compiledSystem(root) {
   root = await fs.realpath(root);

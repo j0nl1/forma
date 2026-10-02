@@ -41,7 +41,13 @@ function localReference(root, base, value) {
 }
 export async function inlineHtml(
   input,
-  { root: scope, generated = new Map(), transformScript, ensureScript } = {},
+  {
+    root: scope,
+    generated = new Map(),
+    transformScript,
+    ensureScript,
+    rewriteScriptSource,
+  } = {},
 ) {
   const pageBase = path.dirname(path.resolve(input));
   const root = scope ? path.resolve(scope) : pageBase;
@@ -123,6 +129,13 @@ export async function inlineHtml(
         throw new Error("Bundle ES module scripts before standalone export.");
       const src = attr(n, "src");
       if (src) {
+        if (
+          rewriteScriptSource &&
+          (await rewriteScriptSource(src.value)) === null
+        ) {
+          n.parentNode.childNodes.splice(n.parentNode.childNodes.indexOf(n), 1);
+          return;
+        }
         const f = await local(pageBase, src.value);
         text(n, (await read(f, "utf8")).replace(/<\/script/gi, "<\\/script"));
         remove(n, "src");
@@ -206,6 +219,21 @@ export async function inlineHtml(
         child.value?.startsWith(ensureScript.marker),
       )) ||
     node.childNodes?.some(containsScript);
+  if (ensureScript?.prepend) {
+    const remove = (node) => {
+      for (const child of [...(node.childNodes ?? [])]) {
+        if (
+          child.tagName === "script" &&
+          child.childNodes?.some((text) =>
+            text.value?.startsWith(ensureScript.marker),
+          )
+        )
+          node.childNodes.splice(node.childNodes.indexOf(child), 1);
+        else remove(child);
+      }
+    };
+    remove(doc);
+  }
   if (ensureScript && !containsScript(doc)) {
     const node = {
       nodeName: "script",
@@ -217,6 +245,11 @@ export async function inlineHtml(
     };
     text(node, ensureScript.code.replace(/<\/script/gi, "<\\/script"));
     head.childNodes.unshift(node);
+    if (ensureScript.after) {
+      const after = { ...node, childNodes: [] };
+      text(after, ensureScript.after.replace(/<\/script/gi, "<\\/script"));
+      head.childNodes.splice(1, 0, after);
+    }
   }
   if (
     !head?.childNodes.some((node) =>

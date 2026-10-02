@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { sharedRuntimePlugin } from "./lib/system-shared-runtime.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { build } from "esbuild";
@@ -11,7 +12,13 @@ import {
   reviewRuntimeAssets,
   portableCardAssets,
 } from "./lib/system-review-data.mjs";
-import { cardScript, cardNeedsReact } from "./lib/system-card-scripts.mjs";
+import { cardScript } from "./lib/system-card-scripts.mjs";
+import {
+  authoringModel,
+  authoringPlugin,
+  reactRuntime,
+  runtimeDeclaration,
+} from "./lib/system-authoring.mjs";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import {
   namespaceFor,
@@ -150,7 +157,7 @@ export async function inspect(root) {
     } catch (e) {
       issues.push(e.message);
     }
-  return {
+  const result = {
     spec,
     tokens,
     files: [...files.keys()].map((f) => path.relative(root, f)),
@@ -159,6 +166,12 @@ export async function inspect(root) {
     declarations: source.declarations,
     sourceFiles: source.sourceFiles,
   };
+  try {
+    result.authoring = await authoringModel(root, result);
+  } catch (error) {
+    result.issues.push(error.message);
+  }
+  return result;
 }
 const nodePaths = [
   fileURLToPath(new URL("../node_modules", import.meta.url)),
@@ -169,6 +182,7 @@ export async function compile(root) {
   const model = await inspect(root);
   if (model.issues.length) throw new Error(model.issues.join("\n"));
   const { spec, tokens } = model;
+  const authoring = model.authoring;
   const namespace = await namespaceFor(root, spec.slug);
   // Resolution checks happen without evaluating imported component source.
   const fence = {
@@ -200,21 +214,8 @@ export async function compile(root) {
   });
   const css = cssResult.outputFiles[0].text;
   let bundle = null;
-  let jsxCards = false;
-  const jsxSourceFiles = new Set();
-  for (const card of [
-    ...model.cards,
-    ...(spec.startingPoints ?? []).filter(
-      (start) => start.kind !== "component",
-    ),
-  ])
-    if (
-      cardNeedsReact(await fs.readFile(await safeFile(root, card.path), "utf8"))
-    ) {
-      jsxCards = true;
-      jsxSourceFiles.add(card.path);
-    }
-  if (spec.entry || spec.components.length || jsxCards) {
+  if (spec.entry || spec.components.length || authoring.reactFiles.size) {
+    const runtime = reactRuntime(authoring.version);
     const imports = spec.components
       .map(
         (component, index) =>
@@ -232,7 +233,7 @@ export async function compile(root) {
       .join(",");
     const result = await build({
       stdin: {
-        contents: `${imports}import React from 'react';import{createRoot}from'react-dom/client';${base}const Components={...Base,${componentMap}};export{React,createRoot,Components};`,
+        contents: `${imports}import{React,ReactDOM,createRoot,hydrateRoot}from'codex-design:runtime';${base}const Components={...Base,${componentMap}};export{React,ReactDOM,createRoot,hydrateRoot,Components};`,
         resolveDir: root,
         loader: "jsx",
       },
@@ -246,8 +247,16 @@ export async function compile(root) {
       },
       platform: "browser",
       jsx: "automatic",
+      define:
+        authoring.version === "18.3.1"
+          ? { "process.env.NODE_ENV": JSON.stringify("production") }
+          : {},
       nodePaths,
-      plugins: [fence],
+      plugins: [
+        sharedRuntimePlugin(runtime),
+        authoringPlugin(root, model, authoring),
+        fence,
+      ],
       logLevel: "silent",
       legalComments: "eof",
     });
@@ -257,21 +266,32 @@ export async function compile(root) {
     ["_ds_tokens.css", css],
     ...(bundle ? [["_ds_bundle.js", bundle]] : []),
   ]);
-  const transformScript = (code, type) => cardScript(code, type, namespace);
+  const transformScript = (code, type) =>
+    cardScript(code, type, namespace, authoring.sourceNamespaces);
+  const cardOptions = (file) => ({
+    root,
+    generated,
+    transformScript,
+    rewriteScriptSource: (src) => (runtimeDeclaration(src) ? null : undefined),
+    ensureScript: authoring.reactFiles.has(file)
+      ? {
+          marker: `/* @codex-ds namespace=${namespace}`,
+          code: bundle,
+          prepend: true,
+          after: `/* @codex-ds-card-runtime */\nwindow.React=window[${JSON.stringify(namespace)}].React;window.ReactDOM=window[${JSON.stringify(namespace)}].ReactDOM;`,
+        }
+      : undefined,
+  });
   const seeds = [],
     cards = [],
     startingPoints = [],
     seedNames = new Set();
   for (const [index, card] of model.cards.entries()) {
     const name = "_ds_card_" + index + "_" + slug(card.name) + ".html";
-    const content = await inlineHtml(await safeFile(root, card.path), {
-      root,
-      generated,
-      transformScript,
-      ensureScript: jsxSourceFiles.has(card.path)
-        ? { marker: `/* @codex-ds namespace=${namespace}`, code: bundle }
-        : undefined,
-    });
+    const content = await inlineHtml(
+      await safeFile(root, card.path),
+      cardOptions(card.path),
+    );
     seeds.push({ name, content, sourcePath: card.path });
     cards.push({ ...card, sourcePath: card.path, path: name });
   }
@@ -293,14 +313,10 @@ export async function compile(root) {
     if (seedNames.has(name))
       throw new Error("Duplicate starting-point filename");
     seedNames.add(name);
-    const content = await inlineHtml(await safeFile(root, seed.path), {
-      root,
-      generated,
-      transformScript,
-      ensureScript: jsxSourceFiles.has(seed.path)
-        ? { marker: `/* @codex-ds namespace=${namespace}`, code: bundle }
-        : undefined,
-    });
+    const content = await inlineHtml(
+      await safeFile(root, seed.path),
+      cardOptions(seed.path),
+    );
     seeds.push({ name, content, sourcePath: seed.path });
     startingPoints.push({
       ...seed,
@@ -343,6 +359,9 @@ export async function compile(root) {
     name: spec.name,
     slug: spec.slug,
     namespace,
+    sourceNamespaces: authoring.sourceNamespaces,
+    reactVersion: bundle ? authoring.version : null,
+    runtimeDeclarations: authoring.declarations,
     tokens,
     components: spec.components ?? [],
     examples: spec.examples ?? [],
@@ -417,6 +436,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
           components: m.spec.components,
           cards: m.cards,
           startingPoints: m.spec.startingPoints,
+          reactVersion: m.authoring?.version,
+          runtimeDeclarations: m.authoring?.declarations,
+          sourceNamespaces: m.authoring?.sourceNamespaces,
         }),
       );
       if (m.issues.length) process.exitCode = 1;
