@@ -41,7 +41,7 @@ function localReference(root, base, value) {
 }
 export async function inlineHtml(
   input,
-  { root: scope, generated = new Map() } = {},
+  { root: scope, generated = new Map(), transformScript, ensureScript } = {},
 ) {
   const pageBase = path.dirname(path.resolve(input));
   const root = scope ? path.resolve(scope) : pageBase;
@@ -129,6 +129,18 @@ export async function inlineHtml(
         remove(n, "integrity");
         remove(n, "crossorigin");
       }
+      if (transformScript) {
+        const type = attr(n, "type")?.value ?? "";
+        const code = await transformScript(
+          n.childNodes?.map((child) => child.value ?? "").join("") ?? "",
+          type,
+        );
+        text(n, code.replace(/<\/script/gi, "<\\/script"));
+        if (["text/babel", "text/jsx", "text/tsx"].includes(type)) {
+          remove(n, "type");
+          n.attrs.push({ name: "type", value: "text/javascript" });
+        }
+      }
     }
     if (n.tagName === "link" && attr(n, "rel")?.value === "stylesheet") {
       const f = await local(pageBase, attr(n, "href")?.value ?? "");
@@ -188,6 +200,24 @@ export async function inlineHtml(
   await visit(doc);
   const html = doc.childNodes.find((node) => node.tagName === "html");
   const head = html?.childNodes.find((node) => node.tagName === "head");
+  const containsScript = (node) =>
+    (node.tagName === "script" &&
+      node.childNodes?.some((child) =>
+        child.value?.startsWith(ensureScript.marker),
+      )) ||
+    node.childNodes?.some(containsScript);
+  if (ensureScript && !containsScript(doc)) {
+    const node = {
+      nodeName: "script",
+      tagName: "script",
+      namespaceURI: "http://www.w3.org/1999/xhtml",
+      attrs: [],
+      childNodes: [],
+      parentNode: head,
+    };
+    text(node, ensureScript.code.replace(/<\/script/gi, "<\\/script"));
+    head.childNodes.unshift(node);
+  }
   if (
     !head?.childNodes.some((node) =>
       node.attrs?.some(

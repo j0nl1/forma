@@ -6,6 +6,12 @@ import postcss from "postcss";
 import { inlineHtml } from "./lib/inline.mjs";
 import { readSystemSource } from "./lib/system-source.mjs";
 import { systemReview } from "./lib/system-review.mjs";
+import {
+  buildReviewData,
+  reviewRuntimeAssets,
+  portableCardAssets,
+} from "./lib/system-review-data.mjs";
+import { cardScript, cardNeedsReact } from "./lib/system-card-scripts.mjs";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import {
   namespaceFor,
@@ -194,7 +200,21 @@ export async function compile(root) {
   });
   const css = cssResult.outputFiles[0].text;
   let bundle = null;
-  if (spec.entry || spec.components.length) {
+  let jsxCards = false;
+  const jsxSourceFiles = new Set();
+  for (const card of [
+    ...model.cards,
+    ...(spec.startingPoints ?? []).filter(
+      (start) => start.kind !== "component",
+    ),
+  ])
+    if (
+      cardNeedsReact(await fs.readFile(await safeFile(root, card.path), "utf8"))
+    ) {
+      jsxCards = true;
+      jsxSourceFiles.add(card.path);
+    }
+  if (spec.entry || spec.components.length || jsxCards) {
     const imports = spec.components
       .map(
         (component, index) =>
@@ -237,6 +257,7 @@ export async function compile(root) {
     ["_ds_tokens.css", css],
     ...(bundle ? [["_ds_bundle.js", bundle]] : []),
   ]);
+  const transformScript = (code, type) => cardScript(code, type, namespace);
   const seeds = [],
     cards = [],
     startingPoints = [],
@@ -246,8 +267,12 @@ export async function compile(root) {
     const content = await inlineHtml(await safeFile(root, card.path), {
       root,
       generated,
+      transformScript,
+      ensureScript: jsxSourceFiles.has(card.path)
+        ? { marker: `/* @codex-ds namespace=${namespace}`, code: bundle }
+        : undefined,
     });
-    seeds.push({ name, content });
+    seeds.push({ name, content, sourcePath: card.path });
     cards.push({ ...card, sourcePath: card.path, path: name });
   }
   for (const seed of spec.startingPoints ?? []) {
@@ -271,8 +296,12 @@ export async function compile(root) {
     const content = await inlineHtml(await safeFile(root, seed.path), {
       root,
       generated,
+      transformScript,
+      ensureScript: jsxSourceFiles.has(seed.path)
+        ? { marker: `/* @codex-ds namespace=${namespace}`, code: bundle }
+        : undefined,
     });
-    seeds.push({ name, content });
+    seeds.push({ name, content, sourcePath: seed.path });
     startingPoints.push({
       ...seed,
       sourcePath: seed.path,
@@ -280,6 +309,17 @@ export async function compile(root) {
       previewPath: name,
     });
   }
+  const runtimeAssets = await reviewRuntimeAssets(
+    root,
+    model.sourceFiles,
+    seeds.some((seed) => /\bfetch\s*\(/.test(seed.content)),
+  );
+  for (const seed of seeds)
+    seed.content = portableCardAssets(
+      seed.content,
+      seed.sourcePath,
+      runtimeAssets.assets,
+    );
   const contracts =
     JSON.stringify(
       {
@@ -314,18 +354,32 @@ export async function compile(root) {
     bundle: bundle ? "_ds_bundle.js" : null,
     artifacts,
   };
+  const reviewFiles = new Map([
+    ...generated,
+    ...seeds.map((seed) => [seed.name, seed.content]),
+  ]);
+  const reviewData =
+    JSON.stringify(
+      await buildReviewData(root, manifest, reviewFiles, model.sourceFiles),
+    ) + "\n";
+  manifest.review = "_ds_review.json";
+  artifacts[manifest.review] = hash(reviewData);
   for (const seed of seeds)
     await write(path.join(root, seed.name), seed.content);
   await write(path.join(root, "_ds_tokens.css"), css);
   await write(path.join(root, "_ds_contracts.json"), contracts);
+  await write(path.join(root, manifest.review), reviewData);
   if (bundle) await write(path.join(root, "_ds_bundle.js"), bundle);
   else await fs.rm(path.join(root, "_ds_bundle.js"), { force: true });
   await writeJson(path.join(root, "_ds_manifest.json"), manifest);
   return manifest;
 }
 export async function preview(root) {
-  const { manifest: m } = await compiledSystem(root);
-  const content = systemReview(m);
+  const { manifest: m, files } = await compiledSystem(root);
+  const data = m.review
+    ? JSON.parse(files.get(m.review).toString())
+    : await buildReviewData(root, m, files);
+  const content = await systemReview(m, { files, data });
   await write(path.join(root, "preview.html"), content);
   return path.join(root, "preview.html");
 }

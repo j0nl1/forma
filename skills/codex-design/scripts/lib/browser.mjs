@@ -76,6 +76,7 @@ export async function withPage(
         window.CodexFileWindowsReady,
         window.CodexSocialReady,
         window.CodexPostsReady,
+        window.CodexSystemReviewReady,
         window.CodexStoriesReady,
         window.CodexSocialFramesReady,
         window.CodexXReady,

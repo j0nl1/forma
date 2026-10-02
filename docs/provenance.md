@@ -18,6 +18,8 @@ Research snapshots stay outside the repository. Components and schemas are indep
 | fzstd | Streaming Zstandard decoding | [fzstd](https://github.com/101arrowz/fzstd) |
 | parse5 | HTML parsing | [parse5](https://github.com/inikulin/parse5) |
 | postcss | CSS inspection, font rule parsing and export | [PostCSS](https://github.com/postcss/postcss) |
+| postcss-selector-parser | Shadow-root selector transformations that preserve literals | [Selector parser](https://github.com/postcss/postcss-selector-parser) |
+| marked | Design-system README Markdown rendering | [Marked](https://github.com/markedjs/marked) |
 | playwright | Chromium verification and capture | [Playwright](https://github.com/microsoft/playwright) |
 | react / react-dom | Optional component systems | [React](https://github.com/facebook/react) |
 | three | Optional 3D | [Three.js](https://github.com/mrdoob/three.js) |

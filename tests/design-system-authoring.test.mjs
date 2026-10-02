@@ -185,9 +185,14 @@ test("first compilation creates working portable cards and screen seeds; importe
     );
     assert.equal(
       await page
-        .getByRole("link", { name: "Action variants" })
+        .getByRole("link", { name: "Welcome", exact: true })
         .getAttribute("href"),
-      manifest.cards[0].path,
+      "#review-card-1",
+    );
+    assert.equal(await page.locator("iframe").count(), 0);
+    assert.equal(
+      await page.getByRole("button", { name: "Start 0" }).count(),
+      2,
     );
   });
   const project = path.join(directory, "project");
