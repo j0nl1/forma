@@ -8,6 +8,8 @@ import { nodeEffects } from "./figma-effects.mjs";
 import { nodePaints, visiblePaints, paintList } from "./figma-paints.mjs";
 import { boxStroke } from "./figma-strokes.mjs";
 import { nodeGeometry } from "./figma-geometry.mjs";
+import { renderMaskedChildren } from "./figma-masks.mjs";
+import { hasGlyphOutlines, nodeText } from "./figma-text.mjs";
 const LIMIT = 128 * 1024 * 1024;
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
@@ -231,15 +233,32 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
         "REGULAR_POLYGON",
         "BOOLEAN_OPERATION",
       ].includes(node.type));
-  const paints = nodePaints(doc, node, { id, w, h, color, vector, warnings });
+  const glyphs = node.type === "TEXT" && hasGlyphOutlines(node);
+  const paints = nodePaints(
+    doc,
+    glyphs ? { ...node, fillPaints: [], backgroundPaints: [] } : node,
+    {
+      id,
+      w,
+      h,
+      color,
+      vector: vector || glyphs,
+      warnings,
+    },
+  );
   css.push(...paints.declarations);
-  for (const key of ["mask", "isMask", "derivedSymbolData", "symbolData"])
+  for (const key of ["derivedSymbolData", "symbolData"])
     if (
       node[key] &&
       (typeof node[key] !== "object" || Object.keys(node[key]).length)
     )
       warnings.push(`${id}: ${key} needs visual review`);
-  const stroke = boxStroke(node, { id, color, vector, warnings });
+  const stroke = boxStroke(node, {
+    id,
+    color,
+    vector: vector || glyphs,
+    warnings,
+  });
   css.push(...stroke.declarations);
   const effects = nodeEffects(node, {
     id,
@@ -251,17 +270,9 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   css.push(...effects.declarations);
   let content = "";
   if (node.type === "TEXT") {
-    css.push(
-      `color:${paints.textColor}`,
-      `font-size:${finite(node.fontSize, 16)}px`,
-      `font-family:${JSON.stringify(node.fontName?.family ?? "sans-serif")}`,
-      `font-weight:${finite(node.fontWeight, 400)}`,
-      "white-space:pre-wrap",
-      `text-align:${String(node.textAlignHorizontal ?? "left").toLowerCase()}`,
-    );
-    content = html(
-      node.textData?.characters ?? node.characters ?? node.name ?? "",
-    );
+    const text = nodeText(doc, node, paints, { id, w, h, color, warnings });
+    css.push(...text.declarations);
+    content = text.content;
   } else if (vector) {
     content = nodeGeometry(doc, node, paints, {
       id,
@@ -276,9 +287,10 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     warnings.push(`${id}: auto-layout rendered from saved geometry`);
   }
   content = effects.defs + content;
-  content += node.children
-    .map((c) => renderNode(doc, c, { root: false, warnings }))
-    .join("");
+  content += renderMaskedChildren(doc, node, {
+    warnings,
+    renderChild: (child) => renderNode(doc, child, { root: false, warnings }),
+  });
   return `<div data-figma-id="${html(id)}" aria-label="${html(node.name)}" style="${html(css.join(";"))}">${content}</div>`;
 }
 export function renderDocument(doc, node) {
