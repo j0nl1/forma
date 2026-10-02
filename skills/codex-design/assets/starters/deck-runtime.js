@@ -18,6 +18,9 @@ export class DeckStage extends HTMLElement {
   ];
   connectedCallback() {
     if (this.controller) return;
+    const query = new URLSearchParams(location.search);
+    if (query.has("_snthumb") || query.has("deck-thumbnail"))
+      this.setAttribute("no-rail", "");
     if (!this.shadowRoot)
       this.attachShadow({ mode: "open" }).innerHTML = template;
     this.controller = new AbortController();

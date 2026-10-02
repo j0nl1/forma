@@ -69,7 +69,7 @@ Before the first click-triggered effect, builds form an automatic lead-in. Every
 
 Forward arrival starts the lead-in and hides pending entrances. Exits and emphasis/path elements begin in their base state. Right/Down, Space, PageDown and touch-right play pending click groups before advancing. Left/Up, PageUp, direct number/Home/End/reset/rail/API jumps bypass the current slide's groups. Backward arrival restores every group instantly: entrances visible, exits hidden, emphasis/path at their final state. Same-slide navigation does not replay active builds. Leaving cancels only runtime-owned animation objects and removes runtime hiding/mask attributes; authored transform shorthand and unrelated animations remain intact.
 
-Reduced motion finishes each played group instantly and retains click gating. `noscale`, `?_snthumb=` and `?deck-thumbnail=` disable the build engine and show base content. During print, runtime animations are cancelled and all unskipped slides show their authored base layout; returning restores the current slide fully built. Media-query changes and browser print events both use this contract.
+Reduced motion finishes each played group instantly and retains click gating. `noscale`, `?_snthumb=` and `?deck-thumbnail=` disable the build engine and show base content. Both thumbnail query parameters also hide the rail and its resize handle, so the slide fits the full viewport width without an editor gutter; a `#N` hash still selects the requested slide. During print, runtime animations are cancelled and all unskipped slides show their authored base layout; returning restores the current slide fully built. Media-query changes and browser print events both use this contract.
 
 ## Local APIs, notes and presentation
 

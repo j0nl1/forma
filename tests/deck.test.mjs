@@ -424,10 +424,34 @@ test("print, capture and reduced motion retain different state contracts while s
   await withPage(capture.url, async (page) => {
     await ready(page);
     assert.equal(
+      await page.locator("deck-stage").locator(".rail").isVisible(),
+      false,
+    );
+    assert.equal(
+      await page.locator("deck-stage").locator(".rail-resize").isVisible(),
+      false,
+    );
+    assert.equal(
+      await page.locator("deck-stage").evaluate((deck) => {
+        const viewport = deck.shadowRoot.querySelector(".viewport");
+        return viewport.clientWidth === deck.clientWidth;
+      }),
+      true,
+    );
+    assert.equal(
       await page.locator("deck-stage").evaluate((e) => e.stepsRemaining),
       0,
     );
     assert.equal(await page.locator("[data-deck-anim-hidden]").count(), 0);
+    await page.goto(
+      capture.url.replace("_snthumb=0", "deck-thumbnail=0") + "#3",
+    );
+    await ready(page);
+    assert.equal(
+      await page.locator("deck-stage").locator(".rail").isVisible(),
+      false,
+    );
+    assert.equal(await page.locator("deck-stage").evaluate((e) => e.index), 2);
   });
 });
 
