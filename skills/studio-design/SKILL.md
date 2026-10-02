@@ -1,11 +1,11 @@
 ---
 name: studio-design
-description: "Create and refine local HTML design artifacts in Codex: product mockups, interactive prototypes, wireframes, mobile screens, design systems, diagrams, documents, campaigns, PowerPoint presentations, and motion pieces. Use for visual design exploration or design-system import and authoring."
+description: "Create and refine local HTML design artifacts: product mockups, interactive prototypes, wireframes, mobile screens, design systems, diagrams, documents, campaigns, PowerPoint presentations, and motion pieces. Use for visual design exploration or design-system import and authoring."
 ---
 
 # Studio Design
 
-Produce local, inspectable design artifacts with Codex. Read [methodology](references/methodology.md) and [Codex workflow](references/codex.md) once, then load only the relevant recipes below. Use the user's existing project and authorized scope. PowerPoint presentations use the HTML deck workflow and local editable or screenshot export.
+Produce local, inspectable design artifacts with the available agent tools. Read [methodology](references/methodology.md) and [harness workflow](references/harness.md) once, then load only the relevant recipes below. In Codex, also read the optional [Codex integration](references/codex.md). Use the user's existing project and authorized scope. PowerPoint presentations use the HTML deck workflow and local editable or screenshot export.
 
 Read [known limitations](references/limitations.md) when choosing an export or integration. Preserve existing functions and state when editing a design, and disclose any limitation that affects the requested result.
 
@@ -13,7 +13,7 @@ Read [known limitations](references/limitations.md) when choosing an export or i
 
 Read the user's brief, applicable project instructions, existing source, and supplied references. For an existing design, read `design.json` (or an existing `_d_meta.json`) before changing it. Reuse the established direction and design systems unless the user changes them.
 
-For a new design, clarify only information that materially changes the outcome: audience, primary task, references, fidelity, and dimensions or variation count. Proceed with stated assumptions when reasonable; do not require a screenshot, ten questions, or a confirmation round when the brief is sufficient. Use Codex's available input tools as described in the Codex reference.
+For a new design, clarify only information that materially changes the outcome: audience, primary task, references, fidelity, and dimensions or variation count. Proceed with stated assumptions when reasonable; do not require a screenshot, ten questions, or a confirmation round when the brief is sufficient. Use available structured input tools or concise chat questions as described in the harness reference.
 
 Default output: `designs/<descriptive-slug>/index.html`, with local assets alongside it. Respect the user's chosen destination. Research captures, traces, and temporary exports belong outside the repository unless requested. Persist prose and generated UI in English unless the user explicitly requests a different language for that artifact.
 
@@ -56,8 +56,8 @@ Record completed deliverables with `scripts/project.mjs record`; it records loca
 
 ## Verify and deliver
 
-Serve the project over loopback HTTP using `scripts/preview.mjs`. Verify the main flow, keyboard behavior, small viewport, console errors, and screenshots using available Codex browser tools or the local Playwright helper. Inspect screenshots when layout matters. For motion, verify timestamps around every scene boundary, then play the entire piece.
+Serve the project over loopback HTTP using `scripts/preview.mjs`. Verify the main flow, keyboard behavior, small viewport, console errors, and screenshots using available browser tools or the local Playwright helper. Inspect screenshots when layout matters. For motion, verify timestamps around every scene boundary, then play the entire piece.
 
 Use `scripts/verify.mjs` for local automated browser checks when dependencies are installed. A passing static check does not prove visual quality. Report missing browser verification explicitly. Fix observed failures before handing over.
 
-In Codex desktop, open the verified local URL in the visible in-app browser when available. Deliver an absolute file link, the preview URL, and a short explanation of what works and any material limitation. In CLI, provide the URL and file link. Never invent available tools, silently install a connector, publish externally, or replace Codex's chosen model. Use subagents only when authorized.
+Open the verified local URL through the harness's preview UI when available; otherwise provide the URL for a standard browser. Deliver an absolute file path or supported file link, the preview URL, and a short explanation of what works and any material limitation. Never invent available tools, silently install a connector, publish externally, or replace the user's chosen model. Use subagents only when authorized.

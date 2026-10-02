@@ -90,4 +90,4 @@ The default handoff copies the actual draft to the clipboard and displays it for
 
 Tests exercise typed edits, palette shape, range/select/toggle controls, number and segmented pointer scrubbing, live component preservation, drag/clamping, keyboard/focus, print, JSON downloads, browser persistence, legacy/JSON source writes, script-ending escapes, stale/foreign/concurrent rejection, storage recovery and actual clipboard draft delivery. The showcase is `tweaks.html`.
 
-Automatic native Codex-composer insertion is not available. Clipboard handoff requires the user's paste/review/send step. Verify additional browsers/touch devices and multiple independently mounted panels when those layouts are needed.
+Automatic harness-composer insertion requires an explicitly configured integration and is not provided by the runtime. Clipboard handoff requires the user's paste/review/send step. Verify additional browsers/touch devices and multiple independently mounted panels when those layouts are needed.

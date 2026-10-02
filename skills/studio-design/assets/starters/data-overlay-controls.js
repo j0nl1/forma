@@ -62,7 +62,9 @@ export class OverlayControls {
     const button = node(
       "button",
       "dv-ask",
-      busy ? "Draft ready — awaiting data" : "Ask Codex to fetch metrics",
+      busy
+        ? "Draft ready — awaiting data"
+        : "Ask your assistant to fetch metrics",
     );
     button.type = "button";
     button.toggleAttribute("data-busy", busy);
@@ -284,15 +286,15 @@ export class OverlayControls {
       if (typeof this.host.onRequest === "function") {
         await this.host.onRequest(request);
         this.host.draftStatus.textContent =
-          "Draft delivered for review. Send it in Codex when ready.";
+          "Draft delivered for review. Send it in your assistant chat when ready.";
       } else {
         await navigator.clipboard.writeText(request.text);
         this.host.draftStatus.textContent =
-          "Copied. Paste into Codex, review and send.";
+          "Copied. Paste into your assistant chat, review and send.";
       }
     } catch {
       this.host.draftStatus.textContent =
-        "Copy the draft below, then paste it into Codex to review and send.";
+        "Copy the draft below, then paste it into your assistant chat to review and send.";
     }
     return request;
   }
@@ -312,11 +314,11 @@ export class OverlayControls {
       try {
         await navigator.clipboard.writeText(this.host.draftText.value);
         this.host.draftStatus.textContent =
-          "Copied. Paste into Codex, review and send.";
+          "Copied. Paste into your assistant chat, review and send.";
       } catch {
         this.host.draftText.select();
         this.host.draftStatus.textContent =
-          "Select and copy the draft, then review and send it in Codex.";
+          "Select and copy the draft, then review and send it in your assistant chat.";
       }
     });
     close.addEventListener("click", () => {

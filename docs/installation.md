@@ -1,8 +1,8 @@
 # Installation
 
-Use Codex desktop, CLI, or IDE with local file access. The Markdown skill and basic native HTML starters have no package dependency. Preview, build, verification, export and design-system helpers require the pinned dependencies below, including previewing or exporting plain HTML. General D3 charts, geographic maps, 3D and React runtimes also use those dependencies and the build helper. Use Node.js 22+ for the helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio. Both are also required when PowerPoint media needs a local playback copy for source trims, speed or volume/mute; unadjusted PowerPoint media does not require them.
+Use an agent harness with local file and terminal access. The Markdown skill and basic native HTML starters have no package dependency. Preview, build, verification, export and design-system helpers require the pinned dependencies below, including previewing or exporting plain HTML. General D3 charts, geographic maps, 3D and React runtimes also use those dependencies and the build helper. Use Node.js 22+ for the helpers. Playwright Chromium is needed for browser checks and exports; FFmpeg is needed for video, and FFprobe is used when including audio. Both are also required when PowerPoint media needs a local playback copy for source trims, speed or volume/mute; unadjusted PowerPoint media does not require them.
 
-The [official skill documentation](https://developers.openai.com/codex/skills) describes `SKILL.md` discovery. The inspected local Codex loader supports project and user `.agents/skills` roots. UI metadata lives in `agents/openai.yaml`.
+The portable entry point follows the [Agent Skills specification](https://agentskills.io/specification). `agents/openai.yaml` supplies optional Codex UI metadata; other agents use `SKILL.md` and the same local resources. Native preview, input and generation tools are discovered by capability, with alternatives documented in the [harness workflow](../skills/studio-design/references/harness.md).
 
 ## Install a reviewed local copy
 
@@ -13,20 +13,46 @@ node tools/install.mjs --global --dry-run
 node tools/install.mjs --global
 ```
 
-Destination: `~/.agents/skills/studio-design`. For one project:
+Destination: `~/.agents/skills/studio-design`. This shared default preserves existing installations. For one project:
 
 ```sh
 node tools/install.mjs --project /absolute/path/to/project --dry-run
 node tools/install.mjs --project /absolute/path/to/project
 ```
 
-Destination: `<project>/.agents/skills/studio-design`. For a custom or legacy root:
+Destination: `<project>/.agents/skills/studio-design`. Select another discovery root explicitly:
+
+```sh
+node tools/install.mjs --global --harness claude --dry-run
+node tools/install.mjs --global --harness claude
+node tools/install.mjs --project /absolute/path/to/project --harness gemini
+```
+
+| `--harness` | Global destination | Project destination | Activation |
+| --- | --- | --- | --- |
+| `shared` (default) | `~/.agents/skills/studio-design` | `<project>/.agents/skills/studio-design` | Use a recognizing harness's skill mechanism, or load by path |
+| `codex` | `~/.agents/skills/studio-design` | `<project>/.agents/skills/studio-design` | `$studio-design` |
+| `claude` | `~/.claude/skills/studio-design` | `<project>/.claude/skills/studio-design` | `/studio-design` |
+| `gemini` | `~/.gemini/skills/studio-design` | `<project>/.gemini/skills/studio-design` | Confirm discovery with `/skills list`, then request Studio Design |
+| `opencode` | `~/.config/opencode/skills/studio-design` | `<project>/.opencode/skills/studio-design` | Ask the agent to load the `studio-design` skill |
+
+These roots are documented by [Codex](https://developers.openai.com/codex/skills), [Claude Code](https://code.claude.com/docs/en/skills), [Gemini CLI](https://geminicli.com/docs/cli/skills/) and [OpenCode](https://opencode.ai/docs/skills/). Gemini CLI and OpenCode also recognize the shared `.agents/skills` root. Avoid duplicate installations of the same skill in roots read by one harness. Presets select the destination only: the installed skill bytes are identical and the installer does not detect, launch or configure any harness.
+
+For any other agent, or a customized configuration root, use its documented skills directory as a destination:
 
 ```sh
 node tools/install.mjs --dest /absolute/path/to/skills/studio-design
 ```
 
-The installer rejects existing destinations and source symlinks, stages a complete copy, and performs no network calls or package installs. It copies no `node_modules`. Avoid duplicate discovery roots. Reload Codex or start a new chat if needed, then explicitly invoke `$studio-design`.
+Do not combine `--dest` with `--harness`. An agent without native skills support can use the installed files directly:
+
+```text
+Read /absolute/path/to/skills/studio-design/SKILL.md and use it for this task.
+Resolve references, starters and helper commands from that skill folder.
+Build a working reading-app prototype in /absolute/path/to/designs/reader.
+```
+
+The installer rejects existing destinations and source symlinks, stages a complete copy, and performs no network calls or package installs. It copies no `node_modules`. Reload the harness or start a new session if needed. Discovery paths and helper execution are tested; authenticated end-to-end sessions in every third-party harness are not verified. A harness without local filesystem/process permissions needs an environment that supplies those capabilities before it can execute the workflow.
 
 ## Runtime dependencies
 
@@ -37,7 +63,7 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-For the installed global skill:
+For the installed shared global skill:
 
 ```sh
 cd "$HOME/.agents/skills/studio-design"
@@ -45,7 +71,7 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-Use the project installation folder instead when applicable. Keep npm workspace installation enabled: the packaged `runtimes/react18` workspace installs the matched React/ReactDOM 18.3.1 pair separately from the native 19.2.4 pair. Do not pass `--workspaces=false`, force peer dependencies, or install a second React version over the primary pair. Both the checkout and installed copy include pinned lockfiles for this graph. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio or adjusted PowerPoint media.
+Use the actual selected installation folder instead when applicable. Keep npm workspace installation enabled: the packaged `runtimes/react18` workspace installs the matched React/ReactDOM 18.3.1 pair separately from the native 19.2.4 pair. Do not pass `--workspaces=false`, force peer dependencies, or install a second React version over the primary pair. Both the checkout and installed copy include pinned lockfiles for this graph. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio or adjusted PowerPoint media.
 
 PowerPoint export uses pinned PptxGenJS and Chromium, with no Office installation or external service required. Both lockfiles pin the patched image-size 2.0.4 dependency through an override. Keep that override when updating packages. Supply explicit local static TTF/OTF files through `pptxFonts` to embed fonts for editable text. Unembedded fonts, or applications that ignore embedded fonts, need the corresponding local fonts. See the [PowerPoint guide](../skills/studio-design/references/powerpoint.md).
 
@@ -60,6 +86,7 @@ Animation captions include Inter Medium 4.1 under the SIL Open Font License; no 
 Commands in the usage guide show checkout-relative paths. For an installed skill, use its absolute directory instead:
 
 ```sh
+# Set this to the actual folder printed by the installer.
 STUDIO_DESIGN_SKILL="$HOME/.agents/skills/studio-design"
 node "$STUDIO_DESIGN_SKILL/scripts/preview.mjs" /absolute/path/to/design --port 0
 ```
@@ -81,16 +108,16 @@ Reference `app.bundle.js` from the design's HTML. The installed helper resolves 
 
 ## Update and remove
 
-Review changes, then update the original scope:
+Review changes, then update the original scope and harness target:
 
 ```sh
 node tools/install.mjs --global --update --dry-run
 node tools/install.mjs --global --update
 ```
 
-An update requires a managed install marker and refuses changed, added, or deleted source files. Preserve local customizations separately. Re-run `npm ci --ignore-scripts` after updating; generated dependencies are not retained. Manually copied and symlink installations are not adopted automatically.
+Repeat the original `--harness` value when using a non-default root, or the original `--dest` for a custom installation. An update requires a managed install marker and refuses changed, added, or deleted source files. Preserve local customizations separately. Re-run `npm ci --ignore-scripts` after updating; generated dependencies are not retained. Manually copied and symlink installations are not adopted automatically.
 
-To uninstall, inspect and remove only the chosen `studio-design` installation directory with your file manager, then reload Codex. Generated designs stay in their output folders. The installer and removal do not alter Codex configuration.
+To uninstall, inspect and remove only the chosen `studio-design` installation directory with your file manager, then reload the harness. Generated designs stay in their output folders. The installer and removal do not alter harness configuration.
 
 Geography dependencies are pinned with the other helpers: D3 7.9.0, topojson-client 3.1.0, world-atlas 2.0.2 and Leaflet 1.9.4. Build the vector and street entries as described in the [geography guide](../skills/studio-design/references/geography.md). Copy/link the street bundle's generated CSS alongside its JavaScript. Country geometry is local; an enabled street tile provider uses the page's normal network connection.
 

@@ -444,7 +444,7 @@ test("suggestion typewriter plays once, freezes a complete ghost, copies real dr
       "Add a quiet-hours dial",
     );
     assert.equal(
-      await page.getByRole("textbox", { name: "Codex draft" }).inputValue(),
+      await page.getByRole("textbox", { name: "Assistant draft" }).inputValue(),
       "Add a quiet-hours dial",
     );
     await input.fill("Adjust the headline hierarchy");
@@ -486,7 +486,7 @@ test("suggestion typewriter plays once, freezes a complete ghost, copies real dr
       /Copy the draft below/,
     );
     assert.equal(
-      await page.getByRole("textbox", { name: "Codex draft" }).inputValue(),
+      await page.getByRole("textbox", { name: "Assistant draft" }).inputValue(),
       "Use a quieter palette",
     );
     assert.deepEqual(await page.evaluate(() => window.messages), []);

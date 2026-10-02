@@ -72,7 +72,7 @@ Escape, the close button or the backdrop closes the view and restores the opener
 | `file-window:pick` | `{ file }`, from card click or keyboard activation. |
 | `file-window:action` | `{ file }`, from the optional expanded-view action. |
 
-Handle these events in the containing page to select/open/use a project file. Automatic handoff to the Codex composer remains a required integration; emitting a local event does not claim that the composer received a file.
+Handle these events in the containing page to select/open/use a project file. Automatic handoff to a harness composer is an optional integration; emitting a local event does not claim that an agent received a file. Without a configured handler, share the selected file path in chat or open it in a standard browser.
 
 Theme using `--fw-ud` (waiting pencil), `--fw-surf`, `--fw-muted`, `--fw-fg`, `--fw-fg3`, `--fw-line`, `--fw-line2`, `--fw-hov`, `--fw-sel`, `--fw-skel`, `--fw-scroll` and `--fw-font`. The expanded view copies those variables from its owner.
 
@@ -82,4 +82,4 @@ Whole-page PNG/PDF export settles available file previews, including lazy ones, 
 
 Tests cover geometry/path bounds, real same-length rewrites, two-miss/reappearance behavior, missing-file patience with unrelated streaming activity, reduced motion, both native transports and duplicate-name paths, embedded receivers in both views, lazy/reconnect behavior, HEAD fallback without validators, stale request cancellation, actual polling, tall/narrow/dynamically growing modal documents, CSS viewport height, transformed-body escape, action changes, close/focus behavior, portable runtime removal and actual exported crop pixels.
 
-additional browser engines, physical interaction checks and automatic Codex authoring/selection handoff remain required. Independently drawn waiting plans preserve the animation contract; exact source-artwork equivalence has not been verified.
+additional browser engines, physical interaction checks and configured harness authoring/selection handoff need separate verification when used. Independently drawn waiting plans preserve the animation contract; exact source-artwork equivalence has not been verified.

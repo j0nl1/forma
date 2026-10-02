@@ -47,4 +47,4 @@ The result reports `audio`, `audioTracks` (distinct source range/speed stems), a
 
 Use an available, authorized connector for a requested send-to-Figma or Canva action. Read that connector's skill and verify destination and result. Without one, provide editable HTML, local assets, tokens, dimensions, and interaction notes as a handoff package and clearly say transfer did not occur. Do not invent upload URLs or claim native editability after a raster export.
 
-A Codex implementation handoff stays in the current repository or a user-requested new chat. Explain the state model, component boundaries, tokens, dependencies, and verified flow. Do not message other chats or publish without authorization. PowerPoint handoff uses the local editable or screenshot exporter described above.
+An implementation handoff stays in the current repository or a user-requested new chat. Explain the state model, component boundaries, tokens, dependencies, and verified flow. Do not message other chats or publish without authorization. PowerPoint handoff uses the local editable or screenshot exporter described above.

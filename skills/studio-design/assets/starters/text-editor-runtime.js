@@ -173,7 +173,7 @@ export class TextEditor extends HTMLElement {
     event.stopImmediatePropagation();
     if (!target) {
       this.notice = this.store.source
-        ? "This content has no matching literal HTML text. Edit its authoring code in Codex."
+        ? "This content has no matching literal HTML text. Edit its authoring code with your assistant or file editor."
         : "This content changed outside the editor. Reload the preview before selecting it.";
       this.refresh();
       return;

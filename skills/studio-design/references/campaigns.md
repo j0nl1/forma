@@ -27,7 +27,7 @@ The default is fourteen placements: ten mobile assets and four desktop feeds. A 
 | `facebookDesktop` | Browser + Facebook feed card | 1200×630 |
 | `redditDesktop` | Browser + Reddit feed card | 1200×675 |
 
-When required campaign/brand information is missing, combine the subject, voice/assets/constraints and optional format choice in one native Codex question round. Do not repeat an answered interview. An unanswered optional format question keeps the complete roster. `campaignDefaults()` supplies those fourteen true flags. `campaignDefaults({platforms:["x","reddit"]})` selects both phone/desktop pairs; `{mobileOnly:true}` narrows platform selection. `{formats:["story","redditDesktop"]}` selects explicit placements. An explicit empty array selects none; it is not the representation of a skipped question. Unknown keys fail rather than silently omitting a requested platform.
+When required campaign/brand information is missing, combine the subject, voice/assets/constraints and optional format choice in one available structured question round, or a concise chat question. Do not repeat an answered interview. An unanswered optional format question keeps the complete roster. `campaignDefaults()` supplies those fourteen true flags. `campaignDefaults({platforms:["x","reddit"]})` selects both phone/desktop pairs; `{mobileOnly:true}` narrows platform selection. `{formats:["story","redditDesktop"]}` selects explicit placements. An explicit empty array selects none; it is not the representation of a skipped question. Unknown keys fail rather than silently omitting a requested platform.
 
 ## Author and control the board
 

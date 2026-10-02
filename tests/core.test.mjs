@@ -5,7 +5,7 @@ import http from "node:http";
 import path from "node:path";
 import { zipSync } from "fflate";
 import { temporary, root, figFixture } from "./helpers.mjs";
-import { install } from "../tools/install.mjs";
+import { install, installationDestination } from "../tools/install.mjs";
 import {
   inspect,
   compile,
@@ -293,9 +293,9 @@ test("compiled starting points remain self-contained after system import", async
   assert.ok(await fs.stat(seed));
 });
 
-test("installed skill lockfile and helpers work independently of the checkout", async (t) => {
+test("installed skill lockfile and helpers work in a non-Codex root independently of the checkout", async (t) => {
   const dir = await temporary(t),
-    dest = path.join(dir, "installed");
+    dest = installationDestination({ project: dir, harness: "claude" });
   await install(dest);
   const { execFileSync } = await import("node:child_process");
   execFileSync("npm", ["ci", "--ignore-scripts", "--offline"], {

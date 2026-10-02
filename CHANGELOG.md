@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Made the skill workflow independent of the agent harness, with standard file, chat, browser, clipboard and provider fallbacks. Retained optional Codex input/preview conveniences and existing browser contracts.
+- Added explicit shared, Codex, Claude Code, Gemini CLI and OpenCode installation targets plus arbitrary destination support, without automatic detection or harness configuration changes.
+
 - Fixed media posters obscuring automatic native video during slide builds. Eligible manual videos use a conditional cover that remains visible before a click and in print, then disappears as the real player starts; playback is verified in Impress 24.2 and 25.8.
 
 - Fixed isolated picture captures being truncated or omitted on later print-layout slides by capturing their document-coordinate clip in full-page mode.

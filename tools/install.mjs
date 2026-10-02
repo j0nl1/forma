@@ -17,6 +17,36 @@ const source = fileURLToPath(
 );
 const digest = (data) => createHash("sha256").update(data).digest("hex");
 const marker = ".studio-design-install.json";
+export function installationDestination(
+  { global, project, dest, harness } = {},
+  { homeDir = os.homedir() } = {},
+) {
+  const roots = {
+    shared: ".agents",
+    codex: ".agents",
+    claude: ".claude",
+    gemini: ".gemini",
+    opencode: global ? path.join(".config", "opencode") : ".opencode",
+  };
+  if ([global, project, dest].filter(Boolean).length !== 1)
+    throw new Error("Choose exactly one of --global, --project or --dest");
+  if (dest) {
+    if (harness)
+      throw new Error("Use --dest without --harness for a custom skill root");
+    return path.resolve(dest);
+  }
+  const target = harness ?? "shared";
+  if (!Object.hasOwn(roots, target))
+    throw new Error(
+      `Unknown harness: ${target}; choose shared, codex, claude, gemini or opencode, or use --dest`,
+    );
+  return path.resolve(
+    global ? homeDir : project,
+    roots[target],
+    "skills",
+    "studio-design",
+  );
+}
 export async function install(
   destination,
   { update = false, dryRun = false } = {},
@@ -93,24 +123,15 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--global": "boolean",
       "--project": "value",
       "--dest": "value",
+      "--harness": "value",
       "--update": "boolean",
       "--dry-run": "boolean",
     });
-    if (
-      p.length ||
-      [flags.global, flags.project, flags.dest].filter(Boolean).length !== 1
-    )
+    if (p.length)
       throw new Error(
-        "Usage: node tools/install.mjs --global | --project <folder> | --dest <skill-folder> [--update] [--dry-run]",
+        "Usage: node tools/install.mjs --global | --project <folder> | --dest <skill-folder> [--harness shared|codex|claude|gemini|opencode] [--update] [--dry-run]",
       );
-    const dest =
-      flags.dest ||
-      path.join(
-        flags.global ? os.homedir() : path.resolve(flags.project),
-        ".agents",
-        "skills",
-        "studio-design",
-      );
+    const dest = installationDestination(flags);
     console.log(
       JSON.stringify(
         await install(dest, { update: flags.update, dryRun: flags["dry-run"] }),
