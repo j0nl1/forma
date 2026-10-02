@@ -346,32 +346,24 @@ test("actual HTML export preserves custom pivots, CSS base transforms and compos
   );
 });
 
-test("nested opacity, repeated builds and moving ancestor clips retain explicit static diagnostics", async () => {
-  for (const [effect, attributes, reason] of [
-    ["fade-in", {}, "compositing"],
-    ["spin", { "data-anim-repeat": "2" }, "repeated"],
-    ["spin", {}, "ancestor clips"],
-  ]) {
-    const { buffer, captures } = await generated(["path"]),
-      capture = captures[0],
-      base = capture.animations[0];
-    capture.objects[0].animIds = ["child", base.id];
-    capture.animations.push({
-      ...base,
-      id: "child",
-      documentIndex: 1,
-      clippedByAncestor: reason === "ancestor clips",
-      attributes: {
-        "data-anim": effect,
-        "data-anim-trigger": "with",
-        ...attributes,
-      },
-    });
-    const result = applyPptxMotion(buffer, captures);
-    assert.equal(result.animationCount, 0);
-    assert.equal(result.staticAnimationCount, 2);
-    assert.ok(result.warnings.some((warning) => warning.includes(reason)));
-  }
+test("moving ancestor clips retain explicit static diagnostics", async () => {
+  const { buffer, captures } = await generated(["path"]),
+    capture = captures[0],
+    base = capture.animations[0];
+  capture.objects[0].animIds = ["child", base.id];
+  capture.animations.push({
+    ...base,
+    id: "child",
+    documentIndex: 1,
+    clippedByAncestor: true,
+    attributes: { "data-anim": "spin", "data-anim-trigger": "with" },
+  });
+  const result = applyPptxMotion(buffer, captures);
+  assert.equal(result.animationCount, 0);
+  assert.equal(result.staticAnimationCount, 2);
+  assert.ok(
+    result.warnings.some((warning) => warning.includes("ancestor clips")),
+  );
 });
 
 test("Impress imports and round-trips all native build families when installed", async (t) => {

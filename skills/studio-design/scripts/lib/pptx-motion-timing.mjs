@@ -13,8 +13,8 @@ export function timingWriter(nextId) {
     `<p:set>${behavior(shapeId, ["style.visibility"], duration, delay)}<p:to><p:strVal val="${visible ? "visible" : "hidden"}"/></p:to></p:set>`;
   const filterEffect = (shapeId, entry) =>
     `<p:animEffect transition="${entry.kind === "exit" ? "out" : "in"}" filter="${entry.filter}">${behavior(shapeId, [], entry.duration).replace("<p:attrNameLst></p:attrNameLst>", "")}</p:animEffect>`;
-  const numeric = (shapeId, attribute, track, duration) =>
-    `<p:anim calcmode="lin" valueType="num">${behavior(shapeId, [attribute], duration)}<p:tavLst>${track
+  const numeric = (shapeId, attribute, track, duration, delay = 0) =>
+    `<p:anim calcmode="lin" valueType="num">${behavior(shapeId, [attribute], duration, delay)}<p:tavLst>${track
       .map(([offset, value]) => {
         const content = attribute.startsWith("ppt_")
           ? `<p:strVal val="${`#${attribute}${value < 0 ? "" : "+"}${number(value)}`}"/>`
@@ -22,7 +22,7 @@ export function timingWriter(nextId) {
         return `<p:tav tm="${Math.round(offset * 100000)}"><p:val>${content}</p:val></p:tav>`;
       })
       .join("")}</p:tavLst></p:anim>`;
-  const transform = (shapeId, type, track, duration) =>
+  const transform = (shapeId, type, track, duration, delay = 0) =>
     track
       .slice(1)
       .map(([offset, value], index) => {
@@ -31,7 +31,7 @@ export function timingWriter(nextId) {
           shapeId,
           type === "rotation" ? ["r"] : ["ScaleX", "ScaleY"],
           Math.round(offset * duration) - Math.round(previous * duration),
-          previous * duration,
+          delay + previous * duration,
         );
         return type === "rotation"
           ? `<p:animRot from="${Math.round(from * 60000)}" to="${Math.round(value * 60000)}">${common}</p:animRot>`
@@ -41,25 +41,47 @@ export function timingWriter(nextId) {
   function effect(entry, start, groupId) {
     const nodeId = id();
     const duration = entry.duration * (entry.autoReverse ? 2 : 1);
-    const contents = (entry.targets ?? [])
-      .map((target) => {
-        const body = [...entry.tracks]
-          .map(([attribute, values]) =>
-            ["rotation", "scale"].includes(attribute)
-              ? transform(target, attribute, values, duration)
-              : numeric(target, attribute, values, duration),
-          )
+    const contents = entry.frameVisibility
+      ? entry.frameVisibility
+          .map(({ target, visible }) => visibility(target, visible, 0, 0))
+          .join("")
+      : (entry.targets ?? [])
+          .map((target) => {
+            const body = (
+              entry.segments ?? [{ start: 0, duration, tracks: entry.tracks }]
+            )
+              .map((segment) =>
+                [...segment.tracks]
+                  .map(([attribute, values]) =>
+                    ["rotation", "scale"].includes(attribute)
+                      ? transform(
+                          target,
+                          attribute,
+                          values,
+                          segment.duration,
+                          segment.start,
+                        )
+                      : numeric(
+                          target,
+                          attribute,
+                          values,
+                          segment.duration,
+                          segment.start,
+                        ),
+                  )
+                  .join(""),
+              )
+              .join("");
+            return (
+              (entry.kind === "entrance" ? visibility(target, true) : "") +
+              body +
+              (entry.filter ? filterEffect(target, entry) : "") +
+              (entry.kind === "exit"
+                ? visibility(target, false, entry.duration, 0)
+                : "")
+            );
+          })
           .join("");
-        return (
-          (entry.kind === "entrance" ? visibility(target, true) : "") +
-          body +
-          (entry.filter ? filterEffect(target, entry) : "") +
-          (entry.kind === "exit"
-            ? visibility(target, false, entry.duration, 0)
-            : "")
-        );
-      })
-      .join("");
     const presetClass = {
       entrance: "entr",
       exit: "exit",
@@ -71,7 +93,7 @@ export function timingWriter(nextId) {
       with: "withEffect",
       after: "afterEffect",
     }[entry.trigger];
-    return `<p:par><p:cTn id="${nodeId}"${contents ? "" : ` dur="${Math.round(duration)}"`} fill="hold" grpId="${groupId}" nodeType="${nodeType}" presetClass="${presetClass}" repeatCount="${entry.repeat * 1000}">${condition(Math.round(start))}${contents ? `<p:childTnLst>${contents}</p:childTnLst>` : ""}</p:cTn></p:par>`;
+    return `<p:par><p:cTn id="${nodeId}"${contents && !entry.segments ? "" : ` dur="${Math.round(duration)}"`} fill="hold" grpId="${groupId}" nodeType="${nodeType}" presetClass="${presetClass}" repeatCount="${entry.repeat * 1000}">${condition(Math.round(start))}${contents ? `<p:childTnLst>${contents}</p:childTnLst>` : ""}</p:cTn></p:par>`;
   }
   function sequence(steps) {
     const seqId = id();
@@ -92,5 +114,5 @@ export function timingWriter(nextId) {
       .join("");
     return `<p:seq concurrent="1" nextAc="seek"><p:cTn id="${seqId}" dur="indefinite" nodeType="mainSeq"><p:childTnLst>${groups}</p:childTnLst></p:cTn><p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst><p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>`;
   }
-  return { id, sequence };
+  return { id, sequence, visibility, numeric };
 }

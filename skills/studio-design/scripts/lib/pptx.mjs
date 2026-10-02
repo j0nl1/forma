@@ -9,6 +9,7 @@ import {
   normalizePptxMedia,
 } from "./pptx-media.mjs";
 import { applyPptxMotion } from "./pptx-motion.mjs";
+import { preparePptxCompositingFrames } from "./pptx-motion-frames.mjs";
 import {
   loadPptxFonts,
   preparePptxFonts,
@@ -125,8 +126,7 @@ export async function renderPptx(page, output, options = {}) {
         warnings.add(`Slide ${index + 1}: ${warning}`);
       const captured = await page.evaluate(captureSlide, index);
       captured.sourceIndex = index;
-      // Some presentation readers omit native media covers during print. Keep a
-      // real picture beneath the player so its authored artwork survives there.
+      // Stable names connect captured artwork with generated native shapes.
       captured.objects.forEach((object, ordinal) => {
         object.objectName = `studio-object-${index}-${ordinal}`;
       });
@@ -178,10 +178,15 @@ export async function renderPptx(page, output, options = {}) {
       }
       for (const warning of captured.warnings)
         warnings.add(`Slide ${index + 1}: ${warning}`);
+      if (config.animations === "native") {
+        const frames = await preparePptxCompositingFrames(page, captured);
+        for (const warning of frames.warnings)
+          warnings.add(`Slide ${index + 1}: ${warning}`);
+      }
       for (const object of captured.objects) {
         const geometry = {
           objectName: object.objectName,
-          x: object.x * unit,
+          x: (object.x + (object.parked ? metadata.width * 2 : 0)) * unit,
           y: object.y * unit,
           w: object.w * unit,
           h: object.h * unit,
@@ -210,7 +215,8 @@ export async function renderPptx(page, output, options = {}) {
           });
           editableObjects++;
         } else {
-          const image = await capturePptxImage(page, locator, object);
+          const image =
+            object.png ?? (await capturePptxImage(page, locator, object));
           if (object.kind === "media") {
             const media = await preparePptxMedia(page, object, image);
             if (media.playback)
@@ -221,10 +227,11 @@ export async function renderPptx(page, output, options = {}) {
               });
             for (const warning of media.warnings)
               warnings.add(`Slide ${index + 1}: ${warning}`);
-            // The native media object's cover supplies its resting artwork.
-            // A separate poster can obscure actual playback during builds.
+            // Automatic media uses its own cover. Native timing hides the
+            // conditional manual-video cover as its click starts playback.
             slide.addMedia({ ...media.options, ...geometry });
             mediaObjects++;
+            rasterObjects += media.playback?.posterObjects ?? 0;
             continue;
           }
           slide.addImage({
@@ -242,11 +249,13 @@ export async function renderPptx(page, output, options = {}) {
     });
     if (config.mode === "editable")
       buffer = normalizePptxMedia(buffer, capturedSlides);
-    let nativeAnimations = 0;
+    let nativeAnimations = 0,
+      rasterAnimations = 0;
     if (config.mode === "editable" && config.animations === "native") {
       const motion = applyPptxMotion(buffer, capturedSlides);
       buffer = motion.buffer;
       nativeAnimations = motion.animationCount;
+      rasterAnimations = motion.rasterAnimationCount;
       for (const warning of motion.warnings) warnings.add(warning);
     } else if (animationCount)
       warnings.add(
@@ -287,7 +296,8 @@ export async function renderPptx(page, output, options = {}) {
       mediaPlayback,
       embeddedFonts,
       nativeAnimations,
-      staticAnimations: animationCount - nativeAnimations,
+      rasterAnimations,
+      staticAnimations: animationCount - nativeAnimations - rasterAnimations,
       warnings: [...warnings],
     };
   } finally {

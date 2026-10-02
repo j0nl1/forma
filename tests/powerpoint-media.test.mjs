@@ -279,7 +279,7 @@ test("PowerPoint exports adjusted playable bytes beside editable builds and expl
     zip = unzipSync(await fs.readFile(output)),
     slide = strFromU8(zip["ppt/slides/slide1.xml"]);
   assert.equal(result.mediaObjects, 1);
-  assert.equal(result.rasterObjects, 0);
+  assert.equal(result.rasterObjects, 1);
   assert.equal(result.nativeAnimations, 1);
   assert.equal(result.mediaPlayback[0].embeddedSource, "derived");
   assert.deepEqual(
@@ -293,7 +293,9 @@ test("PowerPoint exports adjusted playable bytes beside editable builds and expl
   );
   assert.match(slide, /<a:t>Editable heading<\/a:t>/);
   assert.match(slide, /<p:video><p:cMediaNode/);
-  assert.equal((slide.match(/<p:pic>/g) || []).length, 1);
+  assert.equal((slide.match(/<p:pic>/g) || []).length, 2);
+  assert.equal(result.mediaPlayback[0].activation, "poster-click");
+  assert.equal(result.mediaPlayback[0].posterObjects, 1);
   assert.match(slide, /<p:cMediaNode vol="100000" mute="0"/);
   assert.match(slide, /repeatCount="indefinite"/);
   assert.match(slide, /nodeType="mainSeq"/);
@@ -303,7 +305,7 @@ test("PowerPoint exports adjusted playable bytes beside editable builds and expl
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(
     result.warnings.some((warning) =>
-      warning.includes("LibreOffice 25.8 player plays it once"),
+      warning.includes("video playback ran only once"),
     ),
   );
   const payload = Object.entries(zip).find(([name]) =>
@@ -554,5 +556,87 @@ test(
     );
     assert.ok(mediaSlide.some((sample) => sample.headingWhitePixels < 100));
     assert.ok(mediaSlide.some((sample) => sample.headingWhitePixels > 2000));
+  },
+);
+
+test(
+  "real Impress manual video retains its printed cover and starts only on its native click",
+  { skip: process.env.STUDIO_TEST_IMPRESS !== "1" },
+  async (t) => {
+    const { dir } = await clip(t);
+    await fs.cp(
+      path.join(root, "skills/studio-design/assets/starters"),
+      path.join(dir, "starters"),
+      { recursive: true },
+    );
+    await fs.writeFile(
+      path.join(dir, "index.html"),
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Manual media activation regression</title><style>body{margin:0}section{background:#333;padding:30px}h1{font:32px Arial;color:white;margin:0}</style></head><body><deck-stage width="1280" height="720"><section><h1>Playback preparation</h1></section><section><h1 data-anim="fade-in" data-anim-trigger="after" data-anim-duration="1200">Editable media playback</h1><video width="672" height="384" style="position:absolute;left:288px;top:144px" src="source.mp4" muted></video></section></deck-stage><script src="starters/deck.js"></script></body></html>`,
+    );
+    const { server, url } = await serve(dir, 0);
+    t.after(() => new Promise((resolve) => server.close(resolve)));
+    const output = path.join(dir, "manual-media.pptx"),
+      result = await exportArtifact("pptx", url, output),
+      zip = unzipSync(await fs.readFile(output)),
+      slide = strFromU8(zip["ppt/slides/slide2.xml"]);
+    assert.equal(result.mediaObjects, 1);
+    assert.equal(result.rasterObjects, 1);
+    assert.equal(result.nativeAnimations, 1);
+    assert.equal(result.mediaPlayback[0].activation, "poster-click");
+    assert.equal(result.mediaPlayback[0].posterObjects, 1);
+    assert.equal((slide.match(/<p:pic>/g) || []).length, 2);
+    assert.equal((slide.match(/<p14:media\b/g) || []).length, 1);
+    assert.equal(
+      Object.keys(zip).filter((name) => /^ppt\/media\/.*\.png$/.test(name))
+        .length,
+      1,
+    );
+    assert.match(slide, /nodeType="interactiveSeq"/);
+    assert.match(slide, /cmd="stop"/);
+    assert.match(slide, /cmd="playFrom\(0\.0\)"/);
+    const ids = [...slide.matchAll(/<p:cNvPr\b[^>]*\bid="(\d+)"/g)].map(
+      (match) => match[1],
+    );
+    assert.equal(new Set(ids).size, ids.length);
+    const { stdout } = await run(
+      "/usr/bin/python3",
+      [
+        path.join(root, "tests/powerpoint-media-impress.py"),
+        output,
+        dir,
+        "--manual",
+      ],
+      { timeout: 45000, maxBuffer: 1024 * 1024 },
+    );
+    const { version, samples, after, printRGB } = JSON.parse(stdout);
+    t.diagnostic(`Manual media consumer: ${version}`);
+    const red = ({ video }) => video[0] > 200 && video[2] < 30;
+    const blue = ({ video }) => video[2] > 200 && video[0] < 30;
+    const firstCover = samples.findIndex(red);
+    assert.ok(
+      firstCover >= 0,
+      `The resting cover never appeared: ${JSON.stringify(samples)}`,
+    );
+    const resting = samples.slice(firstCover);
+    assert.ok(
+      resting.at(-1).time - resting[0].time > 2,
+      "The cover must remain still beyond the whole source duration.",
+    );
+    assert.ok(
+      resting.every(red),
+      `Manual video changed before its click: ${JSON.stringify(resting)}`,
+    );
+    assert.ok(resting.some((sample) => sample.headingWhitePixels < 100));
+    assert.ok(resting.some((sample) => sample.headingWhitePixels > 2000));
+    const playingRed = after.findIndex(red),
+      playingBlue = after.findIndex(blue);
+    assert.ok(
+      playingRed >= 0 && playingBlue > playingRed,
+      `Click did not start real playback: ${JSON.stringify(after)}`,
+    );
+    assert.ok(
+      printRGB[0] > 200 && printRGB[2] < 30,
+      `Printed cover differs from the source frame: ${printRGB}`,
+    );
   },
 );

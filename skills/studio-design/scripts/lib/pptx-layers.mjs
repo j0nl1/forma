@@ -105,6 +105,9 @@ export async function capturePptxImage(page, slideLocator, object) {
     const geometry = object.captureGeometry ?? object;
     return await page.screenshot({
       type: "png",
+      // The clip below uses document coordinates, including scroll offsets.
+      // Viewport screenshots would truncate or miss later print-layout slides.
+      fullPage: true,
       animations: "disabled",
       omitBackground: true,
       clip: {

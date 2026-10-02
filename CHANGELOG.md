@@ -2,9 +2,13 @@
 
 ## Unreleased
 
-- Fixed a separate media poster obscuring native video during slide builds; the native media object now owns the single captured cover.
+- Fixed media posters obscuring automatic native video during slide builds. Eligible manual videos use a conditional cover that remains visible before a click and in print, then disappears as the real player starts; playback is verified in Impress 24.2 and 25.8.
 
-- Added sampled native pivot compensation and bounded nested transform-only build composition, retaining click/with/after timing and explicit mask/opacity/repeat fallbacks.
+- Fixed isolated picture captures being truncated or omitted on later print-layout slides by capturing their document-coordinate clip in full-page mode.
+
+- Added sampled native pivot compensation and bounded nested build composition, retaining click/with/after timing. Repeated compositions use explicit reset segments; eligible disjoint group opacity and leaf masks retain native editable artwork with pending entrances hidden until their scheduled boundary.
+
+- Added bounded transparent picture builds for overlapping nested fade/wipe composition, preserving shared click/after steps and reporting raster animations separately from native and static effects.
 
 - Retained editable foreground through composed uniform 2D rotations, scales and translations, with authored pivots and local paint capture verified against actual Impress rendering.
 

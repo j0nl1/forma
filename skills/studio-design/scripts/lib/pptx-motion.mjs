@@ -9,6 +9,8 @@ import {
 } from "./pptx-motion-effects.mjs";
 import { timingWriter } from "./pptx-motion-timing.mjs";
 import { composedTargets, composeSteps } from "./pptx-motion-compose.mjs";
+import { compositingInitialNodes } from "./pptx-motion-compositing.mjs";
+import { frameBuildSteps, initialFrameNodes } from "./pptx-motion-frames.mjs";
 
 // PresentationML property behavior and timing contracts:
 // https://learn.microsoft.com/en-us/office/open-xml/presentation/working-with-animation
@@ -177,6 +179,7 @@ export function applyPptxMotion(buffer, slides, options = {}) {
     (node) => node.name === "p:sldSz",
   )?.attributes;
   let animationCount = 0,
+    rasterAnimationCount = 0,
     staticAnimationCount = 0,
     changed = false;
   for (const [index, slide] of slides.entries()) {
@@ -225,7 +228,14 @@ export function applyPptxMotion(buffer, slides, options = {}) {
           (node) =>
             node.name === "p:cTn" && node.attributes.nodeType === "mainSeq",
         ));
-    const components = composedTargets(entries, slide.objects ?? []);
+    const rasterIds = new Set(
+      (slide.rasterBuilds ?? []).flatMap((build) => build.ids),
+    );
+    if (rasterIds.size && (conflict || options.enabled === false))
+      throw new Error(
+        "Prepared compositing frames require the slide's single enabled animation sequence.",
+      );
+    const components = composedTargets(entries, slide.objects ?? [], slide);
     const componentById = new Map();
     for (const component of components) {
       for (const id of component.ids) componentById.set(id, component);
@@ -262,6 +272,8 @@ export function applyPptxMotion(buffer, slides, options = {}) {
     }
     let supported = 0;
     for (const entry of entries) {
+      if (rasterIds.has(entry.id) && !conflict && options.enabled !== false)
+        continue;
       const component = componentById.get(entry.id);
       const issue =
         options.enabled === false
@@ -292,17 +304,25 @@ export function applyPptxMotion(buffer, slides, options = {}) {
       }
       const { tracks, sampled, filter, clipRotation } = tracksFor(entry, slide);
       Object.assign(entry, {
-        targets: component ? [] : targets,
+        targets: component
+          ? component.cohorts
+              .filter((cohort) => cohort.maskEntryId === entry.id)
+              .flatMap((cohort) => cohort.targets)
+          : targets,
         tracks,
         filter,
       });
       if (component)
         warnings.add(
-          "Nested native transform builds use sampled affine composition on separate editable artwork groups; inspect playback in the target application.",
+          "Nested native builds use sampled composition on separate editable artwork groups; inspect playback in the target application.",
         );
       if (filter)
         warnings.add(
           `Native PowerPoint ${entry.family} builds use the application's own filter geometry and pattern, which can differ from the HTML mask.`,
+        );
+      if (entry.family === "wipe")
+        warnings.add(
+          "Native wipe directions follow Microsoft's filter mapping; the tested Impress 25.8 player reveals the opposite edge from the HTML effect.",
         );
       if (clipRotation)
         warnings.add(
@@ -314,15 +334,22 @@ export function applyPptxMotion(buffer, slides, options = {}) {
         );
       supported++;
     }
-    if (!supported) continue;
+    if (!supported && !rasterIds.size) continue;
     const ids = all
       .filter((node) => node.name === "p:cTn")
       .map((node) => Number(node.attributes.id));
     const writer = timingWriter(Math.max(0, ...ids) + 1);
     const rootId = root ? null : writer.id();
-    const sequence = writer.sequence(
-      composeSteps(buildSteps(entries), components, slide),
-    );
+    const sequence =
+      compositingInitialNodes(components, writer.id) +
+      initialFrameNodes(slide.rasterBuilds ?? [], shapeIds, writer) +
+      writer.sequence(
+        frameBuildSteps(
+          composeSteps(buildSteps(entries), components, slide),
+          slide.rasterBuilds ?? [],
+          shapeIds,
+        ),
+      );
     const finalNodes = xmlNodes(xml);
     const finalRoot = descendants(finalNodes).find(
       (node) => node.name === "p:cTn" && node.attributes.nodeType === "tmRoot",
@@ -341,11 +368,13 @@ export function applyPptxMotion(buffer, slides, options = {}) {
     }
     zip[filename] = strToU8(xml);
     animationCount += supported;
+    rasterAnimationCount += rasterIds.size;
     changed = true;
   }
   return {
     buffer: changed ? Buffer.from(zipSync(zip, { level: 6 })) : buffer,
     animationCount,
+    rasterAnimationCount,
     staticAnimationCount,
     warnings: [...warnings],
   };

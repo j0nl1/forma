@@ -141,6 +141,14 @@ export async function preparePptxMedia(page, object, coverBuffer) {
     container(original, type),
     object,
   );
+  playback.activation =
+    playback.trigger === "on-click" &&
+    type === "video" &&
+    !object.hidden &&
+    !object.animIds?.length
+      ? "poster-click"
+      : "native";
+  playback.posterObjects = playback.activation === "poster-click" ? 1 : 0;
   object.playback = playback;
   const warnings = [];
   if (object.hidden && playback.trigger === "on-click")
@@ -153,11 +161,11 @@ export async function preparePptxMedia(page, object, coverBuffer) {
     );
   if (playback.loop)
     warnings.push(
-      "Media looping is encoded as native repetition, but the tested LibreOffice 25.8 player plays it once; Microsoft PowerPoint loop playback remains unverified.",
+      "Media looping is encoded as native repetition, but video playback ran only once in the tested LibreOffice 24.2 and 25.8 players; Microsoft PowerPoint loop playback remains unverified.",
     );
-  if (playback.trigger === "on-click")
+  if (playback.trigger === "on-click" && playback.activation === "native")
     warnings.push(
-      "Media uses native on-click activation; the tested LibreOffice 25.8 player starts media on slide entry instead. Verify activation in the receiving application.",
+      "Direct native on-click activation remains receiver-dependent for audio, hidden media and animated video. Tested LibreOffice 24.2 and 25.8 started direct video on slide entry; those audio and animated-video variants remain unverified.",
     );
   if (playback.fragmentEnd != null)
     warnings.push(

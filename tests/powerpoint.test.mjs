@@ -585,7 +585,12 @@ test("PowerPoint embeds actual local video and audio bytes with native media rel
   const out = path.join(dir, "media.pptx");
   const result = await exportArtifact("pptx", url, out);
   assert.equal(result.mediaObjects, 3);
-  assert.equal(result.rasterObjects, 0);
+  assert.equal(result.rasterObjects, 1);
+  assert.equal(
+    result.mediaPlayback.filter((item) => item.activation === "poster-click")
+      .length,
+    1,
+  );
   assert.ok(result.warnings.some((warning) => warning.includes("object-fit")));
   assert.ok(
     result.warnings.some((warning) =>
@@ -605,7 +610,7 @@ test("PowerPoint embeds actual local video and audio bytes with native media rel
   const rels = xml(zip, "ppt/slides/_rels/slide1.xml.rels");
   assert.equal((slide.match(/ppaction:\/\/media/g) || []).length, 3);
   assert.equal((slide.match(/<p14:media /g) || []).length, 3);
-  assert.equal((slide.match(/<p:pic>/g) || []).length, 3);
+  assert.equal((slide.match(/<p:pic>/g) || []).length, 4);
   assert.match(rels, /relationships\/video/);
   assert.match(rels, /relationships\/audio/);
   assert.doesNotMatch(rels, /TargetMode="External"/);
