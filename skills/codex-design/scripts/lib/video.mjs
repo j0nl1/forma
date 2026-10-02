@@ -58,11 +58,37 @@ export function videoOptions(options = {}) {
 export async function renderVideo(page, errors, output, temporary, options) {
   const { fps, crf, deviceScaleFactor, bridgeGlobal } = options;
   const flags = [];
+  try {
+    const ready = await page.waitForFunction(
+      (name) => {
+        const bridge = window[name];
+        return !!(
+          bridge &&
+          (typeof bridge.seek === "function" ||
+            typeof bridge.setTime === "function")
+        );
+      },
+      bridgeGlobal,
+      { timeout: 8000, polling: 50 },
+    );
+    await ready.dispose();
+  } catch (error) {
+    if (error.name !== "TimeoutError") throw error;
+    throw new Error(
+      `The timeline bridge window.${bridgeGlobal} did not initialize within 8 seconds. Expose seek() or setTime() and duration, or configure bridgeGlobal to match the page.`,
+    );
+  }
   const bridge = await page.evaluate((name) => {
     const b = window[name];
     if (!b || (typeof b.seek !== "function" && typeof b.setTime !== "function"))
       return null;
-    return { duration: b.duration, width: b.width, height: b.height };
+    return {
+      duration: b.duration,
+      width: b.width,
+      height: b.height,
+      captureActive:
+        b.captureActive === undefined ? undefined : !!b.captureActive,
+    };
   }, bridgeGlobal);
   const duration = options.duration ?? bridge?.duration;
   if (!bridge || !Number.isFinite(duration) || duration < 0 || duration > 300)
@@ -118,20 +144,59 @@ export async function renderVideo(page, errors, output, temporary, options) {
     if (warning) flags.push({ kind: "fonts_incomplete", message: warning });
   }
   await page.setViewportSize({ width, height });
-  await page.evaluate(({ hideSelectors = [], resetTransformSelector }) => {
-    document.documentElement.setAttribute("data-capture", "");
-    for (const selector of hideSelectors)
-      for (const node of document.querySelectorAll(selector))
-        node.style.display = "none";
-    if (resetTransformSelector)
-      for (const node of document.querySelectorAll(resetTransformSelector))
-        node.style.transform = "none";
-    const style = document.createElement("style");
-    style.textContent =
-      "html,body{margin:0;width:100%;height:100%;overflow:hidden}";
-    document.head.append(style);
-    void document.body.offsetWidth;
-  }, options);
+  const captureActive = await page.evaluate(
+    ({
+      hideSelectors = [],
+      resetTransformSelector,
+      captureActive,
+      width,
+      height,
+    }) => {
+      document.documentElement.setAttribute("data-capture", "");
+      captureActive ??=
+        !!document.querySelector(".cd-motion[data-capture],motion-stage") ||
+        [...document.querySelectorAll("[data-stage-chrome]")].some(
+          (node) => getComputedStyle(node).display === "none",
+        );
+      if (captureActive) return true;
+      const style = document.createElement("style");
+      style.textContent =
+        "html,body{margin:0;width:100%;height:100%;overflow:hidden}";
+      if (hideSelectors.length || resetTransformSelector) {
+        style.textContent += "*{transition:none!important}";
+        for (const selector of hideSelectors) {
+          document.querySelector(selector);
+          style.textContent += `${selector}{display:none!important}`;
+        }
+        if (resetTransformSelector) {
+          const nodes = document.querySelectorAll(resetTransformSelector);
+          const declarations = Object.entries({
+            transform: "none",
+            "box-shadow": "none",
+            width: `${width}px`,
+            height: `${height}px`,
+          }).map(([property, value]) => `${property}:${value}!important`);
+          style.textContent += `${resetTransformSelector}{${declarations.join(";")}}`;
+          const parent = nodes[0]?.parentElement;
+          if (parent) {
+            parent.style.setProperty("align-items", "flex-start", "important");
+            parent.style.setProperty(
+              "justify-content",
+              "flex-start",
+              "important",
+            );
+            parent.style.setProperty("overflow", "visible", "important");
+          }
+        }
+        document.documentElement.style.background = "transparent";
+        document.body.style.background = "transparent";
+      }
+      document.head.append(style);
+      void document.body.offsetWidth;
+      return false;
+    },
+    { ...options, captureActive: bridge.captureActive, width, height },
+  );
   try {
     await page.waitForFunction(() => document.fonts.status === "loaded", null, {
       timeout: 8000,
@@ -342,15 +407,8 @@ export async function renderVideo(page, errors, output, temporary, options) {
       message:
         "Most consecutive frames were identical; verify the timeline or expected hold",
     });
-  const captured = await page.evaluate(
-    () =>
-      !!document.querySelector(".cd-motion[data-capture],motion-stage") ||
-      [...document.querySelectorAll("[data-stage-chrome]")].some(
-        (node) => getComputedStyle(node).display === "none",
-      ),
-  );
   if (
-    !captured &&
+    !captureActive &&
     !options.hideSelectors?.length &&
     !options.resetTransformSelector
   )

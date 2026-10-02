@@ -3,65 +3,164 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
     <title>Project update</title>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .email-shell {
+          background-color: #222d3c !important;
+        }
+        .email-card {
+          background-color: #293648 !important;
+        }
+        .email-copy {
+          color: #f4f1ea !important;
+        }
+        .email-muted {
+          color: #c6cfdb !important;
+        }
+      }
+    </style>
   </head>
   <body
+    class="email-shell"
     style="
       margin: 0;
-      background: #f2f4f7;
-      font-family: Arial, sans-serif;
+      padding: 0;
+      background-color: #e9edf3;
       color: #202c39;
+      font-family: Arial, Helvetica, sans-serif;
     "
   >
-    <div style="display: none; max-height: 0; overflow: hidden">
-      Your project is ready to review.
-    </div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+    <span
+      style="
+        display: none;
+        font-size: 1px;
+        line-height: 1px;
+        max-height: 0;
+        max-width: 0;
+        overflow: hidden;
+        opacity: 0;
+        mso-hide: all;
+      "
+    >
+      Your project is ready to review. See the latest changes and share what you
+      want next.
+    </span>
+    <table
+      role="presentation"
+      width="100%"
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+      class="email-shell"
+      bgcolor="#e9edf3"
+      style="width: 100%; background-color: #e9edf3; border-collapse: collapse"
+    >
       <tr>
-        <td align="center" style="padding: 24px 12px">
+        <td width="100%" align="center" style="padding: 24px 12px">
+          <!--[if mso]><table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0"><tr><td width="600"><![endif]-->
           <table
             role="presentation"
             width="600"
+            border="0"
             cellspacing="0"
             cellpadding="0"
-            style="width: 100%; max-width: 600px; background: white"
+            class="email-card"
+            bgcolor="#f8f6f1"
+            style="
+              width: 100%;
+              max-width: 600px;
+              background-color: #f8f6f1;
+              border-collapse: collapse;
+            "
           >
             <tr>
-              <td style="padding: 32px">
-                <h1 style="margin: 0 0 20px; font-size: 28px; line-height: 1.2">
+              <td width="600" style="padding: 32px">
+                <h1
+                  class="email-copy"
+                  style="
+                    margin: 0 0 20px;
+                    color: #202c39;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 28px;
+                    font-weight: 700;
+                    line-height: 34px;
+                    mso-line-height-rule: exactly;
+                  "
+                >
                   Ready for your next step
                 </h1>
-                <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px">
+                <p
+                  class="email-copy"
+                  style="
+                    margin: 0 0 24px;
+                    color: #202c39;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 16px;
+                    line-height: 26px;
+                    mso-line-height-rule: exactly;
+                  "
+                >
                   Review the latest changes, share feedback, and decide what to
                   build next.
                 </p>
-                <a
-                  href="https://example.com/review"
-                  style="
-                    display: inline-block;
-                    padding: 14px 22px;
-                    background: #275dad;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    font-weight: bold;
-                  "
-                  >Review project</a
+                <table
+                  role="presentation"
+                  width="180"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                  style="width: 180px; border-collapse: separate"
                 >
+                  <tr>
+                    <td
+                      width="180"
+                      align="center"
+                      bgcolor="#275dad"
+                      style="
+                        padding: 14px 12px;
+                        background-color: #275dad;
+                        border-radius: 6px;
+                      "
+                    >
+                      <a
+                        href="https://example.com/review"
+                        style="
+                          display: block;
+                          color: #f8f6f1;
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 16px;
+                          font-weight: 700;
+                          line-height: 20px;
+                          mso-line-height-rule: exactly;
+                          text-align: center;
+                          text-decoration: none;
+                        "
+                        >Review project</a
+                      >
+                    </td>
+                  </tr>
+                </table>
                 <p
+                  class="email-muted"
                   style="
-                    font-size: 12px;
-                    line-height: 1.6;
-                    color: #5d6673;
                     margin: 28px 0 0;
+                    color: #536174;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                    line-height: 20px;
+                    mso-line-height-rule: exactly;
                   "
                 >
-                  Replace this example with your real sender details and
-                  required footer before sending.
+                  Replace the example links with your real destinations. Add
+                  your real sender details and required footer before sending.
                 </p>
               </td>
             </tr>
           </table>
+          <!--[if mso]></td></tr></table><![endif]-->
         </td>
       </tr>
     </table>

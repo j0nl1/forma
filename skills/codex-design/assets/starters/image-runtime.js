@@ -1,6 +1,6 @@
 import { imageStore } from "./image-store.js";
 import { imageStyle } from "./image-style.js";
-import { IMAGE_TYPES, framing } from "./image-model.js";
+import { IMAGE_TYPES, imageTypeAllowed, framing } from "./image-model.js";
 import { unsplash, renderCredit } from "./image-credit.js";
 import { encodeImage } from "./image-media.js";
 import { ImageReframe } from "./image-reframe.js";
@@ -245,6 +245,11 @@ export class ImageSlot extends HTMLElement {
   }
   async ingest(file) {
     if (!this.editable) return false;
+    if (!imageTypeAllowed(file?.type, this.legacy)) {
+      this.error = "Choose a PNG, JPEG, WebP, or AVIF image.";
+      this.render();
+      return false;
+    }
     const generation = ++this.generation;
     this.error = "";
     this.encoding = true;

@@ -6,6 +6,8 @@ export const IMAGE_TYPES = [
   "image/webp",
   "image/avif",
 ];
+export const imageTypeAllowed = (type, legacy = false) =>
+  IMAGE_TYPES.includes(type) || (legacy && type === "image/gif");
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 export function imageValue(value) {
   if (typeof value === "string") value = { u: value };

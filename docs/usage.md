@@ -30,6 +30,8 @@ Provide timeline controls, inspect scene boundaries, and export MP4 with marked 
 
 For follow-up changes, refer to the same artifact. Canvas, motion, deck, literal-text and typed tweak editors support their documented persistence and opted-in project saves. The older native CSS controls remain session-only.
 
+For an HTML email, follow the [email recipe](../skills/codex-design/references/email.md) and copy `assets/starters/email.html` from the installed skill. Supply the actual destinations and sender/footer details. The showcase's `starters/email.html` demonstrates the table-based template; browser preview is one check, and actual target email-client rendering remains required before describing delivery readiness.
+
 ## Preview and verify
 
 From the checkout:

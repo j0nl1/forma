@@ -79,6 +79,8 @@ A `data-deck-skip` slide remains reachable by direct navigation but is skipped b
 
 `F` and Present toggle native fullscreen; fullscreen changes hide the rail and refit the slide. Presentation chrome appears on pointer movement and remains available on hover/focus. Typing, modified shortcuts and claimed keyboard events keep their normal behavior. On touch devices, stage-half taps navigate while links, controls and open-shadow interactive content retain their taps. `no-rail` suppresses the rail; narrow layouts also hide it.
 
+A real local presentation or fullscreen transition clears controls carried over from editing, their idle timer and hover/focus pins. Repeated delivery of the same state preserves controls the user has revealed. Pointer hover and keyboard focus keep the controls available; mouse button focus alone does not pin them indefinitely. Keyboard slide navigation leaves audience chrome hidden until interaction reveals it.
+
 ## Thumbnail editor and source editing
 
 The rail displays lazy, styled, static previews of the finished slide artwork. It reuses thumbnail elements across reorders, shows skipped slides dimmed without a number, and updates materialized previews when authored content, styles, inherited variables or open-shadow content changes. Preview construction does not create custom-element instances or replay builds. Canvas pixels become image snapshots; videos use posters, embedded frames/audio lose their sources, transient dialogs and popovers are omitted, and preview content is inert. Readable local stylesheets are adopted into isolated preview roots. Cross-origin stylesheets cannot be inspected by the browser and require local copies.

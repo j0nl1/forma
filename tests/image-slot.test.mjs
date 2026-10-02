@@ -457,6 +457,91 @@ test("new upload, clear and authored src changes defeat stale encodes; failed re
   });
 });
 
+test("unsupported native inputs retain a pending valid replacement and its loading mask", async (t) => {
+  const { url, stateFile } = await fixture(t, { source: true });
+  await withPage(url, async (page) => {
+    const buffer = await pattern(page, 300, 200);
+    await page.evaluate(() => {
+      const original = window.createImageBitmap;
+      window.createImageBitmap = async (...args) => {
+        window.pendingImageDecode = true;
+        await new Promise((resolve) => {
+          window.releaseImageDecode = resolve;
+        });
+        return original(...args);
+      };
+    });
+    for (const mimeType of ["text/plain", "image/gif"]) {
+      await page.evaluate(() => {
+        window.pendingImageDecode = false;
+      });
+      await page
+        .locator("#hero")
+        .getByLabel("Choose local image")
+        .setInputFiles({
+          name: "replacement.png",
+          mimeType: "image/png",
+          buffer,
+        });
+      await page.waitForFunction(() => window.pendingImageDecode);
+      const generation = await page
+        .locator("#hero")
+        .evaluate((s) => s.generation);
+      await page
+        .locator("#hero")
+        .getByLabel("Choose local image")
+        .setInputFiles({
+          name: mimeType === "image/gif" ? "unsupported.gif" : "notes.txt",
+          mimeType,
+          buffer: Buffer.from("Unsupported content"),
+        });
+      assert.deepEqual(
+        await page.locator("#hero").evaluate((s) => ({
+          generation: s.generation,
+          encoding: s.encoding,
+          masked: s.hasAttribute("data-swapping"),
+        })),
+        { generation, encoding: true, masked: true },
+      );
+      assert.match(
+        await page.locator("#hero").getByRole("status").textContent(),
+        /PNG, JPEG, WebP, or AVIF/,
+      );
+      await page.evaluate(() => window.releaseImageDecode());
+      await page.waitForFunction(() => {
+        const s = document.getElementById("hero");
+        return (
+          !s.encoding && !s.loading && s.value.src.startsWith("data:image/webp")
+        );
+      });
+      assert.equal(
+        await page.locator("#hero").getAttribute("data-swapping"),
+        null,
+      );
+      await page.evaluate(() =>
+        document.getElementById("hero").store.settled(),
+      );
+      const saved = JSON.parse(await fs.readFile(stateFile, "utf8")).hero;
+      assert.equal(
+        saved.u,
+        await page.locator("#hero").evaluate((s) => s.value.src),
+      );
+      assert.deepEqual(
+        await page
+          .locator("#hero")
+          .evaluate((s) => {
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 1;
+            canvas.getContext("2d").drawImage(s.ui.photo, 0, 0);
+            return [...canvas.getContext("2d").getImageData(0, 0, 1, 1).data];
+          })
+          .then(([r, g, b, a]) => [r > 180, g < 80, b < 80, a]),
+        [true, true, true, 255],
+      );
+    }
+  });
+});
+
 test("canonical attribution errors replace uncredited stock, split safe photographer links and disappear for a user upload", async (t) => {
   const { url } = await fixture(t, { source: true });
   await withPage(url, async (page) => {

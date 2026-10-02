@@ -1,9 +1,6 @@
-import { IMAGE_TYPES } from "./image-model.js";
+import { imageTypeAllowed } from "./image-model.js";
 export async function encodeImage(file, renderedWidth, legacy = false) {
-  if (
-    !IMAGE_TYPES.includes(file?.type) &&
-    !(legacy && file?.type === "image/gif")
-  )
+  if (!imageTypeAllowed(file?.type, legacy))
     throw new Error("Choose a PNG, JPEG, WebP, or AVIF image.");
   if (legacy && file.type === "image/gif") {
     const url = await new Promise((resolve, reject) => {
