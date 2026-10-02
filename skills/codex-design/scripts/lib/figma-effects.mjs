@@ -1,6 +1,9 @@
 import { html } from "./files.mjs";
 const number = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
-export function nodeEffects(node, { id, color, alpha, warnings }) {
+export function nodeEffects(
+  node,
+  { id, color, alpha, warnings, borderShadows = [] },
+) {
   const declarations = [],
     boxes = [],
     drops = [],
@@ -77,7 +80,9 @@ export function nodeEffects(node, { id, color, alpha, warnings }) {
     defs = `<svg aria-hidden="true" width="0" height="0" style="position:absolute;pointer-events:none"><defs><filter id="${key}" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">${primitives}</filter></defs></svg>`;
     innerFilter = `url(#${key})`;
   }
-  if (boxes.length) declarations.push(`box-shadow:${boxes.join(",")}`);
+  const shadowStack = [...borderShadows, ...boxes];
+  if (shadowStack.length)
+    declarations.push(`box-shadow:${shadowStack.join(",")}`);
   const filters = [innerFilter, ...drops, ...blurs].filter(Boolean);
   if (filters.length) declarations.push(`filter:${filters.join(" ")}`);
   if (backdrop.length)

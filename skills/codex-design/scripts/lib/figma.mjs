@@ -5,7 +5,9 @@ import { Decompress } from "fzstd";
 import { ByteBuffer, decodeBinarySchema } from "kiwi-schema";
 import { html } from "./files.mjs";
 import { nodeEffects } from "./figma-effects.mjs";
-import { nodePaints, visiblePaints } from "./figma-paints.mjs";
+import { nodePaints, visiblePaints, paintList } from "./figma-paints.mjs";
+import { boxStroke } from "./figma-strokes.mjs";
+import { nodeGeometry } from "./figma-geometry.mjs";
 const LIMIT = 128 * 1024 * 1024;
 export const nodeId = (guid) =>
   guid ? `${guid.sessionID}:${guid.localID}` : null;
@@ -186,26 +188,6 @@ const finite = (v, fallback = 0) =>
 export function color(c, opacity = 1) {
   return `rgba(${["r", "g", "b"].map((k) => Math.round(Math.min(1, Math.max(0, finite(c?.[k]))) * 255)).join(",")},${Math.min(1, Math.max(0, finite(c?.a, 1) * opacity))})`;
 }
-function pathData(bytes) {
-  const view = new DataView(Uint8Array.from(bytes).buffer);
-  let offset = 0;
-  const out = [];
-  const counts = [0, 2, 2, 4, 6];
-  while (offset < view.byteLength) {
-    const code = view.getUint8(offset++);
-    if (code > 4) throw new Error("Unsupported vector command");
-    const count = counts[code];
-    if (offset + count * 4 > view.byteLength)
-      throw new Error("Truncated vector path");
-    const values = [];
-    for (let i = 0; i < count; i++) {
-      values.push(view.getFloat32(offset, true));
-      offset += 4;
-    }
-    out.push(["Z", "M", "L", "Q", "C"][code] + " " + values.join(" "));
-  }
-  return out.join(" ");
-}
 export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
   if (node.visible === false) return "";
   const id = nodeId(node.guid);
@@ -238,7 +220,17 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     css.push(`border-radius:${finite(node.cornerRadius)}px`);
   if (node.type === "ELLIPSE") css.push("border-radius:50%");
   if (node.clipsContent) css.push("overflow:hidden");
-  const vector = !!node.fillGeometry?.length;
+  const vector =
+    node.type !== "TEXT" &&
+    (!!node.fillGeometry?.length ||
+      !!node.strokeGeometry?.length ||
+      [
+        "VECTOR",
+        "LINE",
+        "STAR",
+        "REGULAR_POLYGON",
+        "BOOLEAN_OPERATION",
+      ].includes(node.type));
   const paints = nodePaints(doc, node, { id, w, h, color, vector, warnings });
   css.push(...paints.declarations);
   for (const key of ["mask", "isMask", "derivedSymbolData", "symbolData"])
@@ -247,11 +239,14 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
       (typeof node[key] !== "object" || Object.keys(node[key]).length)
     )
       warnings.push(`${id}: ${key} needs visual review`);
+  const stroke = boxStroke(node, { id, color, vector, warnings });
+  css.push(...stroke.declarations);
   const effects = nodeEffects(node, {
     id,
     color,
     alpha: node.type === "TEXT" || vector,
     warnings,
+    borderShadows: stroke.shadows,
   });
   css.push(...effects.declarations);
   let content = "";
@@ -267,20 +262,15 @@ export function renderNode(doc, node, { root = true, warnings = [] } = {}) {
     content = html(
       node.textData?.characters ?? node.characters ?? node.name ?? "",
     );
-  } else if (node.fillGeometry?.length) {
-    const paths = [];
-    for (const g of node.fillGeometry) {
-      try {
-        const blob = doc.blobs[g.commandsBlob]?.bytes;
-        if (blob)
-          paths.push(
-            `<path d="${html(pathData(blob))}"${g.windingRule === "EVENODD" ? ' fill-rule="evenodd"' : ""}/>`,
-          );
-      } catch (e) {
-        warnings.push(`${id}: ${e.message}`);
-      }
-    }
-    content = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="isolation:isolate">${paints.defs}${paints.layers.map((layer) => `<g fill="${html(layer.svg)}" style="mix-blend-mode:${layer.blend}">${paths.join("")}</g>`).join("")}</svg>`;
+  } else if (vector) {
+    content = nodeGeometry(doc, node, paints, {
+      id,
+      w,
+      h,
+      color,
+      vector,
+      warnings,
+    });
   }
   if (node.stackMode) {
     warnings.push(`${id}: auto-layout rendered from saved geometry`);
@@ -303,7 +293,10 @@ export function extractedTokens(doc) {
   const tokens = {};
   let count = 0;
   for (const n of doc.nodes.values())
-    for (const f of visiblePaints(n)) {
+    for (const f of [
+      ...visiblePaints(n),
+      ...paintList(n.strokePaints ?? [], () => {}, "stroke"),
+    ]) {
       const stops = f.stops ?? f.gradientStops;
       const colors =
         f.type === "SOLID"
@@ -312,6 +305,7 @@ export function extractedTokens(doc) {
             ? (Array.isArray(stops) ? stops : []).map((s) => s?.color)
             : [];
       for (const c of colors) {
+        if (!c || typeof c !== "object") continue;
         const value = color(c, finite(f.opacity, 1));
         if (!Object.values(tokens).includes(value))
           tokens[`--figma-color-${++count}`] = value;
