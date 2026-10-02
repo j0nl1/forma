@@ -1,0 +1,161 @@
+WEBVTT
+
+1
+00:00:00.080 --> 00:00:02.212
+Studio Design is a skill:
+
+2
+00:00:02.212 --> 00:00:05.196
+instructions, recipes, editable starters, and local helpers.
+
+3
+00:00:05.196 --> 00:00:06.902
+Invoke it inside Codex.
+
+4
+00:00:06.902 --> 00:00:09.033
+The website showcases working examples;
+
+5
+00:00:09.033 --> 00:00:12.018
+it is not the skill’s product interface.
+
+6
+00:00:12.780 --> 00:00:14.376
+Review a local checkout.
+
+7
+00:00:14.376 --> 00:00:17.569
+Run the installer in dry-run mode before installing.
+
+8
+00:00:17.569 --> 00:00:19.165
+Helpers use pinned dependencies.
+
+9
+00:00:19.165 --> 00:00:20.761
+Browser exports need Chromium;
+
+10
+00:00:20.761 --> 00:00:21.958
+video needs FFmpeg.
+
+11
+00:00:21.958 --> 00:00:25.151
+Reload Codex if needed, then invoke Studio Design.
+
+12
+00:00:25.151 --> 00:00:27.146
+These commands are setup guidance.
+
+13
+00:00:27.913 --> 00:00:31.372
+Give the audience, primary task, reference, and output.
+
+14
+00:00:31.372 --> 00:00:32.237
+For example:
+
+15
+00:00:32.237 --> 00:00:37.857
+a reading-room prototype, calm and dense directions, the Harbor style, and editable HTML.
+
+16
+00:00:37.857 --> 00:00:41.315
+Codex reads project instructions and the relevant recipes.
+
+17
+00:00:42.080 --> 00:00:48.552
+Thirteen core modes cover interfaces, mobile, wireframes, documents, resumes, fliers, HTML presentations,
+
+18
+00:00:48.552 --> 00:00:55.024
+animation, three D objects, research, email, diagrams, and color and type systems.
+
+19
+00:00:55.024 --> 00:00:58.260
+Read only the recipes you need.
+
+20
+00:00:59.013 --> 00:01:02.292
+Here, choose two interests to enter the reading room.
+
+21
+00:01:02.292 --> 00:01:05.572
+Save an article, check validation, and confirm the result.
+
+22
+00:01:05.572 --> 00:01:07.393
+Test recovery and keyboard behavior.
+
+23
+00:01:07.393 --> 00:01:11.401
+This real prototype uses local sample data, with no service connection.
+
+24
+00:01:12.180 --> 00:01:14.050
+A canvas compares working artboards.
+
+25
+00:01:14.050 --> 00:01:17.789
+Inspect hierarchy and density, focus an option, and try Save.
+
+26
+00:01:17.789 --> 00:01:21.154
+Connected local previews save supported edits to selected files;
+
+27
+00:01:21.154 --> 00:01:23.772
+public demos keep edits in the browser.
+
+28
+00:01:24.547 --> 00:01:26.818
+Composition Stage keeps a persistent tree.
+
+29
+00:01:26.818 --> 00:01:30.603
+Shots, animations, and captions follow authored time and named cues.
+
+30
+00:01:30.603 --> 00:01:34.388
+Stretch a section or change speed without cutting its choreography.
+
+31
+00:01:34.388 --> 00:01:36.659
+This tutorial uses that same engine.
+
+32
+00:01:37.413 --> 00:01:38.725
+Serve over loopback.
+
+33
+00:01:38.725 --> 00:01:42.662
+Exercise the flow, inspect screenshots, and check the console.
+
+34
+00:01:42.662 --> 00:01:46.598
+Export HTML, PNG, PDF, or MP4 with local helpers.
+
+35
+00:01:46.598 --> 00:01:48.348
+Keep the source folder:
+
+36
+00:01:48.348 --> 00:01:51.847
+the HTML and code remain editable after export.
+
+37
+00:01:52.613 --> 00:01:54.159
+PowerPoint is not included.
+
+38
+00:01:54.159 --> 00:01:57.638
+External generation and transfers need real providers or connectors.
+
+39
+00:01:57.638 --> 00:02:01.503
+An intermittent first-frame export issue with nested video remains unresolved.
+
+40
+00:02:01.503 --> 00:02:06.142
+Give a concrete brief, verify the result, and keep the editable artifact.
