@@ -1,0 +1,460 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import PptxGenJS from "pptxgenjs";
+import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
+import { temporary, root } from "./helpers.mjs";
+import { serve } from "../skills/studio-design/scripts/preview.mjs";
+import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { applyPptxMotion } from "../skills/studio-design/scripts/lib/pptx-motion.mjs";
+import { effects } from "../skills/studio-design/assets/starters/deck-effects.js";
+
+const execute = promisify(execFile);
+const xml = (buffer, file = "ppt/slides/slide1.xml") =>
+  strFromU8(unzipSync(buffer)[file]);
+
+async function generated(names, { split = false } = {}) {
+  const deck = new PptxGenJS();
+  deck.layout = "LAYOUT_WIDE";
+  const captures = [];
+  for (const [index, effect] of names.entries()) {
+    const slide = deck.addSlide();
+    const id = `source-${index}`,
+      geometry = { x: 300, y: 200, w: 400, h: 200 };
+    const objects = [];
+    for (let part = 0; part < (split ? 2 : 1); part++) {
+      const objectName = `shape-${index}-${part}`;
+      const rect = {
+        ...geometry,
+        x: geometry.x + part * 200,
+        w: split ? 200 : 400,
+      };
+      slide.addShape(deck.ShapeType.rect, {
+        objectName,
+        x: rect.x / 96,
+        y: rect.y / 96,
+        w: rect.w / 96,
+        h: rect.h / 96,
+        fill: { color: "4488CC" },
+      });
+      objects.push({ ...rect, objectName, animIds: [id], kind: "shape" });
+    }
+    captures.push({
+      width: 1280,
+      height: 720,
+      objects,
+      animations: [
+        {
+          id,
+          geometry,
+          documentIndex: 0,
+          attributes: {
+            "data-anim": effect,
+            "data-anim-trigger": "click",
+            "data-anim-duration": "800",
+            "data-anim-path": "M0 0 L200 0 L200 120",
+          },
+        },
+      ],
+    });
+  }
+  return { buffer: await deck.write({ outputType: "nodebuffer" }), captures };
+}
+
+test("PowerPoint maps all 44 build names to resolved native shape targets and preserves editable groups", async () => {
+  const names = Object.keys(effects);
+  const { buffer, captures } = await generated(names, { split: true });
+  const result = applyPptxMotion(buffer, captures);
+  assert.equal(result.animationCount, 44);
+  assert.equal(result.staticAnimationCount, 0);
+  assert.ok(
+    result.warnings.some((warning) => warning.includes("linear samples")),
+  );
+  assert.ok(
+    result.warnings.some((warning) => warning.includes("filter geometry")),
+  );
+  assert.ok(
+    result.warnings.some((warning) =>
+      warning.includes(
+        "box-out can hold until completion and leave a one-pixel outline",
+      ),
+    ),
+  );
+  for (const [index, name] of names.entries()) {
+    const slide = xml(result.buffer, `ppt/slides/slide${index + 1}.xml`);
+    const ids = new Set(
+      [...slide.matchAll(/<p:cNvPr id="(\d+)"/g)].map((match) => match[1]),
+    );
+    const timingIds = [...slide.matchAll(/<p:cTn id="(\d+)"/g)].map(
+      (match) => match[1],
+    );
+    assert.equal(
+      new Set(timingIds).size,
+      timingIds.length,
+      `${name} time node IDs`,
+    );
+    for (const [, target] of slide.matchAll(/<p:spTgt spid="(\d+)"/g))
+      assert.ok(ids.has(target), `${name} target ${target}`);
+    assert.match(slide, /nodeType="clickEffect"/);
+    assert.doesNotMatch(slide, /<p:attrNameLst><\/p:attrNameLst>/);
+    assert.equal((slide.match(/<p:sp>/g) ?? []).length, 2);
+    for (const [, duration] of slide.matchAll(/\bdur="([^"]+)"/g))
+      assert.match(duration, /^\d+$|^indefinite$/);
+  }
+  assert.match(
+    xml(result.buffer, "ppt/slides/slide5.xml"),
+    /filter="wipe\(up\)"/,
+  );
+  assert.match(xml(result.buffer, "ppt/slides/slide5.xml"), /<p:grpSp>/);
+});
+
+test("PowerPoint preserves automatic, click, with and after timing even when an earlier target stays static", async () => {
+  const { buffer, captures } = await generated(["spin"]);
+  const captured = captures[0],
+    base = captured.animations[0];
+  captured.animations = [
+    {
+      ...base,
+      id: "missing",
+      attributes: {
+        "data-anim": "fade-in",
+        "data-anim-duration": "700",
+        "data-anim-delay": "100",
+      },
+    },
+    {
+      ...base,
+      attributes: {
+        "data-anim": "spin",
+        "data-anim-duration": "500",
+        "data-anim-trigger": "after",
+        "data-anim-repeat": "2",
+        "data-anim-auto-reverse": "true",
+      },
+    },
+    {
+      ...base,
+      id: "click",
+      attributes: {
+        "data-anim": "appear",
+        "data-anim-trigger": "click",
+        "data-anim-delay": "20",
+      },
+    },
+    {
+      ...base,
+      id: "with",
+      attributes: {
+        "data-anim": "appear",
+        "data-anim-trigger": "with",
+        "data-anim-delay": "30",
+      },
+    },
+  ];
+  const result = applyPptxMotion(buffer, captures),
+    slide = xml(result.buffer);
+  assert.equal(result.animationCount, 1);
+  assert.equal(result.staticAnimationCount, 3);
+  assert.match(slide, /evt="onBegin" delay="0"><p:tn val="\d+"/);
+  assert.match(slide, /dur="700" fill="hold"/);
+  assert.match(slide, /repeatCount="2000"><p:stCondLst><p:cond delay="800"/);
+  assert.match(
+    slide,
+    /nodeType="clickEffect"[^>]*><p:stCondLst><p:cond delay="20"/,
+  );
+  assert.match(
+    slide,
+    /nodeType="withEffect"[^>]*><p:stCondLst><p:cond delay="50"/,
+  );
+  assert.equal((slide.match(/delay="indefinite"/g) ?? []).length, 1);
+});
+
+test("PowerPoint leaves flattened and nested animation targets static without dropping their schedule", async () => {
+  const { buffer, captures } = await generated(["fade-in", "grow"]);
+  captures[0].objects[0].flattenedAnimationIds = [captures[0].animations[0].id];
+  captures[1].objects[0].animIds.push("ancestor");
+  const result = applyPptxMotion(buffer, captures);
+  assert.equal(result.animationCount, 0);
+  assert.equal(result.staticAnimationCount, 2);
+  assert.equal(result.buffer, buffer);
+  assert.ok(result.warnings.some((warning) => warning.includes("flattened")));
+  assert.ok(result.warnings.some((warning) => warning.includes("nested")));
+});
+
+test("PowerPoint adds native builds beside existing media timing without replacing media nodes", async () => {
+  const { buffer, captures } = await generated(["fade-in"]);
+  const zip = unzipSync(buffer),
+    file = "ppt/slides/slide1.xml";
+  const media =
+    '<p:video><p:cMediaNode><p:cTn id="101" dur="indefinite"/><p:tgtEl><p:spTgt spid="2"/></p:tgtEl></p:cMediaNode></p:video>';
+  const timing = `<p:timing><p:tnLst><p:par><p:cTn id="100" nodeType="tmRoot" dur="indefinite"><p:childTnLst>${media}</p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>`;
+  zip[file] = strToU8(
+    strFromU8(zip[file]).replace("</p:sld>", `${timing}</p:sld>`),
+  );
+  const result = applyPptxMotion(Buffer.from(zipSync(zip)), captures),
+    slide = xml(result.buffer);
+  assert.equal(result.animationCount, 1);
+  assert.ok(slide.includes(media));
+  assert.equal((slide.match(/<p:timing>/g) ?? []).length, 1);
+  assert.match(slide, /<p:cTn id="102"[^>]*nodeType="mainSeq"/);
+});
+
+test("actual HTML export resolves grouped builds and static opt-out", async (t) => {
+  const dir = await temporary(t);
+  await fs.cp(
+    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(dir, "starters"),
+    { recursive: true },
+  );
+  await fs.writeFile(
+    path.join(dir, "index.html"),
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Native build fixture</title><style>body{margin:0}section{background:white}.target{position:absolute;left:100px;top:100px;width:250px;height:150px;background:#4488cc;color:white;font:24px Arial}.target span{display:block}</style></head><body><deck-stage width="800" height="500"><section><div class="target" data-anim="zoom-in" data-anim-trigger="click"><span>Editable first line</span><span>Editable second line</span></div></section><section><div class="target" data-anim="blinds-out" data-anim-trigger="click">Native filter</div></section></deck-stage><script src="starters/deck.js"></script></body></html>`,
+  );
+  const { server, url } = await serve(dir, 0);
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const out = path.join(dir, "native.pptx");
+  const result = await exportArtifact("pptx", url, out);
+  assert.equal(result.nativeAnimations, 2);
+  assert.equal(result.staticAnimations, 0);
+  const slide = xml(await fs.readFile(out));
+  assert.match(slide, /<p:grpSp>/);
+  assert.match(slide, /Editable first line/);
+  assert.match(slide, /<p:animScale>/);
+  const staticOut = path.join(dir, "static.pptx");
+  const staticResult = await exportArtifact("pptx", url, staticOut, {
+    pptxAnimations: "static",
+  });
+  assert.equal(staticResult.nativeAnimations, 0);
+  assert.doesNotMatch(xml(await fs.readFile(staticOut)), /<p:timing>/);
+});
+
+test("Impress imports and round-trips all native build families when installed", async (t) => {
+  try {
+    await execute("libreoffice", ["--version"]);
+  } catch {
+    t.skip("LibreOffice is not installed.");
+    return;
+  }
+  const dir = await temporary(t),
+    output = path.join(dir, "roundtrip");
+  await fs.mkdir(output);
+  const { buffer, captures } = await generated(Object.keys(effects), {
+    split: true,
+  });
+  await fs.writeFile(
+    path.join(dir, "builds.pptx"),
+    applyPptxMotion(buffer, captures).buffer,
+  );
+  await execute(
+    "libreoffice",
+    [
+      `-env:UserInstallation=file://${dir}/profile`,
+      "--headless",
+      "--convert-to",
+      "odp",
+      "--outdir",
+      output,
+      path.join(dir, "builds.pptx"),
+    ],
+    { timeout: 30000 },
+  );
+  const content = xml(
+    await fs.readFile(path.join(output, "builds.odp")),
+    "content.xml",
+  );
+  assert.equal((content.match(/<draw:page /g) ?? []).length, 44);
+  assert.equal(
+    (content.match(/presentation:node-type="on-click"/g) ?? []).length,
+    44,
+  );
+  assert.equal((content.match(/<anim:transitionFilter\b/g) ?? []).length, 26);
+  assert.match(content, /svg:type="rotate"/);
+  assert.match(content, /svg:type="scale"/);
+  assert.match(content, /smil:attributeName="opacity"/);
+  assert.match(content, /smil:keyTimes="0;0.5;1"/);
+});
+
+test(
+  "real Impress playback preserves automatic visibility and click/with/after groups",
+  { skip: process.env.STUDIO_TEST_IMPRESS !== "1" },
+  async (t) => {
+    const dir = await temporary(t),
+      deck = new PptxGenJS();
+    deck.layout = "LAYOUT_WIDE";
+    const slide = deck.addSlide(),
+      capture = { width: 1280, height: 720, objects: [], animations: [] };
+    for (const [index, [effect, trigger, delay]] of [
+      ["appear", "after", 0],
+      ["fade-in", "click", 0],
+      ["appear", "with", 300],
+      ["disappear", "after", 0],
+    ].entries()) {
+      const id = `target-${index}`,
+        objectName = `shape-${index}`,
+        geometry = { x: 50 + index * 300, y: 50, w: 200, h: 200 };
+      slide.addShape(deck.ShapeType.rect, {
+        objectName,
+        x: geometry.x / 96,
+        y: geometry.y / 96,
+        w: geometry.w / 96,
+        h: geometry.h / 96,
+        fill: { color: "4488CC" },
+      });
+      capture.objects.push({ ...geometry, objectName, animIds: [id] });
+      capture.animations.push({
+        id,
+        geometry,
+        documentIndex: index,
+        attributes: {
+          "data-anim": effect,
+          "data-anim-trigger": trigger,
+          "data-anim-delay": String(delay),
+          "data-anim-duration": "600",
+        },
+      });
+    }
+    const repeatedSlide = deck.addSlide();
+    const repeatedCapture = {
+      width: 1280,
+      height: 720,
+      objects: [],
+      animations: [],
+    };
+    for (const [index, effect] of ["path", "appear"].entries()) {
+      const id = `repeat-${index}`,
+        objectName = id,
+        geometry = { x: index ? 950 : 50, y: 50, w: 200, h: 200 };
+      repeatedSlide.addShape(deck.ShapeType.rect, {
+        objectName,
+        x: geometry.x / 96,
+        y: geometry.y / 96,
+        w: geometry.w / 96,
+        h: geometry.h / 96,
+        fill: { color: "4488CC" },
+      });
+      repeatedCapture.objects.push({ ...geometry, objectName, animIds: [id] });
+      repeatedCapture.animations.push({
+        id,
+        geometry,
+        documentIndex: index,
+        attributes: {
+          "data-anim": effect,
+          "data-anim-trigger": "after",
+          "data-anim-duration": "300",
+          "data-anim-repeat": "2",
+          "data-anim-auto-reverse": "true",
+          "data-anim-path": "M0 0 L300 0",
+        },
+      });
+    }
+    const file = path.join(dir, "playback.pptx");
+    await fs.writeFile(
+      file,
+      applyPptxMotion(await deck.write({ outputType: "nodebuffer" }), [
+        capture,
+        repeatedCapture,
+      ]).buffer,
+    );
+    const all = await generated(Object.keys(effects), { split: true });
+    for (const captured of all.captures)
+      captured.animations[0].attributes["data-anim-duration"] = "400";
+    const allFile = path.join(dir, "all-effects.pptx");
+    await fs.writeFile(
+      allFile,
+      applyPptxMotion(all.buffer, all.captures).buffer,
+    );
+    const { stdout } = await execute(
+      "/usr/bin/python3",
+      [
+        path.join(root, "tests/powerpoint-motion-impress.py"),
+        file,
+        dir,
+        allFile,
+        JSON.stringify(Object.keys(effects)),
+      ],
+      { timeout: 90000 },
+    );
+    const samples = JSON.parse(stdout),
+      blue = [68, 136, 204],
+      white = [255, 255, 255];
+    assert.deepEqual(samples.initial, [blue, white, white, blue]);
+    assert.deepEqual(samples.early[2], white);
+    assert.deepEqual(samples.early[3], blue);
+    assert.ok(
+      samples.early[1][0] > blue[0] && samples.early[1][0] < white[0],
+      "fade is between its visible and hidden states",
+    );
+    assert.deepEqual(samples.middle[2], blue);
+    assert.deepEqual(samples.finished, [blue, blue, blue, white]);
+    assert.deepEqual(samples["repeat-middle"].marker, white);
+    assert.ok(
+      samples["repeat-middle"].left > 150,
+      "the second forward iteration is still moving",
+    );
+    assert.deepEqual(samples["repeat-finished"][0], blue);
+    assert.deepEqual(samples["repeat-finished"][3], blue);
+    assert.equal(samples.effects.length, 44);
+    for (const result of samples.effects) {
+      const spec = effects[result.effect];
+      if (spec.kind === "entrance") {
+        assert.equal(result.before.pixels, 0, `${result.effect} starts hidden`);
+        assert.ok(
+          result.after.pixels > 75000,
+          `${result.effect} finishes visible`,
+        );
+      } else if (spec.kind === "exit") {
+        assert.ok(
+          result.before.pixels > 75000,
+          `${result.effect} starts visible`,
+        );
+        if (result.effect === "box-out" && result.after.pixels) {
+          // Impress 24.2 can leave a one-pixel edge after this native filter.
+          // The export warns about it; no colored interior may remain.
+          const [left, top, right, bottom] = result.before.bounds;
+          assert.equal(
+            result.after.interiorPixels,
+            0,
+            "box-out clears its interior",
+          );
+          assert.ok(result.after.pixels <= 2 * (right - left + bottom - top));
+          const [afterLeft, afterTop, afterRight, afterBottom] =
+            result.after.bounds;
+          assert.ok(
+            afterLeft >= left &&
+              afterTop >= top &&
+              afterRight <= right &&
+              afterBottom <= bottom,
+          );
+        } else {
+          assert.equal(
+            result.after.pixels,
+            0,
+            `${result.effect} finishes hidden`,
+          );
+        }
+      } else {
+        assert.ok(
+          result.before.pixels > 75000 && result.after.pixels > 30000,
+          `${result.effect} retains its artwork`,
+        );
+      }
+      // Impress imports box-out but can hold the full box until completion.
+      // Its specific export warning covers this client behavior as well.
+      if (!["appear", "disappear", "box-out"].includes(result.effect)) {
+        assert.ok(
+          result.middle.some(
+            (frame) =>
+              JSON.stringify(frame) !== JSON.stringify(result.before) &&
+              (frame.pixels !== result.after.pixels ||
+                JSON.stringify(frame.bounds) !==
+                  JSON.stringify(result.after.bounds)),
+          ),
+          `${result.effect} has an intermediate rendered state`,
+        );
+      }
+    }
+  },
+);

@@ -6,7 +6,7 @@ Studio Design creates local, editable design artifacts through Codex. Read the r
 | --- | --- | --- |
 | Interface, website, prototype and wireframe | Interface/prototype/mobile recipes and native HTML | Responsive layouts, working flows, keyboard access, optional comparison variants |
 | Comparison canvas | Native elements or React canvas | Pan/zoom, sections, notes, focus, reorder/hide, browser state, opted-in project saves and PNG/HTML snapshots |
-| Presentations | Deck runtime and PowerPoint exporter | 44 HTML build effects, click groups, thumbnails, notes, fullscreen, structural editing, undo, PDF print and editable/image-based PPTX |
+| Presentations | Deck runtime and PowerPoint exporter | 44 HTML build effects, click groups, thumbnails, notes, fullscreen, structural editing, undo, PDF print and editable/image-based PPTX with supported native builds and local media |
 | Documents and print | Document and fixed-sheet runtimes | Flow/explicit/fixed/fit layouts, Letter/A4/Legal geometry, running content, text editing and real PDF output |
 | HTML email | Table-based starter and email recipe | Inline styles, preheader and dark palette; verify in actual target clients |
 | Mobile, browser and desktop contexts | Device/window components | iOS/Android/Chrome/macOS shells, authored content, live controls and image-only exports |
@@ -31,4 +31,4 @@ Runtime identifiers, event names and storage keys remain stable across the Studi
 
 ## Boundaries
 
-PowerPoint exports support native text/shapes, individual pictures and screenshot decks with notes. Complex CSS uses explicit raster fallbacks; HTML builds export as finished static artwork. See the [PowerPoint guide](../skills/studio-design/references/powerpoint.md). External generation, live model interactions, tiles and transfers use the actual available tools or explicitly configured providers. No simulated integration is described as a completed transfer or provider result. See [known limitations](limitations.md) for the nested-video export issue and specific editing/import constraints.
+PowerPoint exports support native text/shapes, individual pictures, isolated CSS background layers, supported native builds, local playable media and screenshot decks with notes. Inseparable CSS and unsupported animation targets use explicit static fallbacks. See the [PowerPoint guide](../skills/studio-design/references/powerpoint.md). External generation, live model interactions, tiles and transfers use the actual available tools or explicitly configured providers. No simulated integration is described as a completed transfer or provider result. See [known limitations](limitations.md) for specific export, editing and import constraints.

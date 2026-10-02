@@ -2,6 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
+import http from "node:http";
+import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { captureSlide } from "../skills/studio-design/scripts/lib/pptx-capture.mjs";
+import { capturePptxImage } from "../skills/studio-design/scripts/lib/pptx-layers.mjs";
+import {
+  preparePptxMedia,
+  preparePptxMediaElements,
+} from "../skills/studio-design/scripts/lib/pptx-media.mjs";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
 import { serve } from "../skills/studio-design/scripts/preview.mjs";
@@ -30,7 +39,9 @@ const xml = (zip, file) => strFromU8(zip[file]);
 test("PowerPoint produces native text/shapes, local pictures, ordered slides and private notes", async (t) => {
   const { dir, url } = await fixture(t);
   const out = path.join(dir, "deck.pptx");
-  const result = await exportArtifact("pptx", url, out);
+  const result = await exportArtifact("pptx", url, out, {
+    pptxAnimations: "static",
+  });
   assert.equal(result.slides, 2);
   assert.equal(result.mode, "editable");
   assert.ok(result.editableObjects > 5);
@@ -119,6 +130,7 @@ test("PowerPoint rejects invalid options and non-decks without leaving partial f
   const output = path.join(dir, "invalid.pptx");
   for (const options of [
     { pptxMode: "fake" },
+    { pptxAnimations: "fake" },
     { deviceScaleFactor: 0 },
     { fontSwaps: [{ from: "Arial" }] },
   ])
@@ -174,14 +186,14 @@ test("PowerPoint preserves font substitutions, wrapped lines, links and empty-no
   );
 });
 
-test("PowerPoint handles complex slide roots and reports identical artwork and indexed-note mismatches", async (t) => {
+test("PowerPoint isolates gradient slide backgrounds and reports identical artwork and indexed-note mismatches", async (t) => {
   const { dir, url } = await fixture(
     t,
     `<section style="background:linear-gradient(#fff,#def)"><h1>Same</h1></section><section style="background:linear-gradient(#fff,#def)"><h1>Same</h1></section><script id="speaker-notes" type="application/json">["Only first"]</script>`,
   );
   const out = path.join(dir, "fallback.pptx");
   const result = await exportArtifact("pptx", url, out);
-  assert.equal(result.editableObjects, 0);
+  assert.equal(result.editableObjects, 2);
   assert.equal(result.rasterObjects, 2);
   assert.ok(result.warnings.some((w) => w.includes("identical artwork")));
   assert.ok(result.warnings.some((w) => w.includes("note count differs")));
@@ -215,22 +227,404 @@ test("PowerPoint fails on malformed notes and browser resource errors and cleans
   );
 });
 
-test("PowerPoint retains decorative pseudo-elements, wide-gamut color, RTL and explicit stacking as pictures", async (t) => {
+test("PowerPoint retains decorative pseudo-elements, wide-gamut color, RTL, individual transforms and explicit stacking as pictures", async (t) => {
   const { dir, url } = await fixture(
     t,
-    `<style>.decorated{position:relative}.decorated::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff8,#def8)}</style><section><h1>Editable heading</h1><p class="decorated">Decorative layer</p><p style="color:color(display-p3 1 0 0)">Wide-gamut color</p><p style="direction:rtl">Right-to-left layout</p></section><section><p style="position:relative;z-index:2">Explicit stacking</p></section>`,
+    `<style>.decorated{position:relative}.decorated::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff8,#def8)}</style><section><h1>Editable heading</h1><p class="decorated">Decorative layer</p><p style="color:color(display-p3 1 0 0)">Wide-gamut color</p><p style="direction:rtl">Right-to-left layout</p><p style="rotate:8deg">Authored rotation</p><p style="scale:0.8">Authored scale</p><p style="translate:12px 0">Authored translation</p></section><section><p style="position:relative;z-index:2">Explicit stacking</p></section>`,
   );
   const out = path.join(dir, "complex.pptx");
   const result = await exportArtifact("pptx", url, out);
-  assert.equal(result.rasterObjects, 4);
+  assert.equal(result.rasterObjects, 7);
   const zip = unzipSync(await fs.readFile(out));
   assert.match(xml(zip, "ppt/slides/slide1.xml"), /Editable heading/);
+  assert.doesNotMatch(
+    xml(zip, "ppt/slides/slide1.xml"),
+    /Authored rotation|Authored scale|Authored translation/,
+  );
   assert.equal(
     (xml(zip, "ppt/slides/slide1.xml").match(/<p:pic>/g) || []).length,
-    3,
+    6,
   );
   assert.equal(
     (xml(zip, "ppt/slides/slide2.xml").match(/<p:pic>/g) || []).length,
     1,
   );
+});
+
+test("PowerPoint paint captures retain editable text, transparent shadows and exact source styles", async (t) => {
+  const { url } = await fixture(
+    t,
+    `<section><h1>First</h1></section><section style="background:linear-gradient(#fff,#def)"><h1>Foreground heading</h1><div style="margin:35px;background:#f80;border-radius:18px;width:240px;height:90px;box-shadow:12px 12px 8px #0008">Editable card</div><p>Unrelated sibling</p></section>`,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const captured = await page.evaluate(captureSlide, 1);
+    assert.ok(
+      captured.objects.some((object) => object.text === "Foreground heading"),
+    );
+    assert.ok(
+      captured.objects.some((object) => object.text === "Editable card"),
+    );
+    const styles = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll("*")].map((element) =>
+          element.getAttribute("style"),
+        ),
+      );
+    const locator = page.locator("deck-stage > [data-deck-slide]").nth(1);
+    const original = await locator.screenshot();
+    const before = await styles();
+    const paints = captured.objects.filter(
+      (object) => object.layer === "paint",
+    );
+    assert.equal(paints.length, 2);
+    const background = await capturePptxImage(page, locator, paints[0]);
+    const card = await capturePptxImage(page, locator, paints[1]);
+    assert.deepEqual(await styles(), before);
+    assert.deepEqual(await locator.screenshot(), original);
+    const sample = await page.evaluate(
+      async ({ background, card }) => {
+        const read = async (data) => {
+          const image = new Image();
+          image.src = `data:image/png;base64,${data}`;
+          await image.decode();
+          const canvas = document.createElement("canvas");
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext("2d");
+          context.drawImage(image, 0, 0);
+          return (x, y) => [...context.getImageData(x, y, 1, 1).data];
+        };
+        const bg = await read(background),
+          paint = await read(card);
+        return {
+          textArea: bg(40, 50),
+          blankArea: bg(600, 50),
+          outside: paint(10, 10),
+          center: paint(150, 150),
+          shadow: paint(309, 205),
+        };
+      },
+      {
+        background: background.toString("base64"),
+        card: card.toString("base64"),
+      },
+    );
+    assert.deepEqual(sample.textArea, sample.blankArea);
+    assert.equal(sample.outside[3], 0);
+    assert.equal(sample.center[3], 255);
+    assert.ok(sample.shadow[3] > 0 && sample.shadow[3] < 255);
+  });
+});
+
+test("PowerPoint embeds actual local video and audio bytes with native media relationships", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section><h1>Playable sources</h1><video src="clip.mp4" width="180" height="150" style="object-fit:cover;border-radius:8px" loop muted></video><p>Between media objects</p><audio src="tone.wav" controls></audio><audio src="tone.wav"></audio></section>`,
+  );
+  execFileSync("ffmpeg", [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-f",
+    "lavfi",
+    "-i",
+    "color=c=blue:s=160x100:r=10:d=0.3",
+    "-c:v",
+    "libx264",
+    "-pix_fmt",
+    "yuv420p",
+    path.join(dir, "clip.mp4"),
+  ]);
+  execFileSync("ffmpeg", [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-f",
+    "lavfi",
+    "-i",
+    "sine=frequency=440:duration=0.3",
+    "-c:a",
+    "pcm_s16le",
+    path.join(dir, "tone.wav"),
+  ]);
+  const out = path.join(dir, "media.pptx");
+  const result = await exportArtifact("pptx", url, out);
+  assert.equal(result.mediaObjects, 3);
+  assert.equal(result.rasterObjects, 2);
+  assert.ok(result.warnings.some((warning) => warning.includes("object-fit")));
+  assert.ok(
+    result.warnings.some((warning) =>
+      warning.includes("complete original source"),
+    ),
+  );
+  assert.ok(result.warnings.some((warning) => warning.includes("off-slide")));
+  const zip = unzipSync(await fs.readFile(out));
+  for (const name of ["clip.mp4", "tone.wav"]) {
+    const source = await fs.readFile(path.join(dir, name));
+    assert.ok(
+      Object.values(zip).some((entry) => Buffer.from(entry).equals(source)),
+      `${name} source bytes must be embedded unchanged`,
+    );
+  }
+  const slide = xml(zip, "ppt/slides/slide1.xml");
+  const rels = xml(zip, "ppt/slides/_rels/slide1.xml.rels");
+  assert.equal((slide.match(/ppaction:\/\/media/g) || []).length, 3);
+  assert.equal((slide.match(/<p14:media /g) || []).length, 3);
+  assert.equal((slide.match(/<p:pic>/g) || []).length, 5);
+  assert.match(rels, /relationships\/video/);
+  assert.match(rels, /relationships\/audio/);
+  assert.doesNotMatch(rels, /TargetMode="External"/);
+  assert.equal((slide.match(/<a:audioFile /g) || []).length, 2);
+  assert.equal((slide.match(/<a:videoFile /g) || []).length, 1);
+  const ids = [...slide.matchAll(/<p:cNvPr\b[^>]*\bid="(\d+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.equal(new Set(ids).size, ids.length);
+  const staticOut = path.join(dir, "media-static.pptx");
+  await exportArtifact("pptx", url, staticOut, { pptxAnimations: "static" });
+  const staticZip = unzipSync(await fs.readFile(staticOut));
+  assert.equal(
+    (xml(staticZip, "ppt/slides/slide1.xml").match(/<a:audioFile /g) || [])
+      .length,
+    2,
+  );
+});
+
+test("PowerPoint media snapshots reject remote origins, redirect escapes and oversized sources", async (t) => {
+  const server = http.createServer((request, response) => {
+    if (request.url === "/redirect") {
+      response.writeHead(302, { location: "https://example.com/clip.mp4" });
+      response.end();
+    } else {
+      response.writeHead(200, { "content-length": 128 * 1024 * 1024 + 1 });
+      response.end();
+    }
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const origin = `http://127.0.0.1:${server.address().port}`;
+  const page = { url: () => `${origin}/deck.html` };
+  const base = { mediaType: "video", playbackRate: 1, volume: 1 };
+  await assert.rejects(
+    preparePptxMedia(
+      page,
+      { ...base, src: "https://example.com/clip.mp4" },
+      Buffer.alloc(0),
+    ),
+    /loopback/,
+  );
+  await assert.rejects(
+    preparePptxMedia(
+      page,
+      { ...base, src: "http://127.0.0.1:9/clip.mp4" },
+      Buffer.alloc(0),
+    ),
+    /same loopback origin/,
+  );
+  await assert.rejects(
+    preparePptxMedia(
+      page,
+      { ...base, src: `${origin}/redirect` },
+      Buffer.alloc(0),
+    ),
+    /loopback/,
+  );
+  await assert.rejects(
+    preparePptxMedia(page, { ...base, src: `${origin}/huge` }, Buffer.alloc(0)),
+    /128 MiB/,
+  );
+});
+
+test("PowerPoint raster fallback retains shadow-root artwork without surrounding slide paint", async (t) => {
+  const { url } = await fixture(
+    t,
+    `<section style="background:#fff"><h1>Editable neighbor</h1><sample-card style="display:block;width:180px;height:80px"></sample-card></section><script>customElements.define("sample-card", class extends HTMLElement { constructor() { super(); this.attachShadow({mode:"open"}).innerHTML = '<div style="width:180px;height:80px;background:rgb(240,80,20);color:white">Shadow content</div>'; } });</script>`,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const captured = await page.evaluate(captureSlide, 0);
+    const raster = captured.objects.find((object) => object.kind === "image");
+    assert.ok(raster);
+    assert.ok(
+      captured.objects.some((object) => object.text === "Editable neighbor"),
+    );
+    const center = await page.locator("sample-card").evaluate((element) => {
+      const box = element.getBoundingClientRect(),
+        root = element.closest("section").getBoundingClientRect();
+      return {
+        x: box.x - root.x + box.width / 2,
+        y: box.y - root.y + box.height / 2,
+      };
+    });
+    const data = await capturePptxImage(
+      page,
+      page.locator("deck-stage > [data-deck-slide]").first(),
+      raster,
+    );
+    const pixel = await page.evaluate(
+      async ({ encoded, center }) => {
+        const image = new Image();
+        image.src = `data:image/png;base64,${encoded}`;
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0);
+        return {
+          art: [...context.getImageData(center.x, center.y, 1, 1).data],
+          outside: [...context.getImageData(0, 0, 1, 1).data],
+        };
+      },
+      { encoded: data.toString("base64"), center },
+    );
+    assert.deepEqual(pixel.art, [240, 80, 20, 255]);
+    assert.equal(pixel.outside[3], 0);
+  });
+});
+
+test("PowerPoint keeps source-less video posters as static artwork in both modes", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section><h1>Static poster</h1><video width="180" height="120" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='120'%3E%3Crect width='180' height='120' fill='blue'/%3E%3C/svg%3E"></video></section>`,
+  );
+  const editable = await exportArtifact(
+    "pptx",
+    url,
+    path.join(dir, "poster.pptx"),
+  );
+  assert.equal(editable.mediaObjects, 0);
+  assert.equal(editable.rasterObjects, 1);
+  assert.ok(
+    editable.warnings.some((warning) => warning.includes("no playable source")),
+  );
+  const screenshots = await exportArtifact(
+    "pptx",
+    url,
+    path.join(dir, "poster-screenshots.pptx"),
+    { pptxMode: "screenshots" },
+  );
+  assert.equal(screenshots.rasterObjects, 1);
+});
+
+test("PowerPoint isolates wide-gamut background paint while retaining ordinary foreground text", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section style="background:color(display-p3 1 0.4 0.1);color:rgb(20,30,40)"><h1>Editable on wide-gamut paint</h1></section>`,
+  );
+  const out = path.join(dir, "wide-background.pptx");
+  const result = await exportArtifact("pptx", url, out);
+  assert.equal(result.editableObjects, 1);
+  assert.equal(result.rasterObjects, 1);
+  const zip = unzipSync(await fs.readFile(out));
+  assert.match(
+    xml(zip, "ppt/slides/slide1.xml"),
+    /<a:t>Editable on wide-gamut paint<\/a:t>/,
+  );
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const captured = await page.evaluate(captureSlide, 0);
+    const data = await capturePptxImage(
+      page,
+      page.locator("deck-stage > [data-deck-slide]").first(),
+      captured.objects.find((object) => object.layer === "paint"),
+    );
+    const pixel = await page.evaluate(async (encoded) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${encoded}`;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      return [...context.getImageData(400, 300, 1, 1).data];
+    }, data.toString("base64"));
+    assert.equal(pixel[0], 255);
+    assert.ok(pixel[1] > 50 && pixel[1] < 150);
+    assert.ok(pixel[2] < 50);
+    assert.equal(pixel[3], 255);
+  });
+});
+
+test("PowerPoint media readiness settles native control artwork without changing the authored time or styles", async (t) => {
+  const { dir, url } = await fixture(
+    t,
+    `<section><video src="clip.mp4" controls width="320" height="200" style="display:block"></video></section>`,
+  );
+  execFileSync("ffmpeg", [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-f",
+    "lavfi",
+    "-i",
+    "color=c=blue:s=320x200:r=30:d=2",
+    "-c:v",
+    "libx264",
+    "-pix_fmt",
+    "yuv420p",
+    path.join(dir, "clip.mp4"),
+  ]);
+  await withPage(url, async (page) => {
+    await page.evaluate(() =>
+      document.querySelector("deck-stage").preparePrint(),
+    );
+    await page.emulateMedia({ media: "print" });
+    const before = await page.evaluate(() => {
+      const media = document.querySelector("video");
+      media.currentTime = 0.125;
+      return {
+        time: media.currentTime,
+        controls: media.controls,
+        style: media.getAttribute("style"),
+      };
+    });
+    const warnings = await preparePptxMediaElements(page, 0);
+    assert.deepEqual(warnings, []);
+    const after = await page.evaluate(() => {
+      const media = document.querySelector("video");
+      return {
+        time: media.currentTime,
+        controls: media.controls,
+        style: media.getAttribute("style"),
+      };
+    });
+    assert.deepEqual(after, before);
+    const data = await page
+      .locator("deck-stage > [data-deck-slide]")
+      .first()
+      .locator("video")
+      .screenshot({ animations: "allow" });
+    const darkPixels = await page.evaluate(async (encoded) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${encoded}`;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      const pixels = context.getImageData(110, 45, 100, 90).data;
+      let dark = 0;
+      for (let i = 0; i < pixels.length; i += 4)
+        if (pixels[i + 2] < 100) dark++;
+      return dark;
+    }, data.toString("base64"));
+    assert.equal(
+      darkPixels,
+      0,
+      "The blue poster must not contain Chromium's transient black loading spinner.",
+    );
+  });
 });

@@ -2,7 +2,7 @@
 
 ## Motion and audio
 
-- Exporting an animation containing nested video can intermittently capture the previous decoded frame at the first visible timestamp. The issue remains unresolved. Do not describe an affected export as verified without inspecting the encoded scene boundary.
+- Nested-video capture waits for decoding, requests paused-video surface resubmission after visibility paint, and cancels callback registrations without waiting for a new callback. Regression checks inspect actual encoded first-visible and held/quantized frames. Inspect scene boundaries when delivering new media combinations; browser/application coverage remains environment-specific.
 - MP4/WebM exports mix marked local media. Arbitrary live Web Audio and unmarked playback are not recorded; GIF has no audio.
 - Sound-effect generation requires an explicitly configured provider. Local fixture checks verify protocol handling, not live provider quality. Narration uses an available text-to-speech engine or supplied recording; there is no bundled speech engine.
 - Keep assets local for portable output. Font embedding supports configured read-only provider origins, but standalone HTML still requires localized document assets.
@@ -16,7 +16,7 @@
 
 ## Imports and output
 
-- PowerPoint exports use native text/shapes and individual pictures, with explicit raster fallbacks for complex CSS. Screenshot mode preserves the rendered artwork as one image per slide. Fonts must be available in the recipient's application; HTML animations export as finished static artwork, and playable video/audio is not embedded. See the [PowerPoint guide](powerpoint.md).
+- Editable PowerPoint exports retain native text/shapes over eligible isolated CSS paint layers, translate supported builds into native timing, and embed local video/audio. Inseparable CSS and flattened/nested animation targets can still require static picture fallback; inspect explicit warnings. Fonts must be available in the recipient's application. Native effect rendering and media codecs can vary, and HTML media playback settings are not translated. Screenshot mode preserves finished artwork as one image per slide. See the [PowerPoint guide](powerpoint.md).
 - Figma import reports unsupported and approximate paints, masks, typography, variable wiring and instance properties. Inspect its warnings and compare a real design export when exact fidelity matters.
 - Design-system checks are advisory source analysis, not complete type checking or brand certification. External/ambient types, package export maps and unsupported legacy formats can require manual conversion.
 - HTML email requires testing in the actual target clients. Browser preview does not establish Outlook, Gmail or Apple Mail compatibility.

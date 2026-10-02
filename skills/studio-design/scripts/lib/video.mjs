@@ -291,15 +291,15 @@ export async function renderVideo(page, errors, output, temporary, options) {
           else await b.setTime(time);
           // A React commit changes a video's desired frame synchronously,
           // but decoding happens later. Capture only after the seek completes.
+          const visibleVideos = [
+            ...document.querySelectorAll("video[data-codex-video-target]"),
+          ].filter(
+            (video) =>
+              video.getBoundingClientRect().width &&
+              getComputedStyle(video).visibility !== "hidden",
+          );
           await Promise.all(
-            [
-              ...document.querySelectorAll("video[data-codex-video-target]"),
-            ].map(async (video) => {
-              if (
-                !video.getBoundingClientRect().width ||
-                getComputedStyle(video).visibility === "hidden"
-              )
-                return;
+            visibleVideos.map(async (video) => {
               video.pause();
               const target = Number(video.dataset.codexVideoTarget);
               await new Promise((resolve, reject) => {
@@ -351,6 +351,24 @@ export async function renderVideo(page, errors, output, temporary, options) {
           await new Promise((resolve) =>
             requestAnimationFrame(() => requestAnimationFrame(resolve)),
           );
+          // Chromium can drop a paused video's decoded-frame submission while
+          // the newly visible surface awaits its previous frame acknowledgement.
+          // After that paint, requesting a video frame retries surface submission.
+          // Do not await the callback: held or quantized source frames may not
+          // emit another callback. Keep the timeline paused throughout capture.
+          const frameRequests = visibleVideos.map((video) => [
+            video,
+            video.requestVideoFrameCallback(() => {}),
+          ]);
+          try {
+            if (frameRequests.length)
+              await new Promise((resolve) =>
+                requestAnimationFrame(() => requestAnimationFrame(resolve)),
+              );
+          } finally {
+            for (const [video, id] of frameRequests)
+              video.cancelVideoFrameCallback(id);
+          }
         },
         { name: bridgeGlobal, time: start / 1000 + i / fps },
       );

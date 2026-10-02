@@ -15,6 +15,11 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg poppler-utils
+      - name: Install export verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg poppler-utils libreoffice-impress python3-uno python3-pil xvfb
       - run: npm run check
       - run: npm test
+        env:
+          STUDIO_TEST_IMPRESS: '1'

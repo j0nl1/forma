@@ -76,7 +76,7 @@ node skills/studio-design/scripts/export.mjs pptx http://127.0.0.1:4311/deck.htm
 node skills/studio-design/scripts/export.mjs pptx http://127.0.0.1:4311/deck.html /absolute/path/to/deck-images.pptx --pptx-mode screenshots --scale 2
 ```
 
-Editable mode retains native text and simple shapes, with pictures for images and unsupported CSS. Screenshot mode retains the rendered composition as one image per slide. Both preserve notes and omit skipped slides. Inspect the result in the target application; fonts and complex layouts can vary. HTML build animations remain in the HTML and export as finished static artwork in PowerPoint. Keep the original source folder.
+Editable mode retains native text and simple shapes, uses separate picture layers for eligible complex backgrounds, translates supported builds into native PowerPoint timing, and embeds local video/audio. Screenshot mode retains the finished composition as one image per slide. Both preserve notes and omit skipped slides. Use `--pptx-animations static` for finished artwork without native builds. Inspect the result and media playback in the target application; fonts, CSS and animation rendering can vary. Read fallback warnings and keep the original source folder.
 
 ## Typed design controls
 

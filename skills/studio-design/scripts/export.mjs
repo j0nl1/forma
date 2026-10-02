@@ -91,10 +91,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       "--paper": "value",
       "--orientation": "value",
       "--pptx-mode": "value",
+      "--pptx-animations": "value",
     });
     if (positional.length !== 3)
       throw new Error(
-        "Usage: node export.mjs html|pdf|png|video|pptx <input-path-or-loopback-url> <output> [--config export.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none] [--paper letter|a4|legal] [--orientation portrait|landscape] [--pptx-mode editable|screenshots]",
+        "Usage: node export.mjs html|pdf|png|video|pptx <input-path-or-loopback-url> <output> [--config export.json] [--fps 30] [--crf 18] [--start-ms 0] [--end-ms 2000] [--scale 2] [--bridge codexTimeline] [--audio auto|none] [--paper letter|a4|legal] [--orientation portrait|landscape] [--pptx-mode editable|screenshots] [--pptx-animations native|static]",
       );
     const config = flags.config
       ? await readJson(path.resolve(flags.config))
@@ -110,6 +111,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       paper: "paper",
       orientation: "orientation",
       "pptx-mode": "pptxMode",
+      "pptx-animations": "pptxAnimations",
     }))
       if (flags[flag] !== undefined) config[key] = flags[flag];
     console.log(JSON.stringify(await exportArtifact(...positional, config)));

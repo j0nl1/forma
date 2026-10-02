@@ -1,11 +1,21 @@
 import fs from "node:fs/promises";
 import PptxGenJS from "pptxgenjs";
 import { captureSlide } from "./pptx-capture.mjs";
+import { capturePptxImage } from "./pptx-layers.mjs";
+import {
+  preparePptxMedia,
+  preparePptxMediaElements,
+  normalizePptxMedia,
+} from "./pptx-media.mjs";
+import { applyPptxMotion } from "./pptx-motion.mjs";
 
 export function pptxOptions(options = {}) {
   const mode = options.pptxMode ?? "editable";
   if (!["editable", "screenshots"].includes(mode))
     throw new Error("pptxMode must be editable or screenshots.");
+  const animations = options.pptxAnimations ?? "native";
+  if (!["native", "static"].includes(animations))
+    throw new Error("pptxAnimations must be native or static.");
   const scale = Number(options.deviceScaleFactor ?? 1);
   if (!Number.isFinite(scale) || scale < 1 || scale > 4)
     throw new Error("PowerPoint capture scale must be between 1 and 4.");
@@ -22,7 +32,7 @@ export function pptxOptions(options = {}) {
     )
   )
     throw new Error("fontSwaps must contain nonempty from/to font names.");
-  return { mode, deviceScaleFactor: scale, fontSwaps };
+  return { mode, animations, deviceScaleFactor: scale, fontSwaps };
 }
 
 export async function renderPptx(page, output, options = {}) {
@@ -62,6 +72,11 @@ export async function renderPptx(page, output, options = {}) {
   // Keep dimensions within PowerPoint's 56-inch limit, preserving the source ratio.
   const unit = 1 / Math.max(96, metadata.width / 56, metadata.height / 56);
   const deck = new PptxGenJS();
+  const transparentCover = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    return `image/png;base64,${canvas.toDataURL("image/png").split(",")[1]}`;
+  });
   deck.defineLayout({
     name: "STUDIO",
     width: metadata.width * unit,
@@ -73,9 +88,11 @@ export async function renderPptx(page, output, options = {}) {
   deck.title = metadata.title;
   deck.lang = "en-US";
   const warnings = new Set(),
-    signatures = [];
+    signatures = [],
+    capturedSlides = [];
   let editableObjects = 0,
     rasterObjects = 0,
+    mediaObjects = 0,
     animationCount = 0;
   try {
     await page.emulateMedia({ media: "print" });
@@ -86,7 +103,22 @@ export async function renderPptx(page, output, options = {}) {
         ),
     );
     for (const index of metadata.slides) {
+      for (const warning of (await preparePptxMediaElements(page, index)) ?? [])
+        warnings.add(`Slide ${index + 1}: ${warning}`);
       const captured = await page.evaluate(captureSlide, index);
+      captured.sourceIndex = index;
+      // Some presentation readers omit native media covers during print. Keep a
+      // real picture beneath the player so its authored artwork survives there.
+      if (config.mode === "editable")
+        captured.objects = captured.objects.flatMap((object) =>
+          object.kind === "media" && !object.hidden
+            ? [{ ...object, kind: "image", layer: "mediaPoster" }, object]
+            : [object],
+        );
+      captured.objects.forEach((object, ordinal) => {
+        object.objectName = `studio-object-${index}-${ordinal}`;
+      });
+      capturedSlides.push(captured);
       if (
         Math.abs(captured.width - metadata.width) > 1 ||
         Math.abs(captured.height - metadata.height) > 1
@@ -116,7 +148,7 @@ export async function renderPptx(page, output, options = {}) {
       );
       const slide = deck.addSlide();
       slide.addNotes(captured.notes);
-      animationCount += captured.animations;
+      animationCount += captured.animationCount;
       for (const warning of captured.warnings.filter((w) =>
         w.startsWith("Speaker note"),
       ))
@@ -134,8 +166,10 @@ export async function renderPptx(page, output, options = {}) {
       }
       for (const warning of captured.warnings)
         warnings.add(`Slide ${index + 1}: ${warning}`);
+      const mediaCovers = new Map();
       for (const object of captured.objects) {
         const geometry = {
+          objectName: object.objectName,
           x: object.x * unit,
           y: object.y * unit,
           w: object.w * unit,
@@ -164,13 +198,23 @@ export async function renderPptx(page, output, options = {}) {
           });
           editableObjects++;
         } else {
-          const target = object.root
-            ? locator
-            : locator.locator(`[data-codex-pptx-raster="${object.id}"]`);
-          const image = await target.screenshot({
-            type: "png",
-            animations: "disabled",
-          });
+          const image =
+            mediaCovers.get(object.sourceId) ??
+            (await capturePptxImage(page, locator, object));
+          if (object.layer === "mediaPoster")
+            mediaCovers.set(object.sourceId, image);
+          if (object.kind === "media") {
+            const media = await preparePptxMedia(page, object, image);
+            for (const warning of media.warnings)
+              warnings.add(`Slide ${index + 1}: ${warning}`);
+            // A separate real poster supplies the resting artwork. Avoid
+            // compositing its semitransparent edges twice beneath the player.
+            if (mediaCovers.has(object.sourceId))
+              media.options.cover = transparentCover;
+            slide.addMedia({ ...media.options, ...geometry });
+            mediaObjects++;
+            continue;
+          }
           slide.addImage({
             ...geometry,
             data: `image/png;base64,${image.toString("base64")}`,
@@ -180,7 +224,19 @@ export async function renderPptx(page, output, options = {}) {
         }
       }
     }
-    if (animationCount)
+    let buffer = await deck.write({
+      outputType: "nodebuffer",
+      compression: true,
+    });
+    if (config.mode === "editable")
+      buffer = normalizePptxMedia(buffer, capturedSlides);
+    let nativeAnimations = 0;
+    if (config.mode === "editable" && config.animations === "native") {
+      const motion = applyPptxMotion(buffer, capturedSlides);
+      buffer = motion.buffer;
+      nativeAnimations = motion.animationCount;
+      for (const warning of motion.warnings) warnings.add(warning);
+    } else if (animationCount)
       warnings.add(
         `${animationCount} HTML build animations are retained in the HTML source; PowerPoint contains their finished static artwork.`,
       );
@@ -204,10 +260,7 @@ export async function renderPptx(page, output, options = {}) {
       warnings.add(
         "PowerPoint text uses the recipient's installed fonts; inspect wrapping in the target application.",
       );
-    await fs.writeFile(
-      output,
-      await deck.write({ outputType: "nodebuffer", compression: true }),
-    );
+    await fs.writeFile(output, buffer);
     return {
       mode: config.mode,
       slides: metadata.slides.length,
@@ -215,6 +268,9 @@ export async function renderPptx(page, output, options = {}) {
       height: metadata.height,
       editableObjects,
       rasterObjects,
+      mediaObjects,
+      nativeAnimations,
+      staticAnimations: animationCount - nativeAnimations,
       warnings: [...warnings],
     };
   } finally {

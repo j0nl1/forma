@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Added local PowerPoint export from HTML decks: native editable text/shapes, individual pictures, screenshot mode, slide order/skip handling, notes, font substitutions and explicit fidelity warnings.
+- Extended editable PowerPoint export with isolated CSS background layers, native build timing, embedded local audio/video and an explicit static-build option.
+- Fixed stale first-visible nested-video frames by retrying paused Chromium surface submission after visibility paint, with actual encoded entry/held-frame regression coverage.
 - Fixed CI verification by installing Poppler and removing a personal screenshot path from a deck test.
 
 - Renamed the project and skill to Studio Design, with `$studio-design` invocation, updated package metadata, installation paths and examples.

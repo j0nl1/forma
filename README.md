@@ -2,7 +2,7 @@
 
 A local design skill built specifically for Codex. Create editable HTML mockups, working prototypes, wireframes, mobile screens, presentations, documents, campaigns, design systems, charts, and motion pieces, then inspect and export them with local tools.
 
-Studio Design runs inside Codex and keeps generated files local. HTML presentations export to PowerPoint as editable objects or full-slide images, with speaker notes. See [known limitations](docs/limitations.md) for concrete constraints and the current nested-video export issue.
+Studio Design runs inside Codex and keeps generated files local. HTML presentations export to PowerPoint as editable objects with supported native builds and embedded local media, or as full-slide images, with speaker notes. See [known limitations](docs/limitations.md) for concrete fidelity and integration constraints.
 
 ## Watch the tutorial
 

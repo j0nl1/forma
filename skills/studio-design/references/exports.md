@@ -10,7 +10,7 @@ Serve the artifact and run `scripts/export.mjs pdf <loopback-url> <output.pdf>` 
 
 ## PowerPoint
 
-Run `scripts/export.mjs pptx <loopback-deck-url> <output.pptx>`. The default mode creates native editable text and simple shapes, with individual pictures and explicit raster fallbacks. `--pptx-mode screenshots` creates one full-slide image per slide. Both modes preserve source order, skip flags, dimensions and speaker notes. Read the [PowerPoint guide](powerpoint.md) for font substitution, verification and static-motion constraints.
+Run `scripts/export.mjs pptx <loopback-deck-url> <output.pptx>`. The default mode creates native editable text and simple shapes, isolated CSS paint layers, supported native builds and embedded local media, with explicit fallback warnings. `--pptx-mode screenshots` creates one finished full-slide image per slide; `--pptx-animations static` disables native builds in editable mode. Both modes preserve source order, skip flags, dimensions and speaker notes. Read the [PowerPoint guide](powerpoint.md) for font substitution, media/playback constraints and verification.
 
 ## Video
 
