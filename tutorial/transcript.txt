@@ -2,7 +2,7 @@ Skill
 Studio Design is a skill: instructions, recipes, editable starters, and local helpers. Invoke it inside Codex. The website showcases working examples; it is not the skill’s product interface.
 
 Install
-Review a local checkout. Run the installer in dry-run mode before installing. Helpers use pinned dependencies. Browser exports need Chromium; video needs FFmpeg. Reload Codex if needed, then invoke Studio Design. These commands are setup guidance.
+Let your agent handle setup. Copy the installation prompt from the README. Your agent reviews the repository, chooses a skills folder for your harness, checks the dry run, and prepares local tools. Reload if needed, then activate Studio Design.
 
 Brief
 Give the audience, primary task, reference, and output. For example: a reading-room prototype, calm and dense directions, the Harbor style, and editable HTML. Codex reads project instructions and the relevant recipes.
