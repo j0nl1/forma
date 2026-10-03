@@ -1,6 +1,6 @@
 # Image slots and framing
 
-The image editor supports a container-sized `<image-slot>`, directory-shared image state, drag/drop and browse, replace requests, cover/contain framing, pan/zoom/corner resizing, attribution, replacement masks and duplicate-slide state copying. The Codex runtime implements those contracts independently through editable modules and an opt-in local sidecar service. No proprietary host bridge is installed.
+The image editor supports a container-sized `<image-slot>`, directory-shared image state, drag/drop and browse, replace requests, cover/contain framing, pan/zoom/corner resizing, attribution, replacement masks and duplicate-slide state copying. The local runtime implements those contracts independently through editable modules and an opt-in local sidecar service. No proprietary host bridge is installed.
 
 ## Authoring
 

@@ -97,7 +97,7 @@ Free text normalizes keyboard curly quotes/dashes and whitespace, validates a sh
 
 ## Requests, reload and remaining integration
 
-The default request action copies an actual draft and shows a selectable textarea fallback. Refresh drafts ask Codex to re-run the active view's recorded source, preserve population/window and other views, recompute provenance, derive finding, then reload. Missing-view drafts request real values for the selected triple and preserve existing views. IDs and phrases are validated before entering the structured request. The user pastes, reviews and sends the draft in Codex; the runtime does not report a query as running merely because text was copied.
+The default request action copies an actual draft and shows a selectable textarea fallback. Refresh drafts ask the agent to re-run the active view's recorded source, preserve population/window and other views, recompute provenance, derive finding, then reload. Missing-view drafts request real values for the selected triple and preserve existing views. IDs and phrases are validated before entering the structured request. The user pastes, reviews and sends the draft in the agent chat; the runtime does not report a query as running merely because text was copied.
 
 While awaiting an update, the stage shimmers and offers cancellation. A matching newly loaded/imperatively provided view is adopted. A successful refresh clears waiting. After 90 seconds without an answer, paint is visibly stale; cancellation returns to the current authored state. Removal tears down timers/listeners and restores opacity. Native composer insertion is not available. Clipboard delivery requires the user to paste, review and send the draft, as with typed tweak requests.
 

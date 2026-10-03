@@ -1,27 +1,13 @@
-# Codex workflow
+# Optional Codex integration
 
-Use the tools exposed in the current Codex session. Tool names vary between CLI, IDE, and desktop; capability discovery is more reliable than copying an API bootstrap from another environment.
+Apply the shared [harness workflow](harness.md) first. Read this reference only when using Codex. The skill and local helpers do not require these tools; preserve the standard fallback when they are absent.
 
-## Questions and files
+| Capability | Codex convenience | Fallback |
+| --- | --- | --- |
+| Questions | Use `request_user_input_async` for missing preferences when exposed; continue independent work. In Plan mode, use an exposed structured input tool for suitable optional questions. | Ask a concise question in chat when an answer is required. A text input tool cannot accept screenshot uploads. |
+| Visible preview | If `open_in_codex` is exposed, open the verified URL as a browser target in the current chat. | Deliver the reported loopback URL for a standard browser. |
+| Browser control | If unified browser control is exposed, follow its returned documentation and exact initialization requirements. Prefer the in-app browser for local pages. | Use local Playwright checks and ordinary browser inspection. Use a signed-in browser only when the task needs the user's existing session. |
+| Files and media | Use absolute Markdown file links and local media embeds when the current client supports them. | Provide absolute paths and URLs for local applications. |
+| Optional assets and transfer | Use available image, PDF, presentation or connector capabilities with their associated skills and authorization. | Use supplied local assets or deliver an explicit local handoff. |
 
-Use `request_user_input_async` when exposed for missing preferences and continue independent work. A text input tool cannot accept screenshot uploads. In Plan mode, use the exposed structured input tool for suitable optional questions. Otherwise ask a concise question in chat when the answer is required. Respect prior authorization and do not repeat permission requests for routine local edits.
-
-Read and edit with Codex's normal filesystem tools. Use `rg` for discovery. Resolve skill paths from the installed skill directory, never assume the working directory is the skill. Do not install the skill into the user's environment merely to build a design.
-
-## Preview
-
-Start `node <skill>/scripts/preview.mjs <output-folder> --port 4311`. The helper binds `127.0.0.1`, rejects paths and symlinks outside the root, and prints its actual URL. Keep the process running while the preview is in use. It never publishes or creates a public tunnel.
-
-If `open_in_codex` is exposed, open the URL as a browser target in the current chat. If unified browser control is exposed, follow its returned documentation and use the in-app browser for local pages. Initialize exactly as that tool requires. Use Chrome only when the task needs the user's existing signed-in session. Do not invent a Playwright API on top of an unrelated browser tool.
-
-Prefer browser clicks and keyboard input to exercise behavior. Check DOM, runtime errors, mobile dimensions, and rendered screenshots. Without browser control, run `scripts/verify.mjs <url>` when Playwright is installed. Place its captures under the user's home artifact root or an OS temporary directory, never the source tree by default.
-
-If browser verification is unavailable, run static checks, deliver the file and loopback URL, and explicitly state that visual and runtime verification remain unperformed. Do not call the output fully verified.
-
-## Assets and delivery
-
-Use installed image, PDF, Figma, or other capabilities only when relevant. Read their associated skills when required. The core workflow needs no connector or API key. Do not change model, approval settings, plugins, or unrelated Codex configuration.
-
-Use absolute Markdown file links. Embed local media with absolute paths. Present the visible live preview when available. A local server running on a remote host requires an SSH port forward before the user's browser can reach it.
-
-For macOS-specific work in the maintained workspace, run commands through `ssh sirius` when the project's instructions require it. The cross-platform helpers also work on Linux.
+Tool names and capabilities differ between CLI, IDE and desktop. Do not invent tools or modify Codex's model, approval settings, plugins or unrelated configuration. Do not install this skill merely to build a design. Resolve skill paths from its discovered directory; UI metadata in `agents/openai.yaml` is optional Codex configuration and is not a requirement for other harnesses.

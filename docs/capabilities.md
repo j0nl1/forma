@@ -1,6 +1,6 @@
 # Capabilities
 
-Studio Design creates local, editable design artifacts through Codex. Read the relevant skill recipe for authoring and the [known limitations](limitations.md) before choosing an export or external integration.
+Studio Design creates local, editable design artifacts through any agent harness with the required local capabilities. Read the relevant skill recipe for authoring and the [known limitations](limitations.md) before choosing an export or external integration.
 
 | Workflow | Available tools | Output and interaction |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Studio Design creates local, editable design artifacts through Codex. Read the r
 | Mobile, browser and desktop contexts | Device/window components | iOS/Android/Chrome/macOS shells, authored content, live controls and image-only exports |
 | Social campaigns | Social boards, feed/story/phone shells | Fourteen placements, grouped carousels, format controls, image editing and nominal-size PNG/ZIP downloads |
 | Charts, diagrams and geography | Local D3/Sankey/TopoJSON/Leaflet and overlays | Interactive charts, real country geometry, optional configured street tiles, annotations and SVG/PNG exports |
-| Research and review | Codex tools and authored overlays | Cited sources, provenance, feedback views, local clipboard drafts and typed design controls |
+| Research and review | Available harness tools and authored overlays | Cited sources, provenance, feedback views, local clipboard drafts and typed design controls |
 | Animation and video | Continuous composition, scene/sprite APIs and watercolor | Authored cues, persistent shots, captions, timing editor, source saves and MP4/WebM/GIF export |
 | Audio | Marked-media mixer and configured sound-effects helper | Local ranges/loops/speed/gain, AAC/Opus mixing and generated MP3 assets |
 | 3D | Three.js stage | Orbit/pan/zoom, turntable, studio framing, GLB loading and GLB / OBJ + MTL downloads |
@@ -20,7 +20,7 @@ Studio Design creates local, editable design artifacts through Codex. Read the r
 | Figma import | Offline decoder and component generator | Inventory, raw mount, selected rendering, editable React variants and system extraction, with fidelity warnings |
 | Existing HTML/GitHub source | Read-only inspection and import recipe | Reviewed source conversion, localized assets and retained attribution |
 | File previews | Live-file runtime | Existence/rewrite detection, physical crops, waiting states, expanded views and local action events |
-| Images and AI prototypes | Available Codex tools or configured backend | Real image assets, image-slot editing, supplied PDF input and explicitly labeled local simulations |
+| Images and AI prototypes | Available tools or configured backend | Real image assets, image-slot editing, supplied PDF input and explicitly labeled local simulations |
 | Delivery | Local export helpers and available connectors | Standalone HTML, PPTX, PNG, PDF and video; authorized transfers require an actual connector |
 
 ## Editing and persistence

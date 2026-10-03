@@ -903,8 +903,9 @@ export function captureSlide(index) {
     };
   } finally {
     for (const [element, style] of transformStyles) {
+      // Synchronize pending CSSOM edits before removing an absent attribute.
+      element.setAttribute("style", style.original ?? "");
       if (style.original === null) element.removeAttribute("style");
-      else element.setAttribute("style", style.original);
     }
   }
 }

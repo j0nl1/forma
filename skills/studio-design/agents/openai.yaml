@@ -1,6 +1,6 @@
 interface:
   display_name: "Studio Design"
-  short_description: "Design and verify local HTML artifacts in Codex"
+  short_description: "Design and verify editable local HTML artifacts"
   default_prompt: "Use $studio-design to build a polished interactive prototype from my brief."
 policy:
   allow_implicit_invocation: true

@@ -14,7 +14,7 @@ Choose **Edit text**, then click a literal heading, paragraph, bullet, link or f
 
 Edits escape text, including `<`, `>` and `&`. They do not replace parent markup: links, emphasis, line breaks, comments, attributes, styles and other source bytes stay intact. Identical repeated bullets use separate source identities. Clearing a run preserves an insertion slot for retyping. The DOM retains its authored elements and listeners; direct leaf editing restores pre-existing `contenteditable` and `tabindex` attributes.
 
-The runtime binds actual DOM elements through response-only marks. It can therefore find literal text after document layout moves it into print wrappers. Replacing a marked element, duplicating its mark or changing its text outside the editor invalidates that binding. Generated React/script content remains a code-editing task in Codex. This service does not rewrite arbitrary JSX, templates, Markdown or script expressions.
+The runtime binds actual DOM elements through response-only marks. It can therefore find literal text after document layout moves it into print wrappers. Replacing a marked element, duplicating its mark or changing its text outside the editor invalidates that binding. Generated React/script content remains a code-editing task for the agent or a file editor. This service does not rewrite arbitrary JSX, templates, Markdown or script expressions.
 
 ## History and conflicts
 

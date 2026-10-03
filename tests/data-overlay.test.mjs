@@ -498,7 +498,7 @@ test("sentence switching is exact for cohort/window and snaps metrics without in
     );
     assert.equal(
       await page
-        .getByRole("button", { name: "Ask Codex to fetch metrics" })
+        .getByRole("button", { name: "Ask your assistant to fetch metrics" })
         .count(),
       1,
     );
@@ -675,7 +675,7 @@ test("requests copy actual review drafts, normalize typed cuts, adopt new views 
       });
     });
     await page
-      .getByRole("button", { name: "Ask Codex to fetch metrics" })
+      .getByRole("button", { name: "Ask your assistant to fetch metrics" })
       .click();
     assert.equal(
       await page.locator("data-overlay").getAttribute("data-state"),
@@ -694,7 +694,7 @@ test("requests copy actual review drafts, normalize typed cuts, adopt new views 
     );
     assert.match(
       await page.locator("data-overlay .dv-draft [role=status]").innerText(),
-      /Paste into Codex/,
+      /Paste into your assistant chat/,
     );
     await page
       .getByRole("button", { name: "Draft ready — awaiting data" })
@@ -939,7 +939,7 @@ test("default handoff writes the real browser clipboard and hover isolates the m
         origin: new URL(url).origin,
       });
     await page
-      .getByRole("button", { name: "Ask Codex to fetch metrics" })
+      .getByRole("button", { name: "Ask your assistant to fetch metrics" })
       .click();
     const expected = await page
       .getByRole("textbox", { name: "Metric request text" })
@@ -1034,7 +1034,7 @@ test("independent nested overlays own their descendant fades and empty/error dat
     );
     assert.equal(
       await page
-        .getByRole("button", { name: "Ask Codex to fetch metrics" })
+        .getByRole("button", { name: "Ask your assistant to fetch metrics" })
         .count(),
       1,
     );

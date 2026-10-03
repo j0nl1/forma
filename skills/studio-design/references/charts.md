@@ -66,7 +66,7 @@ The draw context is `{ d3, svg, width, height, reason, view, layer, t, tips, esc
 - `tips(selection, formatter)` binds namespaced pointer enter/move/leave/cancel listeners. The formatter receives `(datum, event)` with `this` bound to the mark. Strings render as plain text; null/false hides. `{ html }` permits inert formatting and relative-origin images. It strips active/custom elements, event attributes, inline styles, links, identifiers and external/scheme URLs. Style classes through page CSS. Tooltips flip at container edges and disappear when the chart redraws or starts a gesture. A stationary touch tap retains its tooltip after release so it can be read; the next pointer press dismisses it. Drag and pinch do not latch a tooltip.
 - `esc(value)` escapes `&`, `<`, `>`, `"` and `'`. Escape every dataset value interpolated into tooltip HTML, even with the sanitizer.
 
-Draw errors hide stale marks, display a readable status, and log the actual exception. Re-registering a valid callback or refreshing corrected data recovers. Disconnect/reconnect preserves SVG node and layer identity and reattaches sizing and gestures. There is no source-editing endpoint for chart data: update the authored data through Codex, then refresh; view state remains local to the mounted stage.
+Draw errors hide stale marks, display a readable status, and log the actual exception. Re-registering a valid callback or refreshing corrected data recovers. Disconnect/reconnect preserves SVG node and layer identity and reattaches sizing and gestures. There is no source-editing endpoint for chart data: update the authored data through the agent or a file editor, then refresh; view state remains local to the mounted stage.
 
 ## Authoring and verification
 

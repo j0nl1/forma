@@ -152,10 +152,10 @@ export function TweakSuggestionBar({
     }
     try {
       await navigator.clipboard.writeText(request.text);
-      setMessage("Copied. Paste into Codex, review and send.");
+      setMessage("Copied. Paste into your assistant chat, review and send.");
     } catch {
       setMessage(
-        "Copy the draft below, then paste it into Codex to review and send.",
+        "Copy the draft below, then paste it into your assistant chat to review and send.",
       );
     }
   };
@@ -237,7 +237,7 @@ export function TweakSuggestionBar({
         <div className="draft">
           <textarea
             className="field"
-            aria-label="Codex draft"
+            aria-label="Assistant draft"
             value={draft.text}
             readOnly
           />

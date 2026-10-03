@@ -1,5 +1,11 @@
 # Known limitations
 
+## Harness capabilities
+
+- Native discovery paths and invocation syntax depend on the harness. The instruction format, installer destinations and local helpers are validated independently; authenticated end-to-end sessions in every third-party harness are not verified. Load the skill by absolute path when native discovery is unavailable.
+- Full execution requires local filesystem/process access, Node.js and the documented dependencies. A text-only or restricted environment cannot run unavailable tools. Codex UI metadata and native preview/input tools are optional; standard fallbacks are described in the [harness workflow](harness.md).
+- Image generation, browser control and external connectors depend on the actual session. Existing local browser globals/events with Codex names remain compatibility identifiers and impose no Codex runtime requirement.
+
 ## Motion and audio
 
 - Nested-video capture waits for decoding, requests paused-video surface resubmission after visibility paint, and cancels callback registrations without waiting for a new callback. Regression checks inspect actual encoded first-visible and held/quantized frames. Inspect scene boundaries when delivering new media combinations; browser/application coverage remains environment-specific.
@@ -11,7 +17,7 @@
 
 - Canvas, deck, timing, text, image and typed-tweak project saves require their documented preview-server options. Static/public previews retain browser or session state and do not write project files.
 - Deck source writes support literal HTML slides. Renderer-generated slide source and expanded presenter workflows are not supported by that service.
-- Review and suggestion controls produce clipboard drafts. Automatic insertion into the Codex composer is not available.
+- Review and suggestion controls produce clipboard drafts. Automatic insertion into a harness composer requires a configured integration; clipboard and selectable-text handoff work without it.
 - Transfers to Figma, Canva or Google Slides require an available, authorized connector and verification of its actual result. A local handoff package does not perform a transfer.
 
 ## Imports and output

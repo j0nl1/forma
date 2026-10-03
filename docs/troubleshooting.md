@@ -2,7 +2,7 @@
 
 | Symptom | Resolution |
 | --- | --- |
-| Skill missing | Verify `studio-design/SKILL.md` in a recognized root; reload Codex and invoke explicitly. |
+| Skill missing | Verify `studio-design/SKILL.md` in a recognized root; reload the harness and invoke its skill command, or ask it to read the absolute `SKILL.md` path. See [installation](installation.md) for roots. |
 | Installer refuses destination | Inspect existing files. Use `--update` only for a managed unchanged installation. |
 | Package missing (`ERR_MODULE_NOT_FOUND`, including `parse5`) | Run `npm ci --ignore-scripts` in the checkout or installed skill. Preview and export helpers need packages even when the authored page is plain HTML. |
 | Chromium missing | Run `npx playwright install chromium`; install OS browser libraries under local policy if needed. |
@@ -19,7 +19,7 @@
 | System check fails | Fix paths, identifiers, token alias cycles, missing inputs, or remote CSS. Check is read-only. |
 | System import stale | Recompile from source and import to a fresh binding. |
 | 3D fallback | Bundle source and use a WebGL-capable browser. |
-| Tweaks disappear | Download JSON or ask Codex to apply settings to source. |
+| Tweaks disappear | Download JSON or ask the agent to apply settings to source. |
 | Verifier passes but flow fails | Runtime probes are not interaction verification; exercise and inspect the real flow. |
 
 For issues, supply command, package version, OS, error text, and a minimal input without secrets. Keep traces and captures outside the repository unless explicitly requested as committed fixtures.

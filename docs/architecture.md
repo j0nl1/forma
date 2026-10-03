@@ -1,6 +1,6 @@
 # Architecture
 
-`skills/studio-design/SKILL.md` is the entry point. `agents/openai.yaml` describes Codex UI and invocation. `project-types.json` maps thirteen modes to resources. `references/` holds original task recipes; `assets/starters/` holds editable runtime source. `scripts/` contains deterministic helpers and `scripts/lib/` their shared primitives.
+`skills/studio-design/SKILL.md` is the entry point. `references/harness.md` describes the shared capability-based workflow; `references/codex.md` and `agents/openai.yaml` provide optional Codex integration and UI metadata. The installer selects a skills root without changing the skill or any harness configuration. Existing `Codex*` globals, events and headers are local compatibility identifiers, not a host dependency. `project-types.json` maps thirteen modes to resources. `references/` holds original task recipes; `assets/starters/` holds editable runtime source. `scripts/` contains deterministic helpers and `scripts/lib/` their shared primitives.
 
 The root contains documentation, tests, examples, and packaging. It is an npm workspace; the skill also has its own lockfile for independent installed-copy setup. Packages are pinned dependencies rather than opaque vendored bundles. A separate React 18.3.1 workspace preserves legacy component APIs alongside native React 19.2.4; the installed skill includes the same runtime workspace and its own complete lockfile.
 
@@ -58,7 +58,7 @@ The review payload is a hashed compiled artifact. Review generation reads verifi
 
 ## Trust boundary
 
-Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaScript. Inspection does not evaluate source. Browser previews execute page scripts, so reviewed source and an appropriate environment remain necessary. Browser exporters require loopback HTTP input and keep subresources local by default. Explicit `fontOrigins` grants allow GET/HEAD font, stylesheet and font-embedding fetch requests from selected HTTP(S) origins, without granting scripts or remote writes. Font/stylesheet requests and configured remote embedding requests validate redirect targets before following them. Ordinary authored browser pages retain their own network behavior; the stage's `fontOrigins` prop governs embedding, not a browser sandbox. Codex browser tools have their own permissions. This package is not a sandbox for arbitrary imported code.
+Figma schemas are interpreted as data with ByteBuffer, never compiled into JavaScript. Inspection does not evaluate source. Browser previews execute page scripts, so reviewed source and an appropriate environment remain necessary. Browser exporters require loopback HTTP input and keep subresources local by default. Explicit `fontOrigins` grants allow GET/HEAD font, stylesheet and font-embedding fetch requests from selected HTTP(S) origins, without granting scripts or remote writes. Font/stylesheet requests and configured remote embedding requests validate redirect targets before following them. Ordinary authored browser pages retain their own network behavior; the stage's `fontOrigins` prop governs embedding, not a browser sandbox. Harness browser tools have their own permissions. This package is not a sandbox for arbitrary imported code.
 
 ## Design-system runtime selection
 

@@ -2,7 +2,7 @@
 
 Use `scripts/sound-effects.mjs` for a requested UI sound, ambient effect or other generated sound asset. It accepts a descriptive text prompt, optional 0.5–22 second duration, prompt influence from 0 to 1 (default 0.3), and a real MP3 in the project's `scraps/` directory. Use concrete descriptions of the material, action, atmosphere and tail; inspect the resulting audio before choosing it.
 
-This helper sends the configured provider's actual HTTP request. Its default endpoint is the [ElevenLabs sound generation API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert). The provider currently accepts a broader duration range, but this helper accepts 0.5–22 seconds. Omitting duration lets the provider choose it. The request does not force a lower bitrate or change your Codex model.
+This helper sends the configured provider's actual HTTP request. Its default endpoint is the [ElevenLabs sound generation API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert). The provider currently accepts a broader duration range, but this helper accepts 0.5–22 seconds. Omitting duration lets the provider choose it. The request does not force a lower bitrate or change the agent's chosen model.
 
 ## Prepare and review
 

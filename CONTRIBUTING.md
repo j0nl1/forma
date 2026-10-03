@@ -1,6 +1,6 @@
 # Contributing
 
-Read `AGENTS.md` and `docs/architecture.md`. Keep the skill Codex-specific and preserve user intent. Add guidance only when it changes a design decision or supports a real operation.
+Read `AGENTS.md` and `docs/architecture.md`. Keep the core skill independent of any harness and preserve user intent. Host-specific conveniences must be optional and retain a standard fallback. Add guidance only when it changes a design decision or supports a real operation.
 
 ```sh
 npm ci --ignore-scripts

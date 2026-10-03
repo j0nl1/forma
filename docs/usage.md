@@ -1,30 +1,30 @@
 # Usage
 
-Invoke `$studio-design` with the audience, primary task, references, fidelity, and output folder. Supply real screenshots or source for a faithful recreation. With enough context, Codex proceeds without a questionnaire.
+Activate Studio Design using your harness's skill mechanism, or ask the agent to read its absolute `SKILL.md` path. Codex supports `$studio-design`; Claude Code supports `/studio-design`. Provide the audience, primary task, references, fidelity, and output folder. Supply real screenshots or source for a faithful recreation. With enough context, the agent proceeds without a questionnaire.
 
 ```text
-Use $studio-design to recreate this dashboard from the screenshot. Preserve
+Use the studio-design skill to recreate this dashboard from the screenshot. Preserve
 layout, density, typography, and colors. Make filters and the detail drawer work
 with labeled sample data. Save to designs/dashboard.
 ```
 
 ```text
-Use $studio-design to wireframe three navigation options for a mobile expense
+Use the studio-design skill to wireframe three navigation options for a mobile expense
 tracker. Compare them in one canvas and include a working add-expense flow.
 ```
 
 ```text
-Use $studio-design to build an eight-slide HTML presentation from this PRD for
+Use the studio-design skill to build an eight-slide HTML presentation from this PRD for
 engineering. Include a staged chart reveal, print-to-PDF, and an editable PowerPoint handoff. No speaker notes.
 ```
 
 ```text
-Use $studio-design to create a reusable color and typography system from this
+Use the studio-design skill to create a reusable color and typography system from this
 codebase, compile it, and verify a review page with real component states.
 ```
 
 ```text
-Use $studio-design to create a 12-second product walkthrough at 1280 by 720.
+Use the studio-design skill to create a 12-second product walkthrough at 1280 by 720.
 Provide timeline controls, inspect scene boundaries, and export MP4 with marked media audio.
 ```
 
@@ -41,7 +41,7 @@ node skills/studio-design/scripts/preview.mjs designs/reader --port 4311
 node skills/studio-design/scripts/verify.mjs http://127.0.0.1:4311/ --out /tmp/reader-check
 ```
 
-For installed skills, replace `skills/studio-design` with the absolute installed folder. Stop the server with Ctrl+C. A busy port fails clearly; `--port 0` requests an available port. Use the reported URL. The verifier checks runtime errors, overflow, and screenshots, but Codex must exercise the user flow and inspect captures separately.
+For installed skills, replace `skills/studio-design` with the absolute installed folder. Stop the server with Ctrl+C. A busy port fails clearly; `--port 0` requests an available port. Use the reported URL. The verifier checks runtime errors, overflow, and screenshots, but the agent must exercise the user flow and inspect captures separately.
 
 ## Comparison canvases
 
@@ -86,7 +86,7 @@ The [typed tweaks guide](../skills/studio-design/references/tweaks.md) documents
 node skills/studio-design/scripts/preview.mjs /path/to/design --tweaks-file prototype.html
 ```
 
-One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in Codex. Automatic composer insertion remains under integration review.
+One root HTML JSON defaults block becomes the real save target. Partial updates retain value types and use version checks; reload retains source edits. Suggestion drafts are copied to the clipboard for the user to paste, review and send in the agent chat. Automatic composer insertion is optional and requires an explicitly configured integration.
 
 ## Compose device and desktop contexts
 
@@ -186,10 +186,10 @@ Load the bundle as a classic script. To try the full 3D contract, copy `examples
 
 ```sh
 node skills/studio-design/scripts/project.mjs record designs/reader index.html --type ui-mockups
-node skills/studio-design/scripts/project.mjs record designs/reader cover.png --type image --source "Generated with the configured Codex image tool"
+node skills/studio-design/scripts/project.mjs record designs/reader cover.png --type image --source "Generated with the configured image tool"
 ```
 
-`design.json` preserves unrelated metadata and records local assets and bindings. Figma/Canva transfer uses a real authorized connector when available. Otherwise Codex delivers a local handoff and states that transfer did not occur.
+`design.json` preserves unrelated metadata and records local assets and bindings. Figma/Canva transfer uses a real authorized connector when available. Otherwise the agent delivers a local handoff and states that transfer did not occur.
 
 General interactive charts use the [chart stage contract](../skills/studio-design/references/charts.md) and pinned local D3/Sankey dependencies. Open `charts.html` in the showcase to try wheel/pinch zoom, exact-value tooltips, data updates, explicit empty states and actual SVG/2× PNG downloads. `data.html` retains the basic bar/line API.
 
