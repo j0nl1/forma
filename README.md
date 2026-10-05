@@ -2,15 +2,15 @@
 
 **Turn ideas into media.**
 
-A local design skill for editable prototypes, presentations, documents, motion and source-grounded audio with podcast, explanation, video narration, tutorial and summary presets. Use your preferred agent, keep your files local, and explore the [working examples](https://j0nl1.github.io/studio-design/).
+A local design skill for editable prototypes, presentations, documents, motion and source-grounded audio with podcast, explanation, video narration, tutorial and summary presets. Use your preferred agent, keep your files local, and explore the [working examples](https://j0nl1.github.io/forma/).
 
 ## Tutorial
 
 See how to let your agent install the skill, write a useful brief, compare design directions, build working flows, animate and export. The English walkthrough demonstrates Codex; the skill also supports other harnesses with local file and terminal access.
 
-[![Watch the Forma tutorial](https://j0nl1.github.io/studio-design/tutorial/poster.png)](https://j0nl1.github.io/studio-design/tutorial/watch.html)
+[![Watch the Forma tutorial](https://j0nl1.github.io/forma/tutorial/poster.png)](https://j0nl1.github.io/forma/tutorial/watch.html)
 
-[Watch the tutorial](https://j0nl1.github.io/studio-design/tutorial/watch.html) · [Download the MP4](https://j0nl1.github.io/studio-design/tutorial/studio-design-tutorial-en.mp4)
+[Watch the tutorial](https://j0nl1.github.io/forma/tutorial/watch.html) · [Download the MP4](https://j0nl1.github.io/forma/tutorial/studio-design-tutorial-en.mp4)
 
 ## Example prompt
 
@@ -27,7 +27,7 @@ and verify the main flow before handing it over.
 Copy this into your agent chat:
 
 ```text
-Install Forma from https://github.com/j0nl1/studio-design for this agent.
+Install Forma from https://github.com/j0nl1/forma for this agent.
 
 1. Review the repository's README, docs/installation.md and tools/install.mjs
    before executing setup commands.
