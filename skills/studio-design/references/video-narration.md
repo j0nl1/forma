@@ -14,7 +14,7 @@ Keep a companion scene plan with actual composition/scene IDs, scene start and e
 
 Generate coherent speech blocks, measure their decoded durations, and compute scene fit mechanically. For flexible compositions, adapt scene lengths and dependent cues to the measured narration. For fixed scenes, revise only text that does not fit while preserving essential meaning. Do not cut syllables, force undocumented tempo changes or invent word timings to hide a mismatch. Keep per-scene clips and measured placement data for reuse after visual edits.
 
-The existing `podcast.mjs` helper can measure/assemble a sequential narration or a scene's blocks. It cannot place clips at absolute scene times. Use an available deterministic timeline assembler for a composition-length narration track, with genuine visual pauses, or an actual supported placement mechanism. Do not describe sequential concatenation as synchronization.
+The existing `source-to-audio.mjs` helper can measure/assemble a sequential narration or a scene's blocks. It cannot place clips at absolute scene times. Use an available deterministic timeline assembler for a composition-length narration track, with genuine visual pauses, or an actual supported placement mechanism. Do not describe sequential concatenation as synchronization.
 
 The current motion exporter uses source-range markers with global-time loop phase; mounting a clip at a scene boundary does not reset its audio to zero. Follow the export contract rather than inventing offset markers. A prepared narration track aligned from composition time zero can use its real full source interval; stop its contribution at the intended end to avoid looping. CSS hiding alone does not silence a marked track. Balance speech/music and inspect the final mix.
 

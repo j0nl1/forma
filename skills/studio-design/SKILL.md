@@ -41,7 +41,7 @@ The machine-readable [project types](project-types.json) lists the 13 primary mo
 | Figma `.fig`, GitHub, existing HTML/CSS | [imports](references/imports.md) | Local import helpers |
 | PowerPoint, PDF, standalone HTML, video, Figma/Canva handoff | [exports](references/exports.md) | Local export helpers |
 | Generated sound effects or ambient audio | [sound effects](references/sound-effects.md) | `scripts/sound-effects.mjs` |
-| Source-to-audio: podcast, explanation, video narration, tutorial or summary | [shared audio workflow](references/source-to-audio.md), then only the selected preset | `scripts/podcast.mjs`; user-selected voice production |
+| Source-to-audio: podcast, explanation, video narration, tutorial or summary | [shared audio workflow](references/source-to-audio.md), then only the selected preset | `scripts/source-to-audio.mjs`; user-selected voice production |
 | Generated images or AI interactions | [assets and AI](references/assets-ai.md) | `image-slot.js` |
 | Feedback, experiments, variants, tweaks | [review](references/review.md), [typed tweaks](references/tweaks.md) | `data-overlay.js`, `canvas.js`, `tweaks-components.jsx`, `tweaks-store.js`, `controls.js` |
 

@@ -213,7 +213,7 @@ Follow the [shared audio workflow](../skills/studio-design/references/source-to-
 | [Tutorial](../skills/studio-design/references/tutorials.md) | The listener needs ordered actions, prerequisites and checkpoints |
 | [Summary](../skills/studio-design/references/summaries.md) | The listener needs the essential findings quickly |
 
-Presets guide editorial choices. They share source-linked scripts, duration planning, voice production and local assembly. Keep one canonical structured script and derive other representations mechanically. Retain completed clips and request outcomes, and send only changed or problematic blocks back for creative correction. Choose the output language and voice-production method per project: an available MCP or harness tool, a local engine, a configured provider or supplied recordings. The agent writes the script; `scripts/podcast.mjs` checks the data and measures/assembles local clips without contacting a speech service. No HTML companion or browser is required for audio-only delivery.
+Presets guide editorial choices. They share source-linked scripts, duration planning, voice production and local assembly. Keep one canonical structured script and derive other representations mechanically. Retain completed clips and request outcomes, and send only changed or problematic blocks back for creative correction. Choose the output language and voice-production method per project: an available MCP or harness tool, a local engine, a configured provider or supplied recordings. The agent writes the script; `scripts/source-to-audio.mjs` checks the data and measures/assembles local clips without contacting a speech service. No HTML companion or browser is required for audio-only delivery.
 
 ```text
 Use the studio-design skill to turn this document into a five-minute English podcast
@@ -223,7 +223,7 @@ deliver the audio and transcript in designs/document-podcast. If the voice tool 
 unavailable, deliver the script and a clear clip-production handoff.
 ```
 
-For a tutorial, request follow-along or listen-through delivery and any intended pauses. For a summary, specify the audience and information priorities. For video narration, supply the storyboard or composition, identify fixed versus flexible scene timing, and request measured clips plus a scene-linked handoff or an actual integrated export. The sequential podcast helper does not place audio at absolute scene times.
+For a tutorial, request follow-along or listen-through delivery and any intended pauses. For a summary, specify the audience and information priorities. For video narration, supply the storyboard or composition, identify fixed versus flexible scene timing, and request measured clips plus a scene-linked handoff or an actual integrated export. The sequential audio helper does not place audio at absolute scene times.
 
 An automatic-duration brief can instead ask for the shortest useful explanation of the selected concepts. The agent recommends the scope and duration; word-rate estimates remain separate from measured playback. Duration correction revises source-supported blocks rather than cutting off speech or hiding a mismatch with padding.
 

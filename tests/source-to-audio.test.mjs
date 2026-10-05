@@ -4,13 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { temporary } from "./helpers.mjs";
 import {
-  checkPodcast,
-  planPodcast,
-  measurePodcast,
-  assemblePodcast,
-} from "../skills/studio-design/scripts/podcast.mjs";
+  checkAudio,
+  planAudio,
+  measureAudio,
+  assembleAudio,
+} from "../skills/studio-design/scripts/source-to-audio.mjs";
+import * as legacy from "../skills/studio-design/scripts/podcast.mjs";
 
 const hash = (data) => createHash("sha256").update(data).digest("hex");
 const writeJSON = (file, value) => fs.writeFile(file, JSON.stringify(value));
@@ -54,7 +56,7 @@ async function fixture(t) {
   const episodeFile = path.join(dir, "episode.json");
   const clipsFile = path.join(dir, "clips.json");
   await writeJSON(episodeFile, episode);
-  const checked = await checkPodcast(episodeFile);
+  const checked = await checkAudio(episodeFile);
   await fs.mkdir(path.join(dir, "clips"));
   const clips = { schemaVersion: 1, clips: [] };
   for (let i = 0; i < 2; i++) {
@@ -79,10 +81,10 @@ async function fixture(t) {
   return { dir, episode, episodeFile, clips, clipsFile, checked };
 }
 
-test("podcast planning remains an estimate and decoded clips disclose a missed duration target", async (t) => {
+test("audio planning remains an estimate and decoded clips disclose a missed duration target", async (t) => {
   const { episodeFile, clipsFile } = await fixture(t);
-  const plan = await planPodcast(episodeFile);
-  const measured = await measurePodcast(episodeFile, clipsFile);
+  const plan = await planAudio(episodeFile);
+  const measured = await measureAudio(episodeFile, clipsFile);
   assert.ok(plan.estimatedSeconds > 1);
   assert.ok(Math.abs(measured.actualSeconds - 1) < 0.002);
   assert.equal(measured.timing.targetSeconds, 2);
@@ -90,10 +92,49 @@ test("podcast planning remains an estimate and decoded clips disclose a missed d
   assert.ok(measured.timing.deviationSeconds < -0.99);
 });
 
-test("assembled podcast preserves complete clips in script order without padding to target", async (t) => {
+test("generic and legacy audio entry points preserve CLI and API behavior", async (t) => {
+  const { episodeFile, clipsFile, dir } = await fixture(t);
+  const expected = await planAudio(episodeFile);
+  assert.deepEqual(
+    await legacy.checkPodcast(episodeFile),
+    await checkAudio(episodeFile),
+  );
+  assert.deepEqual(await legacy.planPodcast(episodeFile), expected);
+  assert.deepEqual(
+    await legacy.measurePodcast(episodeFile, clipsFile),
+    await measureAudio(episodeFile, clipsFile),
+  );
+  const assembled = await legacy.assemblePodcast(
+    episodeFile,
+    clipsFile,
+    path.join(dir, "legacy.wav"),
+  );
+  assert.equal(assembled.actualSeconds, 1);
+  for (const name of ["source-to-audio.mjs", "podcast.mjs"]) {
+    const script = fileURLToPath(
+      new URL(`../skills/studio-design/scripts/${name}`, import.meta.url),
+    );
+    const result = spawnSync(process.execPath, [script, "plan", episodeFile], {
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout), expected);
+    const invalid = spawnSync(
+      process.execPath,
+      [script, "plan", episodeFile, "--clips", clipsFile],
+      {
+        encoding: "utf8",
+      },
+    );
+    assert.equal(invalid.status, 1);
+    assert.match(invalid.stderr, /Usage:/);
+  }
+});
+
+test("assembled audio preserves complete clips in script order without padding to target", async (t) => {
   const { dir, episodeFile, clipsFile } = await fixture(t);
   const output = path.join(dir, "episode.wav");
-  const result = await assemblePodcast(episodeFile, clipsFile, output);
+  const result = await assembleAudio(episodeFile, clipsFile, output);
   const decoded = ffmpeg([
     "-i",
     output,
@@ -132,41 +173,41 @@ test("assembled podcast preserves complete clips in script order without padding
   assert.ok(power(0.45, 0.85, 880) > power(0.45, 0.85, 440) * 10);
   assert.equal(result.timing.withinTolerance, false);
   const original = await fs.readFile(output);
-  await assert.rejects(assemblePodcast(episodeFile, clipsFile, output));
+  await assert.rejects(assembleAudio(episodeFile, clipsFile, output));
   assert.deepEqual(await fs.readFile(output), original);
 });
 
-test("podcast assembly rejects missing, corrupt, or stale clips without publishing partial episodes", async (t) => {
+test("audio assembly rejects missing, corrupt, or stale clips without publishing partial episodes", async (t) => {
   const { dir, episode, episodeFile, clips, clipsFile } = await fixture(t);
   const output = path.join(dir, "failed.wav");
   await writeJSON(clipsFile, { ...clips, clips: clips.clips.slice(0, 1) });
-  await assert.rejects(assemblePodcast(episodeFile, clipsFile, output));
+  await assert.rejects(assembleAudio(episodeFile, clipsFile, output));
   await assert.rejects(fs.stat(output), { code: "ENOENT" });
   await writeJSON(clipsFile, clips);
   const broken = Buffer.from("This is not decodable audio.");
   await fs.writeFile(path.join(dir, clips.clips[1].path), broken);
   clips.clips[1].sha256 = hash(broken);
   await writeJSON(clipsFile, clips);
-  await assert.rejects(assemblePodcast(episodeFile, clipsFile, output));
+  await assert.rejects(assembleAudio(episodeFile, clipsFile, output));
   await assert.rejects(fs.stat(output), { code: "ENOENT" });
   episode.segments[0].text =
     "The fictional pilot recorded seven late collections.";
   await writeJSON(episodeFile, episode);
-  await assert.rejects(measurePodcast(episodeFile, clipsFile));
+  await assert.rejects(measureAudio(episodeFile, clipsFile));
 });
 
 test("source references and hashes reject changed evidence before audio assembly", async (t) => {
   const { dir, episode, episodeFile } = await fixture(t);
   episode.segments[0].references[0].anchor = "missing";
   await writeJSON(episodeFile, episode);
-  await assert.rejects(checkPodcast(episodeFile));
+  await assert.rejects(checkAudio(episodeFile));
   episode.segments[0].references[0].anchor = "p1";
   await writeJSON(episodeFile, episode);
   await fs.writeFile(path.join(dir, "source.md"), "Different source evidence.");
-  await assert.rejects(checkPodcast(episodeFile));
+  await assert.rejects(checkAudio(episodeFile));
 });
 
-test("podcast sources, clips, and outputs stay contained, including symlink paths", async (t) => {
+test("audio sources, clips, and outputs stay contained, including symlink paths", async (t) => {
   const { dir, episode, episodeFile, clips, clipsFile } = await fixture(t);
   const outside = await temporary(t);
   await fs.copyFile(
@@ -176,7 +217,7 @@ test("podcast sources, clips, and outputs stay contained, including symlink path
   await fs.symlink(outside, path.join(dir, "outside"));
   episode.sources[0].path = "outside/source.md";
   await writeJSON(episodeFile, episode);
-  await assert.rejects(checkPodcast(episodeFile));
+  await assert.rejects(checkAudio(episodeFile));
   episode.sources[0].path = "source.md";
   await writeJSON(episodeFile, episode);
   await fs.copyFile(
@@ -185,21 +226,21 @@ test("podcast sources, clips, and outputs stay contained, including symlink path
   );
   clips.clips[0].path = "outside/clip.wav";
   await writeJSON(clipsFile, clips);
-  await assert.rejects(measurePodcast(episodeFile, clipsFile));
+  await assert.rejects(measureAudio(episodeFile, clipsFile));
   clips.clips[0].path = "clips/s1.wav";
   await writeJSON(clipsFile, clips);
   await assert.rejects(
-    assemblePodcast(episodeFile, clipsFile, path.join(outside, "escaped.wav")),
+    assembleAudio(episodeFile, clipsFile, path.join(outside, "escaped.wav")),
   );
   await assert.rejects(
-    assemblePodcast(episodeFile, clipsFile, "outside/escaped.wav"),
+    assembleAudio(episodeFile, clipsFile, "outside/escaped.wav"),
   );
   await assert.rejects(fs.stat(path.join(outside, "escaped.wav")), {
     code: "ENOENT",
   });
 });
 
-test("podcast decoder refuses import playlists that would read another local file", async (t) => {
+test("audio decoder refuses import playlists that would read another local file", async (t) => {
   const { dir, episodeFile, clips, clipsFile } = await fixture(t);
   const playlist = "ffconcat version 1.0\nfile 's1.wav'\n";
   await fs.writeFile(path.join(dir, "clips", "import.ffconcat"), playlist);
@@ -207,16 +248,16 @@ test("podcast decoder refuses import playlists that would read another local fil
   clips.clips[0].sha256 = hash(playlist);
   await writeJSON(clipsFile, clips);
   const output = path.join(dir, "playlist.wav");
-  await assert.rejects(assemblePodcast(episodeFile, clipsFile, output));
+  await assert.rejects(assembleAudio(episodeFile, clipsFile, output));
   await assert.rejects(fs.stat(output), { code: "ENOENT" });
 });
 
-test("podcast MP3 delivery reports duration measured from its decoded final audio", async (t) => {
+test("audio MP3 delivery reports duration measured from its decoded final audio", async (t) => {
   const { dir, episode, episodeFile, clipsFile } = await fixture(t);
   episode.timing.targetSeconds = 1;
   await writeJSON(episodeFile, episode);
   const output = path.join(dir, "episode.mp3");
-  const result = await assemblePodcast(episodeFile, clipsFile, output);
+  const result = await assembleAudio(episodeFile, clipsFile, output);
   const decoded = ffmpeg([
     "-i",
     output,
@@ -284,7 +325,7 @@ async function speechFixture(t, { silence = false } = {}) {
 test("speech leveling equalizes distinct voice-like levels and verifies encoded MP3 peaks without changing timing", async (t) => {
   const { dir, episodeFile, clipsFile } = await speechFixture(t);
   const output = path.join(dir, "leveled.mp3");
-  const result = await assemblePodcast(episodeFile, clipsFile, output, {
+  const result = await assembleAudio(episodeFile, clipsFile, output, {
     levelSpeech: true,
   });
   assert.equal(result.leveling.verified, true);
@@ -354,7 +395,7 @@ test("speech leveling equalizes distinct voice-like levels and verifies encoded 
   assert.ok(truePeak <= -2);
   assert.equal(result.leveling.checks.sampleCountPreserved, true);
   await assert.rejects(
-    assemblePodcast(episodeFile, clipsFile, output, { levelSpeech: true }),
+    assembleAudio(episodeFile, clipsFile, output, { levelSpeech: true }),
   );
 });
 
@@ -362,7 +403,7 @@ test("speech leveling preserves digital silence and refuses unverifiable short n
   const { dir, episodeFile, clipsFile } = await speechFixture(t, {
     silence: true,
   });
-  const result = await assemblePodcast(
+  const result = await assembleAudio(
     episodeFile,
     clipsFile,
     "with-silence.wav",
@@ -375,20 +416,20 @@ test("speech leveling preserves digital silence and refuses unverifiable short n
   const short = await fixture(t);
   const output = path.join(short.dir, "unverifiable.wav");
   await assert.rejects(
-    assemblePodcast(short.episodeFile, short.clipsFile, output, {
+    assembleAudio(short.episodeFile, short.clipsFile, output, {
       levelSpeech: true,
     }),
     /cannot be measured/,
   );
   await assert.rejects(fs.stat(output), { code: "ENOENT" });
   await assert.rejects(
-    assemblePodcast(episodeFile, clipsFile, path.join(dir, "bad.wav"), {
+    assembleAudio(episodeFile, clipsFile, path.join(dir, "bad.wav"), {
       targetLufs: -19,
     }),
     /require levelSpeech/,
   );
   await assert.rejects(
-    assemblePodcast(episodeFile, clipsFile, path.join(dir, "bad.wav"), {
+    assembleAudio(episodeFile, clipsFile, path.join(dir, "bad.wav"), {
       levelSpeech: true,
       truePeakDb: 1,
     }),
