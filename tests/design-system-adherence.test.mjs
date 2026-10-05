@@ -8,12 +8,12 @@ import {
   compile,
   importSystem,
   wiring,
-} from "../skills/studio-design/scripts/design-system.mjs";
-import { checkAdherence } from "../skills/studio-design/scripts/adherence.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
+import { checkAdherence } from "../skills/forma/scripts/adherence.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 
 async function system(t, slug = "harbor", variants = '"soft"|"solid"') {
   const directory = await temporary(t),
@@ -152,7 +152,7 @@ test("CLI advisory/strict exits, internal import guidance and genuine syntax fai
     spawnSync(
       process.execPath,
       [
-        path.join(root, "skills/studio-design/scripts/adherence.mjs"),
+        path.join(root, "skills/forma/scripts/adherence.mjs"),
         source,
         file,
         ...flags,

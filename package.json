@@ -1,18 +1,17 @@
 {
-  "name": "studio-design-workspace",
+  "name": "forma-workspace",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "workspaces": [
-    "skills/studio-design",
-    "runtimes/*"
+    "skills/forma"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "check": "node tools/validate.mjs",
     "test:browser": "node --test tests/browser.test.mjs",
     "install:skill": "node tools/install.mjs",
-    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'skills/studio-design/scripts/**/*.mjs' 'skills/studio-design/assets/starters/*.{js,jsx,html}' 'examples/**/*.{html,css,js,jsx,ts,tsx,json}' package.json skills/studio-design/package.json skills/studio-design/project-types.json 'runtimes/*/package.json' 'skills/studio-design/runtimes/*/package.json'"
+    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'skills/forma/scripts/**/*.mjs' 'skills/forma/assets/starters/*.{js,jsx,html}' 'examples/**/*.{html,css,js,jsx,ts,tsx,json}' package.json skills/forma/package.json skills/forma/project-types.json"
   },
   "devDependencies": {
     "prettier": "3.9.9"
@@ -21,6 +20,8 @@
     "image-size": "2.0.4"
   },
   "dependencies": {
-    "pptxgenjs": "4.0.1"
+    "pptxgenjs": "4.0.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }

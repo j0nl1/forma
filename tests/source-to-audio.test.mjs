@@ -11,8 +11,7 @@ import {
   planAudio,
   measureAudio,
   assembleAudio,
-} from "../skills/studio-design/scripts/source-to-audio.mjs";
-import * as legacy from "../skills/studio-design/scripts/podcast.mjs";
+} from "../skills/forma/scripts/source-to-audio.mjs";
 
 const hash = (data) => createHash("sha256").update(data).digest("hex");
 const writeJSON = (file, value) => fs.writeFile(file, JSON.stringify(value));
@@ -92,43 +91,24 @@ test("audio planning remains an estimate and decoded clips disclose a missed dur
   assert.ok(measured.timing.deviationSeconds < -0.99);
 });
 
-test("generic and legacy audio entry points preserve CLI and API behavior", async (t) => {
-  const { episodeFile, clipsFile, dir } = await fixture(t);
+test("source-to-audio CLI returns the canonical plan and rejects invalid flags", async (t) => {
+  const { episodeFile, clipsFile } = await fixture(t);
   const expected = await planAudio(episodeFile);
-  assert.deepEqual(
-    await legacy.checkPodcast(episodeFile),
-    await checkAudio(episodeFile),
+  const script = fileURLToPath(
+    new URL("../skills/forma/scripts/source-to-audio.mjs", import.meta.url),
   );
-  assert.deepEqual(await legacy.planPodcast(episodeFile), expected);
-  assert.deepEqual(
-    await legacy.measurePodcast(episodeFile, clipsFile),
-    await measureAudio(episodeFile, clipsFile),
+  const result = spawnSync(process.execPath, [script, "plan", episodeFile], {
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), expected);
+  const invalid = spawnSync(
+    process.execPath,
+    [script, "plan", episodeFile, "--clips", clipsFile],
+    { encoding: "utf8" },
   );
-  const assembled = await legacy.assemblePodcast(
-    episodeFile,
-    clipsFile,
-    path.join(dir, "legacy.wav"),
-  );
-  assert.equal(assembled.actualSeconds, 1);
-  for (const name of ["source-to-audio.mjs", "podcast.mjs"]) {
-    const script = fileURLToPath(
-      new URL(`../skills/studio-design/scripts/${name}`, import.meta.url),
-    );
-    const result = spawnSync(process.execPath, [script, "plan", episodeFile], {
-      encoding: "utf8",
-    });
-    assert.equal(result.status, 0, result.stderr);
-    assert.deepEqual(JSON.parse(result.stdout), expected);
-    const invalid = spawnSync(
-      process.execPath,
-      [script, "plan", episodeFile, "--clips", clipsFile],
-      {
-        encoding: "utf8",
-      },
-    );
-    assert.equal(invalid.status, 1);
-    assert.match(invalid.stderr, /Usage:/);
-  }
+  assert.equal(invalid.status, 1);
+  assert.match(invalid.stderr, /Usage:/);
 });
 
 test("assembled audio preserves complete clips in script order without padding to target", async (t) => {

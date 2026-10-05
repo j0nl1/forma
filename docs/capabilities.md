@@ -1,9 +1,10 @@
 # Capabilities
 
-Studio Design creates local, editable design artifacts through any agent harness with the required local capabilities. Read the relevant skill recipe for authoring and the [known limitations](limitations.md) before choosing an export or external integration.
+Forma creates local, editable design artifacts through any agent harness with the required local capabilities. Read the relevant skill recipe for authoring and the [known limitations](limitations.md) before choosing an export or external integration.
 
 | Workflow | Available tools | Output and interaction |
 | --- | --- | --- |
+| Project preferences | `config.mjs` | Optional TOML profile; read-only task/capability resolution and advisory decisions, without generation or credential storage |
 | Interface, website, prototype and wireframe | Interface/prototype/mobile recipes and native HTML | Responsive layouts, working flows, keyboard access, optional comparison variants |
 | Comparison canvas | Native elements or React canvas | Pan/zoom, sections, notes, focus, reorder/hide, browser state, opted-in project saves and PNG/HTML snapshots |
 | Presentations | Deck runtime and PowerPoint exporter | 44 HTML build effects, click groups, thumbnails, notes, fullscreen, structural editing, undo, PDF print and editable/image-based PPTX with supported native builds and local media |
@@ -28,8 +29,8 @@ Studio Design creates local, editable design artifacts through any agent harness
 
 Generated artifacts belong to the user's project. Browser controls retain state as documented; the preview server can write selected canvas, deck, timing, text, image and typed-tweak edits to project files through explicit options. Static/public previews do not write source files. Keep the authored folder and assets when delivering an editable application.
 
-Runtime identifiers, event names and storage keys remain stable across the Studio Design rename so existing authored artifacts and saved browser settings continue to work.
+Runtime identifiers, event names and storage keys remain stable across the Forma rename so existing authored artifacts and saved browser settings continue to work.
 
 ## Boundaries
 
-PowerPoint exports support native text/shapes, individual pictures, isolated CSS background layers, composed uniform 2D scaling/translation/rotation, safe rounded foreground, explicit embedded font faces, supported native builds with authored pivots, explicit nested repeat resets, disjoint group opacity and leaf masks, plus bounded transparent picture builds for overlapping fade/wipe composition, local playable media with source-range/rate/gain copies and verified click activation for eligible visible videos and screenshot decks with notes. Inseparable CSS and unsupported animation targets use explicit static fallbacks. See the [PowerPoint guide](../skills/studio-design/references/powerpoint.md). External generation, live model interactions, tiles and transfers use the actual available tools or explicitly configured providers. No simulated integration is described as a completed transfer or provider result. See [known limitations](limitations.md) for specific export, editing and import constraints.
+PowerPoint exports support native text/shapes, individual pictures, isolated CSS background layers, composed uniform 2D scaling/translation/rotation, safe rounded foreground, explicit embedded font faces, supported native builds with authored pivots, explicit nested repeat resets, disjoint group opacity and leaf masks, plus bounded transparent picture builds for overlapping fade/wipe composition, local playable media with source-range/rate/gain copies and verified click activation for eligible visible videos and screenshot decks with notes. Inseparable CSS and unsupported animation targets use explicit static fallbacks. See the [PowerPoint guide](../skills/forma/references/powerpoint.md). External generation, live model interactions, tiles and transfers use the actual available tools or explicitly configured providers. No simulated integration is described as a completed transfer or provider result. See [known limitations](limitations.md) for specific export, editing and import constraints.

@@ -2,7 +2,7 @@
 
 | Symptom | Resolution |
 | --- | --- |
-| Skill missing | Verify `studio-design/SKILL.md` in a recognized root; reload the harness and invoke its skill command, or ask it to read the absolute `SKILL.md` path. See [installation](installation.md) for roots. |
+| Skill missing | Verify `forma/SKILL.md` in a recognized root; reload the harness and invoke its skill command, or ask it to read the absolute `SKILL.md` path. See [installation](installation.md) for roots. |
 | Installer refuses destination | Inspect existing files. Use `--update` only for a managed unchanged installation. |
 | Package missing (`ERR_MODULE_NOT_FOUND`, including `parse5`) | Run `npm ci --ignore-scripts` in the checkout or installed skill. Preview and export helpers need packages even when the authored page is plain HTML. |
 | Chromium missing | Run `npx playwright install chromium`; install OS browser libraries under local policy if needed. |

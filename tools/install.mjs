@@ -11,12 +11,10 @@ import {
   walk,
   readJson,
   writeJson,
-} from "../skills/studio-design/scripts/lib/files.mjs";
-const source = fileURLToPath(
-  new URL("../skills/studio-design", import.meta.url),
-);
+} from "../skills/forma/scripts/lib/files.mjs";
+const source = fileURLToPath(new URL("../skills/forma", import.meta.url));
 const digest = (data) => createHash("sha256").update(data).digest("hex");
-const marker = ".studio-design-install.json";
+const marker = ".forma-install.json";
 export function installationDestination(
   { global, project, dest, harness } = {},
   { homeDir = os.homedir() } = {},
@@ -44,7 +42,7 @@ export function installationDestination(
     global ? homeDir : project,
     roots[target],
     "skills",
-    "studio-design",
+    "forma",
   );
 }
 export async function install(
@@ -61,11 +59,11 @@ export async function install(
       );
     if ((await fs.lstat(destination)).isSymbolicLink())
       throw new Error("Refusing to update a symlink installation");
+    if (!(await exists(path.join(destination, marker))))
+      throw new Error("Destination is not a managed Forma installation");
     const record = await readJson(path.join(destination, marker));
-    if (record.package !== "studio-design" || record.schemaVersion !== 1)
-      throw new Error(
-        "Destination is not a managed Studio Design installation",
-      );
+    if (record.package !== "forma" || record.schemaVersion !== 1)
+      throw new Error("Destination is not a managed Forma installation");
     const present = await walk(destination);
     for (const file of present) {
       const name = path.relative(destination, file);
@@ -85,7 +83,7 @@ export async function install(
   // Resolve ancestors once; a symlink at the destination itself is rejected above.
   const parent = await fs.realpath(path.dirname(destination));
   destination = path.join(parent, path.basename(destination));
-  const staged = path.join(parent, `.studio-design-${randomUUID()}`),
+  const staged = path.join(parent, `.forma-${randomUUID()}`),
     backup = staged + ".previous";
   const hashes = {};
   await fs.mkdir(staged);
@@ -100,7 +98,7 @@ export async function install(
     }
     await writeJson(path.join(staged, marker), {
       schemaVersion: 1,
-      package: "studio-design",
+      package: "forma",
       version: "1.0.0",
       files: hashes,
     });

@@ -6,24 +6,24 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
-import { importFig } from "../skills/studio-design/scripts/figma.mjs";
+import { importFig } from "../skills/forma/scripts/figma.mjs";
 import {
   loadFig,
   renderDocument,
   select,
-} from "../skills/studio-design/scripts/lib/figma.mjs";
+} from "../skills/forma/scripts/lib/figma.mjs";
 import {
   decodeVectorNetwork,
   vectorNetworkPaths,
-} from "../skills/studio-design/scripts/lib/figma-vector-network.mjs";
+} from "../skills/forma/scripts/lib/figma-vector-network.mjs";
 import {
   compile,
   preview,
-} from "../skills/studio-design/scripts/design-system.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
 
 const ring = {
   vertices: [

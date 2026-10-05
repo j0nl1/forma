@@ -6,13 +6,13 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { temporary, root } from "./helpers.mjs";
 import { unzipSync, strFromU8 } from "fflate";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 import {
   pptxMediaSettings,
   preparePptxPlayback,
-} from "../skills/studio-design/scripts/lib/pptx-media-playback.mjs";
+} from "../skills/forma/scripts/lib/pptx-media-playback.mjs";
 
 const run = promisify(execFile);
 const base = {
@@ -265,7 +265,7 @@ test("PowerPoint loop copies retain the initial position and the complete subseq
 test("PowerPoint exports adjusted playable bytes beside editable builds and explicit native-loop diagnostics", async (t) => {
   const { dir, file, bytes } = await clip(t);
   await fs.cp(
-    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(root, "skills/forma/assets/starters"),
     path.join(dir, "starters"),
     { recursive: true },
   );
@@ -513,7 +513,7 @@ test(
   async (t) => {
     const { dir } = await clip(t);
     await fs.cp(
-      path.join(root, "skills/studio-design/assets/starters"),
+      path.join(root, "skills/forma/assets/starters"),
       path.join(dir, "starters"),
       { recursive: true },
     );
@@ -565,7 +565,7 @@ test(
   async (t) => {
     const { dir } = await clip(t);
     await fs.cp(
-      path.join(root, "skills/studio-design/assets/starters"),
+      path.join(root, "skills/forma/assets/starters"),
       path.join(dir, "starters"),
       { recursive: true },
     );

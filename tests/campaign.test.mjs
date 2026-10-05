@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
 import {
   campaignDefaults,
   campaignFormats,
   validateCampaignUnits,
-} from "../skills/studio-design/assets/starters/campaign-model.js";
+} from "../skills/forma/assets/starters/campaign-model.js";
 const keys = [
   "instagramPost",
   "instagramPortrait",
@@ -63,15 +63,15 @@ async function fixture(
         `const portrait = ${JSON.stringify(blue)};`,
       )
       .replaceAll(
-        '"../../skills/studio-design/',
-        `"${path.join(root, "skills/studio-design")}/`,
+        '"../../skills/forma/',
+        `"${path.join(root, "skills/forma")}/`,
       );
     entry = path.join(dir, "solid.jsx");
     await fs.writeFile(entry, authored);
   }
   await bundle(entry, path.join(dir, "campaign.bundle.js"));
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/plain-canvas.js"),
+    path.join(root, "skills/forma/assets/starters/plain-canvas.js"),
     path.join(dir, "starters/plain-canvas.js"),
   );
   if (portable) {

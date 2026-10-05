@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { installationDestination } from "../tools/install.mjs";
+import { installationDestination, install } from "../tools/install.mjs";
 
 test("installation selects shared and native roots without a harness process", async (t) => {
   const dir = await temporary(t);
@@ -20,20 +20,20 @@ test("installation selects shared and native roots without a harness process", a
   for (const [harness, [userRoot, projectRoot]] of Object.entries(expected)) {
     assert.equal(
       installationDestination({ global: true, harness }, { homeDir }),
-      path.join(homeDir, userRoot, "skills/studio-design"),
+      path.join(homeDir, userRoot, "skills/forma"),
     );
     assert.equal(
       installationDestination({ project, harness }, { homeDir }),
-      path.join(project, projectRoot, "skills/studio-design"),
+      path.join(project, projectRoot, "skills/forma"),
     );
   }
   assert.equal(
     installationDestination({ global: true }, { homeDir }),
-    path.join(homeDir, ".agents/skills/studio-design"),
+    path.join(homeDir, ".agents/skills/forma"),
   );
   assert.equal(
     installationDestination({ project }, { homeDir }),
-    path.join(project, ".agents/skills/studio-design"),
+    path.join(project, ".agents/skills/forma"),
   );
   await assert.rejects(fs.stat(homeDir));
   await assert.rejects(fs.stat(project));
@@ -57,15 +57,15 @@ test("ambiguous and unsupported installer targets fail before writing", () => {
     /without --harness/,
   );
   assert.equal(
-    installationDestination({ dest: "custom/studio-design" }),
-    path.resolve("custom/studio-design"),
+    installationDestination({ dest: "custom/forma" }),
+    path.resolve("custom/forma"),
   );
 });
 
 test("CLI installs identical portable files in each project root and preserves local edits", async (t) => {
   const dir = await temporary(t);
   const installer = path.join(root, "tools/install.mjs");
-  const source = path.join(root, "skills/studio-design");
+  const source = path.join(root, "skills/forma");
   for (const harness of ["shared", "codex", "claude", "gemini", "opencode"]) {
     const project = path.join(dir, harness);
     const options = [installer, "--project", project, "--harness", harness];
@@ -87,6 +87,8 @@ test("CLI installs identical portable files in each project root and preserves l
       "agents/openai.yaml",
       "scripts/preview.mjs",
       "scripts/export.mjs",
+      "scripts/config.mjs",
+      "assets/config/forma.toml",
       "package-lock.json",
     ])
       assert.deepEqual(
@@ -102,4 +104,28 @@ test("CLI installs identical portable files in each project root and preserves l
     assert.throws(() => run(["--update"]), /Local changes would be lost/);
     assert.match(await fs.readFile(entry, "utf8"), /Local customization/);
   }
+});
+
+test("installer uses Forma destinations and rejects earlier package identities", async (t) => {
+  const project = await temporary(t);
+  const earlier = path.join(project, ".agents/skills/studio-design");
+  await fs.mkdir(earlier, { recursive: true });
+  await fs.writeFile(path.join(earlier, ".studio-design-install.json"), "{}");
+  assert.equal(
+    installationDestination({ project }),
+    path.join(project, ".agents/skills/forma"),
+  );
+  await assert.rejects(
+    install(earlier, { update: true }),
+    /not a managed Forma/,
+  );
+  assert.deepEqual(await fs.readdir(earlier), [".studio-design-install.json"]);
+  await fs.writeFile(
+    path.join(earlier, ".forma-install.json"),
+    JSON.stringify({ schemaVersion: 1, package: "studio-design", files: {} }),
+  );
+  await assert.rejects(
+    install(earlier, { update: true }),
+    /not a managed Forma/,
+  );
 });

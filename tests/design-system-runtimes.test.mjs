@@ -13,16 +13,16 @@ import {
   inspect,
   preview,
   importSystem,
-} from "../skills/studio-design/scripts/design-system.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
 import {
   runtimeDeclaration,
   reactRuntime,
   usesBrowserReact,
   rewriteCardGlobals,
-} from "../skills/studio-design/scripts/lib/system-authoring.mjs";
-import { sourceAST } from "../skills/studio-design/scripts/lib/system-contracts.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+} from "../skills/forma/scripts/lib/system-authoring.mjs";
+import { sourceAST } from "../skills/forma/scripts/lib/system-contracts.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),
@@ -84,7 +84,7 @@ async function files(directory) {
   return output;
 }
 
-test("runtime declarations identify exact package URLs and both installed React/DOM pairs", () => {
+test("runtime declarations identify exact package URLs and the installed React 18 pair", () => {
   assert.equal(
     runtimeDeclaration(
       "https://unpkg.com/react@18.2.0/umd/react.production.min.js",
@@ -117,7 +117,7 @@ test("runtime declarations identify exact package URLs and both installed React/
       ),
     /Unsupported React CDN version/,
   );
-  for (const version of ["18.3.1", "19.2.4"]) {
+  for (const version of ["18.3.1"]) {
     const runtime = reactRuntime(version),
       require = createRequire(path.join(runtime.alias.react, "package.json"));
     assert.equal(require("react/package.json").version, version);
@@ -280,7 +280,7 @@ test("React 18 rendering, callbacks, class lookup, both hydration APIs, portals,
     });
 });
 
-test("bound window-like values remain local while native React 19 keeps its own runtime", async (t) => {
+test("bound window-like values remain local while module authoring uses the same React 18 dependency", async (t) => {
   for (const code of [
     "function sample(window){return window.React}",
     "{const self={};self.React}",
@@ -310,7 +310,7 @@ test("bound window-like values remain local while native React 19 keeps its own 
     '<!-- @dsCard group="Data" name="Inert data" -->\n<!doctype html><html lang="en"><head><title>Inert data</title></head><body><script type="application/json" id="sample-data">{"ReactDOM.render":"Reference label"}</script></body></html>',
   );
   const manifest = await compile(source);
-  assert.equal(manifest.reactVersion, "19.2.4");
+  assert.equal(manifest.reactVersion, "18.3.1");
   assert.match(
     await fs.readFile(
       path.join(
@@ -325,8 +325,8 @@ test("bound window-like values remain local while native React 19 keeps its own 
   const { server, url } = await serve(directory, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));
   await withPage(url + "native/preview.html", async (page) => {
-    await page.getByRole("button", { name: "Local React 19.2.4 0" }).click();
-    await page.getByRole("button", { name: "Local React 19.2.4 1" }).waitFor();
+    await page.getByRole("button", { name: "Local React 18.3.1 0" }).click();
+    await page.getByRole("button", { name: "Local React 18.3.1 1" }).waitFor();
   });
   await fs.writeFile(
     path.join(source, "system.json"),
@@ -335,14 +335,14 @@ test("bound window-like values remain local while native React 19 keeps its own 
       name: "Native global",
       slug: "native",
       css: "styles.css",
-      reactVersion: "19.2.4",
+      reactVersion: "18.3.1",
     }),
   );
   await fs.writeFile(
     path.join(source, "NativeGlobal.jsx"),
-    `const React=window.React;export function NativeGlobal(){const [count,setCount]=React.useState(0);return <button onClick={()=>setCount(count+1)}>Native global {typeof React.useActionState} {count}</button>}`,
+    `const React=window.React;export function NativeGlobal(){const [count,setCount]=React.useState(0);return <button onClick={()=>setCount(count+1)}>Native global {typeof React.useState} {count}</button>}`,
   );
-  assert.equal((await inspect(source)).authoring.version, "19.2.4");
+  assert.equal((await inspect(source)).authoring.version, "18.3.1");
   await compile(source);
   await preview(source);
   await withPage(url + "native/preview.html", async (page) => {
@@ -449,33 +449,29 @@ test("legacy runtime, translated namespaces and source-free reviews survive mana
   }
 });
 
-test("installed skill includes and resolves its React 18 workspace without the checkout", async (t) => {
+test("installed skill uses its direct React 18 dependency without runtime folders", async (t) => {
   const { directory, source } = await fixture(t),
     destination = path.join(directory, "installed");
   await install(destination);
-  assert.deepEqual(
-    JSON.parse(
-      await fs.readFile(
-        path.join(destination, "runtimes/react18/package.json"),
-        "utf8",
-      ),
-    ),
-    JSON.parse(
-      await fs.readFile(
-        path.join(root, "runtimes/react18/package.json"),
-        "utf8",
-      ),
-    ),
-  );
   execFileSync("npm", ["ci", "--ignore-scripts", "--offline"], {
     cwd: destination,
     stdio: "pipe",
   });
-  const require = createRequire(
-    path.join(destination, "runtimes/react18/package.json"),
-  );
+  const require = createRequire(path.join(destination, "package.json"));
   assert.equal(require("react/package.json").version, "18.3.1");
   assert.equal(require("react-dom/package.json").version, "18.3.1");
+  assert.equal(
+    require.resolve("react/package.json"),
+    createRequire(require.resolve("react-dom/package.json")).resolve(
+      "react/package.json",
+    ),
+  );
+  await assert.rejects(fs.stat(path.join(destination, "runtimes")), {
+    code: "ENOENT",
+  });
+  await assert.rejects(fs.stat(path.join(destination, "dependencies")), {
+    code: "ENOENT",
+  });
   const output = JSON.parse(
     execFileSync(
       process.execPath,
@@ -496,10 +492,10 @@ test("installed skill includes and resolves its React 18 workspace without the c
   });
 });
 
-test("separately compiled systems share each exact React pair and compose stateful components in one root", async (t) => {
+test("separately compiled systems share React 18 and compose stateful components in one root", async (t) => {
   const directory = await temporary(t),
     systems = [];
-  for (const version of ["18.3.1", "19.2.4"]) {
+  for (const version of ["18.3.1"]) {
     for (const label of ["Primary", "Supporting"]) {
       const folder = `system-${version.replaceAll(".", "-")}-${label.toLowerCase()}`,
         source = path.join(directory, folder);
@@ -526,7 +522,7 @@ test("separately compiled systems share each exact React pair and compose statef
       systems.push({ version, label, folder, manifest: await compile(source) });
     }
   }
-  const sections = ["18.3.1", "19.2.4"]
+  const sections = ["18.3.1"]
     .map((version) => {
       const pair = systems.filter((item) => item.version === version);
       return `<section><h1>Shared React ${version}</h1><div id="root-${version}"></div></section>${pair.map((item) => `<script src="${item.folder}/_ds_bundle.js"></script>`).join("")}<script>{const a=window.${pair[0].manifest.namespace},b=window.${pair[1].manifest.namespace};a.createRoot(document.getElementById('root-${version}')).render(a.React.createElement(a.React.Fragment,null,a.React.createElement(a.Components.Panel),a.React.createElement(b.Components.Panel)));}</script>`;
@@ -538,7 +534,7 @@ test("separately compiled systems share each exact React pair and compose statef
   );
   await fs.writeFile(
     path.join(directory, "expected.html"),
-    `<!doctype html><html lang="en"><head><title>Expected composed appearance</title><link rel="stylesheet" href="${systems[0].folder}/_ds_tokens.css"></head><body>${["18.3.1", "19.2.4"].map((version) => `<section><h1>Shared React ${version}</h1><div>${["Primary", "Supporting"].map((label) => `<button>${label} ${version} 1</button>`).join("")}</div></section>`).join("")}</body></html>`,
+    `<!doctype html><html lang="en"><head><title>Expected composed appearance</title><link rel="stylesheet" href="${systems[0].folder}/_ds_tokens.css"></head><body>${["18.3.1"].map((version) => `<section><h1>Shared React ${version}</h1><div>${["Primary", "Supporting"].map((label) => `<button>${label} ${version} 1</button>`).join("")}</div></section>`).join("")}</body></html>`,
   );
   const { server, url } = await serve(directory, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));
@@ -563,9 +559,6 @@ test("separately compiled systems share each exact React pair and compose statef
                   b = window[systems[i * 2 + 1].manifest.namespace];
                 return a.React === b.React && a.ReactDOM === b.ReactDOM;
               }),
-            distinct:
-              window[systems[0].manifest.namespace].React !==
-              window[systems[2].manifest.namespace].React,
             versions: Object.keys(window.CodexDesignRuntimes),
             shapes: systems.map((item) =>
               window[item.manifest.namespace].Components.runtimeShape(),
@@ -573,9 +566,8 @@ test("separately compiled systems share each exact React pair and compose statef
           }),
           systems,
         );
-        assert.deepEqual(result.same, [true, true]);
-        assert.equal(result.distinct, true);
-        assert.deepEqual(result.versions.sort(), ["18.3.1", "19.2.4"]);
+        assert.deepEqual(result.same, [true]);
+        assert.deepEqual(result.versions.sort(), ["18.3.1"]);
         for (let i = 0; i < systems.length; i++) {
           const runtime = reactRuntime(systems[i].version),
             require = createRequire(
@@ -657,4 +649,37 @@ test("separately compiled systems share each exact React pair and compose statef
       },
       { width, height: 600 },
     );
+});
+
+test("React 19 requests are rejected before existing compiled artifacts change", async (t) => {
+  assert.throws(
+    () => reactRuntime("19.2.4"),
+    /Unsupported local React runtime/,
+  );
+  const { source } = await fixture(t);
+  await compile(source);
+  const bundle = await fs.readFile(path.join(source, "_ds_bundle.js"));
+  const manifest = await fs.readFile(path.join(source, "_ds_manifest.json"));
+  await fs.writeFile(
+    path.join(source, "system.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      name: "Unsupported version",
+      slug: "unsupported",
+      css: "styles.css",
+      reactVersion: "19.2.4",
+    }),
+  );
+  await assert.rejects(
+    compile(source),
+    /Unsupported local React runtime: 19.2.4/,
+  );
+  assert.deepEqual(
+    await fs.readFile(path.join(source, "_ds_bundle.js")),
+    bundle,
+  );
+  assert.deepEqual(
+    await fs.readFile(path.join(source, "_ds_manifest.json")),
+    manifest,
+  );
 });
