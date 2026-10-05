@@ -1,0 +1,6 @@
+interface:
+  display_name: "Forma"
+  short_description: "Turn ideas into media with editable local files"
+  default_prompt: "Use $forma to turn my sources into an editable media artifact."
+policy:
+  allow_implicit_invocation: true

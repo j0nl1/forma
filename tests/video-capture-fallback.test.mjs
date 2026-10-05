@@ -4,8 +4,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
 
 async function capture(t, active, fallbackOptions = true) {
   const dir = await temporary(t);

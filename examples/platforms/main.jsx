@@ -10,7 +10,7 @@ import {
   MacWindow,
   MacSidebarHeader,
   MacSidebarItem,
-} from "../../skills/studio-design/assets/starters/platform-components.jsx";
+} from "../../skills/forma/assets/starters/platform-components.jsx";
 function Laboratory() {
   const [dark, setDark] = useState(false),
     [keyboard, setKeyboard] = useState(false),

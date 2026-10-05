@@ -3,20 +3,20 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { args, main } from "../skills/studio-design/scripts/lib/files.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
+import { args, main } from "../skills/forma/scripts/lib/files.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
 import {
   compile,
   importSystem,
   preview,
-} from "../skills/studio-design/scripts/design-system.mjs";
-import { exists } from "../skills/studio-design/scripts/lib/files.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
+import { exists } from "../skills/forma/scripts/lib/files.mjs";
 export async function prepareDemo(destination) {
   const root = fileURLToPath(new URL("..", import.meta.url));
   await fs.cp(path.join(root, "examples"), destination, { recursive: true });
   await fs.cp(
-    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(root, "skills/forma/assets/starters"),
     path.join(destination, "starters"),
     { recursive: true },
   );
@@ -46,12 +46,12 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/deck.js"),
+    path.join(root, "skills/forma/assets/starters/deck.js"),
     path.join(destination, "starters/deck.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/chart-libraries.js"),
+    path.join(root, "skills/forma/assets/starters/chart-libraries.js"),
     path.join(destination, "chart-libraries.bundle.js"),
     { overwrite: true },
   );
@@ -60,38 +60,38 @@ export async function prepareDemo(destination) {
     ["street-libraries.js", "street.bundle.js"],
   ]) {
     await bundle(
-      path.join(root, "skills/studio-design/assets/starters", entry),
+      path.join(root, "skills/forma/assets/starters", entry),
       path.join(destination, output),
       { overwrite: true },
     );
   }
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/data-overlay.js"),
+    path.join(root, "skills/forma/assets/starters/data-overlay.js"),
     path.join(destination, "starters/data-overlay.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/three-stage.js"),
+    path.join(root, "skills/forma/assets/starters/three-stage.js"),
     path.join(destination, "three-stage.bundle.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/document.js"),
+    path.join(root, "skills/forma/assets/starters/document.js"),
     path.join(destination, "starters/document.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/fixed-sheet.js"),
+    path.join(root, "skills/forma/assets/starters/fixed-sheet.js"),
     path.join(destination, "starters/fixed-sheet.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/text-editor.js"),
+    path.join(root, "skills/forma/assets/starters/text-editor.js"),
     path.join(destination, "starters/text-editor.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/image-slot.js"),
+    path.join(root, "skills/forma/assets/starters/image-slot.js"),
     path.join(destination, "starters/image-slot.js"),
     { overwrite: true },
   );
@@ -101,17 +101,17 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/frames.js"),
+    path.join(root, "skills/forma/assets/starters/frames.js"),
     path.join(destination, "starters/frames.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/social.js"),
+    path.join(root, "skills/forma/assets/starters/social.js"),
     path.join(destination, "starters/social.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/plain-canvas.js"),
+    path.join(root, "skills/forma/assets/starters/plain-canvas.js"),
     path.join(destination, "starters/plain-canvas.js"),
     { overwrite: true },
   );
@@ -139,7 +139,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
     });
     if (p.length) throw new Error("Usage: node tools/demo.mjs [--port 4311]");
     const folder = await fs.mkdtemp(
-      path.join(os.tmpdir(), "studio-design-demo-"),
+      path.join(os.tmpdir(), "forma-demo-"),
     );
     await prepareDemo(folder);
     const { server, url } = await serve(folder, Number(flags.port ?? 4311));

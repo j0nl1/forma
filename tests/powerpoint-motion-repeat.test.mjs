@@ -5,19 +5,19 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { unzipSync, strFromU8 } from "fflate";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 import {
   parseEffect,
   buildSteps,
-} from "../skills/studio-design/assets/starters/deck-effects.js";
-import { tracksFor } from "../skills/studio-design/scripts/lib/pptx-motion-effects.mjs";
+} from "../skills/forma/assets/starters/deck-effects.js";
+import { tracksFor } from "../skills/forma/scripts/lib/pptx-motion-effects.mjs";
 import {
   composedTargets,
   composeSteps,
-} from "../skills/studio-design/scripts/lib/pptx-motion-compose.mjs";
+} from "../skills/forma/scripts/lib/pptx-motion-compose.mjs";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
 
 const repeatCases = [
   {
@@ -40,7 +40,7 @@ const repeatCases = [
 async function repeatedFixture(t, cases = repeatCases.slice(0, 1)) {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(root, "skills/forma/assets/starters"),
     path.join(dir, "starters"),
     { recursive: true },
   );

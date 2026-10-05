@@ -11,17 +11,17 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/studio-design/scripts/design-system.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
 import {
   loadFig,
   outline,
   select,
   renderDocument,
-} from "../skills/studio-design/scripts/lib/figma.mjs";
-import { importFig } from "../skills/studio-design/scripts/figma.mjs";
-import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
-import { record } from "../skills/studio-design/scripts/project.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
+} from "../skills/forma/scripts/lib/figma.mjs";
+import { importFig } from "../skills/forma/scripts/figma.mjs";
+import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { record } from "../skills/forma/scripts/project.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
 
 test("installation stages a standalone skill and refuses destructive updates", async (t) => {
   const dir = await temporary(t),
@@ -31,7 +31,7 @@ test("installation stages a standalone skill and refuses destructive updates", a
   await install(dest);
   assert.match(
     await fs.readFile(path.join(dest, "SKILL.md"), "utf8"),
-    /name: studio-design/,
+    /name: forma/,
   );
   assert.ok(await fs.stat(path.join(dest, "package-lock.json")));
   await assert.rejects(install(dest), /Destination exists/);
@@ -312,6 +312,18 @@ test("installed skill lockfile and helpers work in a non-Codex root independentl
     { encoding: "utf8" },
   );
   assert.equal(JSON.parse(output).slug, "harbor");
+  const configured = execFileSync(
+    process.execPath,
+    [path.join(dest, "scripts/config.mjs"), "init", dir],
+    { encoding: "utf8" },
+  );
+  assert.equal(JSON.parse(configured).created, true);
+  const checked = execFileSync(
+    process.execPath,
+    [path.join(dest, "scripts/config.mjs"), "check", dir],
+    { encoding: "utf8" },
+  );
+  assert.equal(JSON.parse(checked).preferences.output.directory, "designs");
 });
 
 test("offline Figma decoder supports independently generated Zstandard chunks", async () => {

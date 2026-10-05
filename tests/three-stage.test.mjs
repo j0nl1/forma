@@ -4,19 +4,19 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import * as THREE from "three";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
 import {
   nameParts,
   releaseModel,
-} from "../skills/studio-design/assets/starters/three-stage-model.js";
+} from "../skills/forma/assets/starters/three-stage-model.js";
 
 async function fixture(t, { fail = false } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/three-stage.js"),
+    path.join(root, "skills/forma/assets/starters/three-stage.js"),
     path.join(dir, "stage.js"),
   );
   const loaderEntry = path.join(dir, "loaders.js");

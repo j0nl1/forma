@@ -11,8 +11,8 @@ import {
   planAudio,
   measureAudio,
   assembleAudio,
-} from "../skills/studio-design/scripts/source-to-audio.mjs";
-import * as legacy from "../skills/studio-design/scripts/podcast.mjs";
+} from "../skills/forma/scripts/source-to-audio.mjs";
+import * as legacy from "../skills/forma/scripts/podcast.mjs";
 
 const hash = (data) => createHash("sha256").update(data).digest("hex");
 const writeJSON = (file, value) => fs.writeFile(file, JSON.stringify(value));
@@ -112,7 +112,7 @@ test("generic and legacy audio entry points preserve CLI and API behavior", asyn
   assert.equal(assembled.actualSeconds, 1);
   for (const name of ["source-to-audio.mjs", "podcast.mjs"]) {
     const script = fileURLToPath(
-      new URL(`../skills/studio-design/scripts/${name}`, import.meta.url),
+      new URL(`../skills/forma/scripts/${name}`, import.meta.url),
     );
     const result = spawnSync(process.execPath, [script, "plan", episodeFile], {
       encoding: "utf8",

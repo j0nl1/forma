@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
 import {
   postPlatforms,
   nominalFrame,
   assetName,
-} from "../skills/studio-design/assets/starters/social-model.js";
+} from "../skills/forma/assets/starters/social-model.js";
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -21,7 +21,7 @@ const photo =
 async function fixture(t, html, options = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/studio-design/assets/starters/social.js"),
+    path.join(root, "skills/forma/assets/starters/social.js"),
     path.join(dir, "app.js"),
   );
   const file = path.join(dir, "index.html");
@@ -499,7 +499,7 @@ test("portable social runtime survives source removal and React conditional boar
   const entry = path.join(dir, "react.jsx");
   await fs.writeFile(
     entry,
-    `import React from 'react';import{createRoot}from'react-dom/client';import ${JSON.stringify(path.join(root, "skills/studio-design/assets/starters/social.js"))};const root=createRoot(document.getElementById('app'));window.renderBoard=flag=>root.render(<social-frames id="board"><div><post-card name="Studio"><div className="asset" data-codex-frame-export="" data-codex-frame-label="One · 600×400"><input id="live" aria-label="React draft"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>React action</button></div></post-card></div>{flag&&<div><div className="asset" data-codex-frame-export="" data-codex-frame-label="Two · 600×400"/></div>}</social-frames>);renderBoard(true);`,
+    `import React from 'react';import{createRoot}from'react-dom/client';import ${JSON.stringify(path.join(root, "skills/forma/assets/starters/social.js"))};const root=createRoot(document.getElementById('app'));window.renderBoard=flag=>root.render(<social-frames id="board"><div><post-card name="Studio"><div className="asset" data-codex-frame-export="" data-codex-frame-label="One · 600×400"><input id="live" aria-label="React draft"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>React action</button></div></post-card></div>{flag&&<div><div className="asset" data-codex-frame-export="" data-codex-frame-label="Two · 600×400"/></div>}</social-frames>);renderBoard(true);`,
   );
   await bundle(entry, path.join(dir, "react.js"));
   await fs.writeFile(
@@ -593,7 +593,7 @@ test("actual shadow-local font declarations survive portable snapshot export wit
   );
   await fs.writeFile(path.join(dir, "face.ttf"), font);
   await fs.copyFile(
-    path.join(root, "skills/studio-design/assets/starters/canvas-export.js"),
+    path.join(root, "skills/forma/assets/starters/canvas-export.js"),
     path.join(dir, "capture.js"),
   );
   await withPage(url, async (page) => {

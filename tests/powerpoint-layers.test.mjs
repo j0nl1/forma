@@ -4,16 +4,16 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { captureSlide } from "../skills/studio-design/scripts/lib/pptx-capture.mjs";
-import { capturePptxImage } from "../skills/studio-design/scripts/lib/pptx-layers.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { captureSlide } from "../skills/forma/scripts/lib/pptx-capture.mjs";
+import { capturePptxImage } from "../skills/forma/scripts/lib/pptx-layers.mjs";
 
 test("isolated paint on a later print-layout slide retains its full extent and pixels", async (t) => {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(root, "skills/forma/assets/starters"),
     path.join(dir, "starters"),
     { recursive: true },
   );

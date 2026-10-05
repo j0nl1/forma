@@ -7,11 +7,11 @@ import {
   reconcileCanvas,
   navigateFocus,
   validateCanvasState,
-} from "../skills/studio-design/assets/starters/canvas-model.js";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-const starters = path.resolve("skills/studio-design/assets/starters");
+} from "../skills/forma/assets/starters/canvas-model.js";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+const starters = path.resolve("skills/forma/assets/starters");
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>body{margin:0}design-canvas{height:100vh}article{padding:20px;background:#e6eed9;font:20px Georgia;height:180px;box-sizing:border-box}</style></head><body><design-canvas id="study"><design-section id="reading" title="Reading" subtitle="Compare reading density"><design-board id="a" label="Calm" width="240" height="180"><article>One clear collection<button onclick="this.textContent='Opened'">Open</button></article></design-board><design-board id="b" label="Dense" width="240" height="180"><article>Everything within reach</article></design-board><design-note top="-10" left="540" rotate="4" width="160">Keep the collection easy to scan.</design-note></design-section><design-section id="empty" title="Empty"></design-section><design-section id="writing" title="Writing"><design-board id="a" label="Draft" width="240" height="180"><article>A space to write.</article></design-board></design-section></design-canvas><script src="starters/canvas.js"></script></body></html>`;
 async function fixture(t, source = html, options = {}) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-canvas-test-"));

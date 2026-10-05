@@ -2,9 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { installationDestination } from "../tools/install.mjs";
+import {
+  installationDestination,
+  resolveInstallationDestination,
+  install,
+} from "../tools/install.mjs";
 
 test("installation selects shared and native roots without a harness process", async (t) => {
   const dir = await temporary(t);
@@ -20,20 +25,20 @@ test("installation selects shared and native roots without a harness process", a
   for (const [harness, [userRoot, projectRoot]] of Object.entries(expected)) {
     assert.equal(
       installationDestination({ global: true, harness }, { homeDir }),
-      path.join(homeDir, userRoot, "skills/studio-design"),
+      path.join(homeDir, userRoot, "skills/forma"),
     );
     assert.equal(
       installationDestination({ project, harness }, { homeDir }),
-      path.join(project, projectRoot, "skills/studio-design"),
+      path.join(project, projectRoot, "skills/forma"),
     );
   }
   assert.equal(
     installationDestination({ global: true }, { homeDir }),
-    path.join(homeDir, ".agents/skills/studio-design"),
+    path.join(homeDir, ".agents/skills/forma"),
   );
   assert.equal(
     installationDestination({ project }, { homeDir }),
-    path.join(project, ".agents/skills/studio-design"),
+    path.join(project, ".agents/skills/forma"),
   );
   await assert.rejects(fs.stat(homeDir));
   await assert.rejects(fs.stat(project));
@@ -57,15 +62,15 @@ test("ambiguous and unsupported installer targets fail before writing", () => {
     /without --harness/,
   );
   assert.equal(
-    installationDestination({ dest: "custom/studio-design" }),
-    path.resolve("custom/studio-design"),
+    installationDestination({ dest: "custom/forma" }),
+    path.resolve("custom/forma"),
   );
 });
 
 test("CLI installs identical portable files in each project root and preserves local edits", async (t) => {
   const dir = await temporary(t);
   const installer = path.join(root, "tools/install.mjs");
-  const source = path.join(root, "skills/studio-design");
+  const source = path.join(root, "skills/forma");
   for (const harness of ["shared", "codex", "claude", "gemini", "opencode"]) {
     const project = path.join(dir, harness);
     const options = [installer, "--project", project, "--harness", harness];
@@ -87,6 +92,8 @@ test("CLI installs identical portable files in each project root and preserves l
       "agents/openai.yaml",
       "scripts/preview.mjs",
       "scripts/export.mjs",
+      "scripts/config.mjs",
+      "assets/config/forma.toml",
       "package-lock.json",
     ])
       assert.deepEqual(
@@ -102,4 +109,48 @@ test("CLI installs identical portable files in each project root and preserves l
     assert.throws(() => run(["--update"]), /Local changes would be lost/);
     assert.match(await fs.readFile(entry, "utf8"), /Local customization/);
   }
+});
+
+test("Forma updates a legacy managed installation in place without duplicates or lost edits", async (t) => {
+  const project = await temporary(t);
+  const legacy = path.join(project, ".agents/skills/studio-design");
+  await fs.mkdir(legacy, { recursive: true });
+  const entry = "Legacy entry point\n";
+  await fs.writeFile(path.join(legacy, "SKILL.md"), entry);
+  await fs.writeFile(
+    path.join(legacy, ".studio-design-install.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      package: "studio-design",
+      files: {
+        "SKILL.md": createHash("sha256").update(entry).digest("hex"),
+      },
+    }),
+  );
+  assert.equal(await resolveInstallationDestination({ project }), legacy);
+  await fs.appendFile(path.join(legacy, "SKILL.md"), "Local customization\n");
+  await assert.rejects(
+    install(legacy, { update: true }),
+    /Local changes would be lost/,
+  );
+  await fs.writeFile(path.join(legacy, "SKILL.md"), entry);
+  await install(legacy, { update: true });
+  assert.match(
+    await fs.readFile(path.join(legacy, "SKILL.md"), "utf8"),
+    /name: forma/,
+  );
+  assert.equal(
+    JSON.parse(await fs.readFile(path.join(legacy, ".forma-install.json")))
+      .package,
+    "forma",
+  );
+  await assert.rejects(
+    fs.stat(path.join(legacy, ".studio-design-install.json")),
+    { code: "ENOENT" },
+  );
+  await install(legacy, { update: true });
+  assert.deepEqual(await fs.readdir(path.dirname(legacy)), ["studio-design"]);
+  await fs.mkdir(path.join(path.dirname(legacy), "forma"));
+  await assert.rejects(resolveInstallationDestination({ project }), /Both/);
+  assert.equal(await resolveInstallationDestination({ dest: legacy }), legacy);
 });

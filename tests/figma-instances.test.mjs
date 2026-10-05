@@ -6,19 +6,19 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
-import { loadFig, select } from "../skills/studio-design/scripts/lib/figma.mjs";
+import { loadFig, select } from "../skills/forma/scripts/lib/figma.mjs";
 import {
   instanceSymbolId,
   resolveInstance,
-} from "../skills/studio-design/scripts/lib/figma-instances.mjs";
-import { importFig } from "../skills/studio-design/scripts/figma.mjs";
+} from "../skills/forma/scripts/lib/figma-instances.mjs";
+import { importFig } from "../skills/forma/scripts/figma.mjs";
 import {
   compile,
   preview,
-} from "../skills/studio-design/scripts/design-system.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
 const identity = { m00: 1, m10: 0, m01: 0, m11: 1, m02: 0, m12: 0 };
 const color = (r, g, b) => ({ r, g, b, a: 1 });
 const white = color(1, 1, 1),

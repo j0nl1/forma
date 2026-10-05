@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Introduced Forma — Turn ideas into media — with updated skill/package names, source paths and examples, preserving local runtime contracts and conflict-checked updates of legacy installations.
+- Added optional `forma.toml` project preferences and offline initialization, validation and resolution, including explicit task precedence and current-session generation capability checks.
+
 - Made the skill workflow independent of the agent harness, with standard file, chat, browser, clipboard and provider fallbacks. Retained optional Codex input/preview conveniences and existing browser contracts.
 - Added explicit shared, Codex, Claude Code, Gemini CLI and OpenCode installation targets plus arbitrary destination support, without automatic detection or harness configuration changes.
 

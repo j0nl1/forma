@@ -8,13 +8,13 @@ import {
   mergeTweaks,
   scrubNumber,
   segmentedOptions,
-} from "../skills/studio-design/assets/starters/tweaks-model.js";
-import { tweakBinding } from "../skills/studio-design/scripts/lib/tweaks-source.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+} from "../skills/forma/assets/starters/tweaks-model.js";
+import { tweakBinding } from "../skills/forma/scripts/lib/tweaks-source.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 const starter = path.resolve(
-  "skills/studio-design/assets/starters/tweaks-components.jsx",
+  "skills/forma/assets/starters/tweaks-components.jsx",
 );
 const defaults = {
   size: 16,

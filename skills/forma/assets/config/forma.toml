@@ -1,0 +1,27 @@
+# Forma — Turn ideas into media.
+# Optional project preferences. Explicit task instructions take precedence.
+# Store no credentials, endpoints, commands, or assumed tool availability here.
+schema_version = 1
+
+[output]
+directory = "designs"
+
+# Select the language for generated artifacts explicitly.
+# [defaults]
+# language = "en"
+
+# [audio]
+# preset = "explanation" # podcast, explanation, video-narration, tutorial, summary
+
+# Use identifiers from the current session or your selected local/provider setup.
+# Generation methods: harness, local, provider, supplied.
+# [generation.speech]
+# method = "harness"
+# capability = "your-speech-tool"
+# model = "your-selected-model"
+# [generation.speech.voices]
+# narrator = "your-selected-voice"
+
+# The same method/capability/model fields support image, video, transcription, ocr.
+# [generation.image]
+# method = "supplied"

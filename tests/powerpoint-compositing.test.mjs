@@ -6,15 +6,15 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
-import { parseEffect } from "../skills/studio-design/assets/starters/deck-effects.js";
-import { tracksFor } from "../skills/studio-design/scripts/lib/pptx-motion-effects.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { parseEffect } from "../skills/forma/assets/starters/deck-effects.js";
+import { tracksFor } from "../skills/forma/scripts/lib/pptx-motion-effects.mjs";
 import {
   compositingIssue,
   cohortOpacity,
   cohortInitialState,
-} from "../skills/studio-design/scripts/lib/pptx-motion-compositing.mjs";
+} from "../skills/forma/scripts/lib/pptx-motion-compositing.mjs";
 
 const slide = { width: 640, height: 360 };
 const run = promisify(execFile);
@@ -125,7 +125,7 @@ test("opacity products preserve pending child clicks and repeated source phases"
 test("PowerPoint exports disjoint nested opacity and leaf masks as editable native builds", async (t) => {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/studio-design/assets/starters"),
+    path.join(root, "skills/forma/assets/starters"),
     path.join(dir, "starters"),
     { recursive: true },
   );
@@ -154,7 +154,7 @@ test(
   async (t) => {
     const dir = await temporary(t);
     await fs.cp(
-      path.join(root, "skills/studio-design/assets/starters"),
+      path.join(root, "skills/forma/assets/starters"),
       path.join(dir, "starters"),
       { recursive: true },
     );

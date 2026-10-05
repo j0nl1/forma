@@ -4,11 +4,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/studio-design/scripts/lib/inline.mjs";
-const starters = path.join(root, "skills/studio-design/assets/starters");
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+const starters = path.join(root, "skills/forma/assets/starters");
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(

@@ -13,16 +13,16 @@ import {
   inspect,
   preview,
   importSystem,
-} from "../skills/studio-design/scripts/design-system.mjs";
+} from "../skills/forma/scripts/design-system.mjs";
 import {
   runtimeDeclaration,
   reactRuntime,
   usesBrowserReact,
   rewriteCardGlobals,
-} from "../skills/studio-design/scripts/lib/system-authoring.mjs";
-import { sourceAST } from "../skills/studio-design/scripts/lib/system-contracts.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
+} from "../skills/forma/scripts/lib/system-authoring.mjs";
+import { sourceAST } from "../skills/forma/scripts/lib/system-contracts.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),

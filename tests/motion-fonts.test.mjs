@@ -6,17 +6,17 @@ import http from "node:http";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/studio-design/scripts/build.mjs";
-import { serve } from "../skills/studio-design/scripts/preview.mjs";
-import { withPage } from "../skills/studio-design/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/studio-design/scripts/export.mjs";
+import { bundle } from "../skills/forma/scripts/build.mjs";
+import { serve } from "../skills/forma/scripts/preview.mjs";
+import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { exportArtifact } from "../skills/forma/scripts/export.mjs";
 import {
   fontOrigins,
   cssURLs,
   cssImport,
   rewriteCSSURLs,
-} from "../skills/studio-design/assets/starters/font-css.js";
-import { fontRequestAllowed } from "../skills/studio-design/scripts/lib/font-network.mjs";
+} from "../skills/forma/assets/starters/font-css.js";
+import { fontRequestAllowed } from "../skills/forma/scripts/lib/font-network.mjs";
 
 test("font CSS handles escaped URLs and nested import conditions without treating strings or comments as requests", async () => {
   const value = String.raw`local("url(fake)"), URL("font \28 copy\29 .ttf"),url(font\ space.woff2) /* url(ignored) */,url("data:font/woff2;base64,YQ==")`;
@@ -116,7 +116,7 @@ async function setup(
   );
   const runtime = path.join(
     root,
-    "skills/studio-design/assets/starters/animations.jsx",
+    "skills/forma/assets/starters/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
@@ -449,7 +449,7 @@ test("remote grants exclude scripts and unconfigured redirect targets, while ord
 test("the pinned default Inter is offline and retains an explicitly authored Inter face", async (t) => {
   const bundled = await fs.readFile(
     new URL(
-      "../skills/studio-design/assets/starters/fonts/inter-medium.woff2",
+      "../skills/forma/assets/starters/fonts/inter-medium.woff2",
       import.meta.url,
     ),
   );
@@ -460,7 +460,7 @@ test("the pinned default Inter is offline and retains an explicitly authored Int
   assert.match(
     await fs.readFile(
       new URL(
-        "../skills/studio-design/assets/starters/fonts/OFL.txt",
+        "../skills/forma/assets/starters/fonts/OFL.txt",
         import.meta.url,
       ),
       "utf8",
