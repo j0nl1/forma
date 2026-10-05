@@ -15,6 +15,7 @@ Studio Design creates local, editable design artifacts through any agent harness
 | Research and review | Available harness tools and authored overlays | Cited sources, provenance, feedback views, local clipboard drafts and typed design controls |
 | Animation and video | Continuous composition, scene/sprite APIs and watercolor | Authored cues, persistent shots, captions, timing editor, source saves and MP4/WebM/GIF export |
 | Audio | Marked-media mixer and configured sound-effects helper | Local ranges/loops/speed/gain, AAC/Opus mixing and generated MP3 assets |
+| Source-to-audio | Shared production workflow with podcast, explanation, video narration, tutorial and summary presets; user-selected voice tools and existing offline audio helper | Canonical editable scripts, target or recommended duration, reusable render blocks, local clip checks, MP3/WAV assembly and optional verified speech levels; video narration adds scene-linked handoffs using the motion/export contracts |
 | 3D | Three.js stage | Orbit/pan/zoom, turntable, studio framing, GLB loading and GLB / OBJ + MTL downloads |
 | Design systems | Source checker, compiler, imports and review | Tokens, typed component contracts, scoped libraries, portable interactive guides and advisory adherence checks |
 | Figma import | Offline decoder and component generator | Inventory, raw mount, selected rendering, editable React variants and system extraction, with fidelity warnings |

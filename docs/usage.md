@@ -201,6 +201,34 @@ The [document guide](../skills/studio-design/references/documents.md) distinguis
 
 Follow the [geography guide](../skills/studio-design/references/geography.md) to bundle real country topology, choose world/regional projections, export SVG/2× PNG, and author interactive Leaflet street maps. `maps.html` is an ordinary HTML example with named selection and an opt-in street section. The demo helper builds both local library entries and the required `street.bundle.css`; tile requests start only on button activation. Vector standalone HTML retains its data after source deletion. Configure tile URL/attribution for your actual provider; synthetic fixture tests cover behavior, and live delivery remains a separate check.
 
+## Source-to-audio presets
+
+Follow the [shared audio workflow](../skills/studio-design/references/source-to-audio.md) and load only the preset that matches the listener's goal:
+
+| Preset | Use when |
+| --- | --- |
+| [Podcast](../skills/studio-design/references/podcasts.md) | The material benefits from a conversation or a requested solo episode |
+| [Explanation](../skills/studio-design/references/explanations.md) | The listener needs to understand a concept or mechanism |
+| [Video narration](../skills/studio-design/references/video-narration.md) | Speech must support a visual composition and its real timing |
+| [Tutorial](../skills/studio-design/references/tutorials.md) | The listener needs ordered actions, prerequisites and checkpoints |
+| [Summary](../skills/studio-design/references/summaries.md) | The listener needs the essential findings quickly |
+
+Presets guide editorial choices. They share source-linked scripts, duration planning, voice production and local assembly. Keep one canonical structured script and derive other representations mechanically. Retain completed clips and request outcomes, and send only changed or problematic blocks back for creative correction. Choose the output language and voice-production method per project: an available MCP or harness tool, a local engine, a configured provider or supplied recordings. The agent writes the script; `scripts/source-to-audio.mjs` checks the data and measures/assembles local clips without contacting a speech service. No HTML companion or browser is required for audio-only delivery.
+
+```text
+Use the studio-design skill to turn this document into a five-minute English podcast
+for a general audience, with two presenters. Use my available speech MCP for voices.
+Keep the script editable with source references, measure the finished duration, and
+deliver the audio and transcript in designs/document-podcast. If the voice tool is
+unavailable, deliver the script and a clear clip-production handoff.
+```
+
+For a tutorial, request follow-along or listen-through delivery and any intended pauses. For a summary, specify the audience and information priorities. For video narration, supply the storyboard or composition, identify fixed versus flexible scene timing, and request measured clips plus a scene-linked handoff or an actual integrated export. The sequential audio helper does not place audio at absolute scene times.
+
+An automatic-duration brief can instead ask for the shortest useful explanation of the selected concepts. The agent recommends the scope and duration; word-rate estimates remain separate from measured playback. Duration correction revises source-supported blocks rather than cutting off speech or hiding a mismatch with padding.
+
+For consistent playback levels, use `assemble --level-speech`; its adjustable mono preset targets −19 LUFS and a −2 dBTP ceiling. The helper measures individual clips and the encoded output, reports the results, and refuses to publish an unverified leveled result. Raw assembly remains available without the flag. See the recipe for target overrides and short/silent-clip handling.
+
 ## Generated sound assets
 
 The [sound workflow](../skills/studio-design/references/sound-effects.md) describes `scripts/sound-effects.mjs`: descriptive prompts, optional duration, prompt influence, MP3 output and project provenance. Its default invocation prints an offline request plan. Add `--generate` only when making the configured provider request, with `ELEVENLABS_API_KEY` in the process environment. Use the resulting local MP3 with the existing animation audio markers. No native sound-generation tool or live provider result is assumed.

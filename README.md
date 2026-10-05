@@ -1,6 +1,6 @@
 # Studio Design
 
-A local design skill for editable prototypes, presentations, documents and motion. Use your preferred agent, keep your files local, and explore the [working examples](https://j0nl1.github.io/studio-design/).
+A local design skill for editable prototypes, presentations, documents, motion and source-grounded audio with podcast, explanation, video narration, tutorial and summary presets. Use your preferred agent, keep your files local, and explore the [working examples](https://j0nl1.github.io/studio-design/).
 
 ## Tutorial
 
