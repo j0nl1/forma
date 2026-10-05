@@ -20,17 +20,14 @@
     "postcss": "8.5.28",
     "postcss-selector-parser": "7.1.6",
     "pptxgenjs": "4.0.1",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "smol-toml": "1.9.0",
     "three": "0.184.0",
     "topojson-client": "3.1.0",
     "typescript": "6.0.3",
     "world-atlas": "2.0.2"
   },
-  "workspaces": [
-    "runtimes/*"
-  ],
   "overrides": {
     "image-size": "2.0.4"
   }

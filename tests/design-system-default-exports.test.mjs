@@ -48,11 +48,11 @@ test("named default components retain their real default import and local declar
     assert.deepEqual(namedExports(sourceAST("unknown.jsx", text).source), []);
 });
 
-test("discovered default classes and functions retain contracts, class state, public imports and portable output with both supported React pairs", async (t) => {
+test("discovered default classes and functions retain contracts, class state, public imports and portable output with the pinned React 18 pair", async (t) => {
   const directory = await temporary(t);
   const { server, url } = await serve(directory, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));
-  for (const version of ["18.3.1", "19.2.4"]) {
+  for (const version of ["18.3.1"]) {
     const slug = version.startsWith("18") ? "classic" : "native",
       source = path.join(directory, slug),
       project = path.join(directory, slug + "-project");

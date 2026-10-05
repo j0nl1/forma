@@ -3,12 +3,8 @@ import path from "node:path";
 import ts from "typescript";
 
 // Read the pinned packages' export assignments without executing their code.
-async function exportedNames(directory, stem, legacy) {
-  const file = path.join(
-    directory,
-    "cjs",
-    `${stem}.${legacy ? "production.min" : "development"}.js`,
-  );
+async function exportedNames(directory, stem) {
+  const file = path.join(directory, "cjs", `${stem}.production.min.js`);
   const source = ts.createSourceFile(
     file,
     await fs.readFile(file, "utf8"),
@@ -57,7 +53,7 @@ export function sharedRuntimePlugin(runtime) {
   return {
     name: "shared-design-system-runtime",
     setup(builder) {
-      builder.onResolve({ filter: /^studio-design:runtime$/ }, () => ({
+      builder.onResolve({ filter: /^forma:runtime$/ }, () => ({
         path: "pair",
         namespace: "codex-shared-runtime",
       }));
@@ -100,15 +96,11 @@ export{React,DOM,Client,JSX,JSXDev,ReactDOM,createRoot,hydrateRoot};`,
         async ({ path: name }) => {
           const [local, pkg, , stem] = modules[name];
           const names =
-            name === "react-dom/client" && runtime.version === "18.3.1"
+            name === "react-dom/client"
               ? ["createRoot", "hydrateRoot"]
-              : await exportedNames(
-                  runtime.alias[pkg],
-                  stem,
-                  runtime.version === "18.3.1",
-                );
+              : await exportedNames(runtime.alias[pkg], stem);
           return {
-            contents: `import{${local} as selected}from'studio-design:runtime';export default selected.default??selected;${names.map((name) => `export const ${name}=selected.${name};`).join("\n")}`,
+            contents: `import{${local} as selected}from'forma:runtime';export default selected.default??selected;${names.map((name) => `export const ${name}=selected.${name};`).join("\n")}`,
             loader: "js",
             resolveDir: runtime.alias.react,
           };

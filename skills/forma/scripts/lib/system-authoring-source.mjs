@@ -50,7 +50,7 @@ export function authoringPlugin(root, model, authoring) {
                       ),
                     ]),
                   ),
-                  ts.factory.createStringLiteral("studio-design:runtime"),
+                  ts.factory.createStringLiteral("forma:runtime"),
                 ),
               );
             }

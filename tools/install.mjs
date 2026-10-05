@@ -15,7 +15,6 @@ import {
 const source = fileURLToPath(new URL("../skills/forma", import.meta.url));
 const digest = (data) => createHash("sha256").update(data).digest("hex");
 const marker = ".forma-install.json";
-const legacyMarker = ".studio-design-install.json";
 export function installationDestination(
   { global, project, dest, harness } = {},
   { homeDir = os.homedir() } = {},
@@ -60,19 +59,15 @@ export async function install(
       );
     if ((await fs.lstat(destination)).isSymbolicLink())
       throw new Error("Refusing to update a symlink installation");
-    const recordMarker = (await exists(path.join(destination, marker)))
-      ? marker
-      : legacyMarker;
-    const record = await readJson(path.join(destination, recordMarker));
-    if (
-      !["forma", "studio-design"].includes(record.package) ||
-      record.schemaVersion !== 1
-    )
+    if (!(await exists(path.join(destination, marker))))
+      throw new Error("Destination is not a managed Forma installation");
+    const record = await readJson(path.join(destination, marker));
+    if (record.package !== "forma" || record.schemaVersion !== 1)
       throw new Error("Destination is not a managed Forma installation");
     const present = await walk(destination);
     for (const file of present) {
       const name = path.relative(destination, file);
-      if (name === recordMarker) continue;
+      if (name === marker) continue;
       if (
         !(name in record.files) ||
         digest(await fs.readFile(file)) !== record.files[name]
@@ -120,19 +115,6 @@ export async function install(
   }
   return { destination, files: names.length, dependenciesInstalled: false };
 }
-export async function resolveInstallationDestination(options, environment) {
-  const destination = installationDestination(options, environment);
-  if (options.dest) return destination;
-  const legacy = path.join(path.dirname(destination), "studio-design");
-  const present = await exists(destination);
-  const oldPresent = await exists(legacy);
-  if (present && oldPresent)
-    throw new Error(
-      "Both Forma and Studio Design installations exist; inspect them and select --dest explicitly",
-    );
-  // Keep the established path during a managed update, without installing twice.
-  return oldPresent ? legacy : destination;
-}
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
   main(async () => {
     const { positional: p, flags } = args(process.argv.slice(2), {
@@ -147,7 +129,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href)
       throw new Error(
         "Usage: node tools/install.mjs --global | --project <folder> | --dest <skill-folder> [--harness shared|codex|claude|gemini|opencode] [--update] [--dry-run]",
       );
-    const dest = await resolveInstallationDestination(flags);
+    const dest = installationDestination(flags);
     console.log(
       JSON.stringify(
         await install(dest, { update: flags.update, dryRun: flags["dry-run"] }),

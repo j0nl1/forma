@@ -116,7 +116,7 @@ Deliver the audio when produced, the editable outline/script, transcript and sou
 
 ## Optional local planning and assembly helper
 
-All five presets can use the existing `scripts/source-to-audio.mjs` when there is one local clip per speaker segment. The existing episode JSON names remain compatible; they do not restrict the editorial format to conversation. The previous `podcast.mjs` entry point forwards to this helper with the same commands and exported API names. For video narration this is a per-scene or sequential audio helper, not absolute timeline placement. This offline helper does not extract documents, author scripts, select voices, call a provider, align grouped dialogue, or perform timing corrections. Planning and checking require Node.js; actual clip measurement and assembly also require FFmpeg.
+All five presets can use the existing `scripts/source-to-audio.mjs` when there is one local clip per speaker segment. The existing episode JSON names remain compatible; they do not restrict the editorial format to conversation. For video narration this is a per-scene or sequential audio helper, not absolute timeline placement. This offline helper does not extract documents, author scripts, select voices, call a provider, align grouped dialogue, or perform timing corrections. Planning and checking require Node.js; actual clip measurement and assembly also require FFmpeg.
 
 ```sh
 node <skill>/scripts/source-to-audio.mjs plan /absolute/episode/episode.json

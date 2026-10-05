@@ -172,7 +172,7 @@ export async function compile(root) {
       .join(",");
     const result = await build({
       stdin: {
-        contents: `${imports}import{React,ReactDOM,createRoot,hydrateRoot}from'studio-design:runtime';${base}const Components={...Base,${componentMap}};export{React,ReactDOM,createRoot,hydrateRoot,Components};`,
+        contents: `${imports}import{React,ReactDOM,createRoot,hydrateRoot}from'forma:runtime';${base}const Components={...Base,${componentMap}};export{React,ReactDOM,createRoot,hydrateRoot,Components};`,
         resolveDir: root,
         loader: "jsx",
       },
@@ -186,10 +186,7 @@ export async function compile(root) {
       },
       platform: "browser",
       jsx: "automatic",
-      define:
-        authoring.version === "18.3.1"
-          ? { "process.env.NODE_ENV": JSON.stringify("production") }
-          : {},
+      define: { "process.env.NODE_ENV": JSON.stringify("production") },
       nodePaths,
       plugins: [
         sharedRuntimePlugin(runtime),

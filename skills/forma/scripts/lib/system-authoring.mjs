@@ -1,14 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
-import ts from "typescript";
 import { parse } from "parse5";
 import { sourceAST } from "./system-contracts.mjs";
 import { safeFile } from "./files.mjs";
-import {
-  browserProperty,
-  usesBrowserReact,
-} from "./system-browser-globals.mjs";
+import { usesBrowserReact } from "./system-browser-globals.mjs";
 export {
   usesBrowserReact,
   rewriteCardGlobals,
@@ -31,61 +27,6 @@ export const sourceNamespace = (name) =>
 const attribute = (node, name) =>
   node.attrs?.find((item) => item.name === name)?.value;
 const jsxTypes = ["text/babel", "text/jsx", "text/tsx"];
-const legacyDomApis = new Set([
-  "render",
-  "hydrate",
-  "findDOMNode",
-  "unmountComponentAtNode",
-  "unstable_renderSubtreeIntoContainer",
-]);
-
-function usesLegacyDom(source) {
-  let found = false;
-  const aliases = new Set(["ReactDOM"]);
-  for (const node of source.statements)
-    if (
-      ts.isImportDeclaration(node) &&
-      node.moduleSpecifier.text === "react-dom"
-    ) {
-      if (node.importClause?.name) aliases.add(node.importClause.name.text);
-      const binding = node.importClause?.namedBindings;
-      if (binding && ts.isNamespaceImport(binding))
-        aliases.add(binding.name.text);
-      if (
-        binding &&
-        ts.isNamedImports(binding) &&
-        binding.elements.some((item) =>
-          legacyDomApis.has((item.propertyName ?? item.name).text),
-        )
-      )
-        found = true;
-    }
-  const visit = (node) => {
-    if (
-      ts.isPropertyAccessExpression(node) &&
-      legacyDomApis.has(node.name.text) &&
-      (browserProperty(node.expression) === "ReactDOM" ||
-        (ts.isIdentifier(node.expression) && aliases.has(node.expression.text)))
-    )
-      found = true;
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isObjectBindingPattern(node.name) &&
-      node.initializer &&
-      (browserProperty(node.initializer) === "ReactDOM" ||
-        (ts.isIdentifier(node.initializer) &&
-          aliases.has(node.initializer.text))) &&
-      node.name.elements.some((item) =>
-        legacyDomApis.has((item.propertyName ?? item.name).text),
-      )
-    )
-      found = true;
-    ts.forEachChild(node, visit);
-  };
-  visit(source);
-  return found;
-}
-
 // Recognize package declarations, never fetch or evaluate their remote code.
 export function runtimeDeclaration(value) {
   let url;
@@ -112,7 +53,7 @@ export function runtimeDeclaration(value) {
     const requestedVersion = react[2] ?? "18";
     if (!/^18(?:\.\d+(?:\.\d+)?)?$/.test(requestedVersion))
       throw new Error(
-        `Unsupported React CDN version: ${requestedVersion}. Supported local authoring runtimes are React 18.3.1 and React 19.2.4.`,
+        `Unsupported React CDN version: ${requestedVersion}. The supported local React version is 18.3.1.`,
       );
     return {
       package: react[1],
@@ -136,7 +77,6 @@ export function runtimeDeclaration(value) {
 export function cardRuntime(content) {
   const declarations = [];
   let react = false;
-  let legacy = false;
   function visit(node) {
     if (node.tagName === "script") {
       if (
@@ -162,52 +102,38 @@ export function cardRuntime(content) {
         node.childNodes?.map((child) => child.value ?? "").join("") ?? "";
       // Includes classic cards using the already-loaded global React/DOM API.
       if (/\bReact(?:DOM)?\b/.test(code)) react = true;
-      if (
-        usesLegacyDom(
-          sourceAST(
-            jsxTypes.includes(attribute(node, "type")) ? "card.tsx" : "card.js",
-            code,
-          ).source,
-        )
-      )
-        legacy = true;
     }
     for (const child of node.childNodes ?? []) visit(child);
   }
   visit(parse(content));
-  return { react, declarations, legacy };
+  return { react, declarations };
 }
-export function reactRuntime(version) {
-  if (!["18.3.1", "19.2.4"].includes(version))
+export function reactRuntime(version = "18.3.1") {
+  if (version !== "18.3.1")
     throw new Error(`Unsupported local React runtime: ${version}`);
-  const candidates =
-    version === "18.3.1"
-      ? [
-          new URL("../../runtimes/react18/package.json", import.meta.url),
-          new URL("../../../../runtimes/react18/package.json", import.meta.url),
-        ]
-      : [new URL("../../package.json", import.meta.url)];
-  for (const location of candidates) {
-    const require = createRequire(location);
-    try {
-      if (
-        require("react/package.json").version !== version ||
-        require("react-dom/package.json").version !== version
-      )
-        continue;
-      return {
-        version,
-        alias: {
-          react: path.dirname(require.resolve("react/package.json")),
-          "react-dom": path.dirname(require.resolve("react-dom/package.json")),
-        },
-      };
-    } catch {
-      /* Try the checkout's separate workspace next. */
-    }
+  try {
+    const require = createRequire(
+      new URL("../../package.json", import.meta.url),
+    );
+    if (
+      require("react/package.json").version !== version ||
+      require("react-dom/package.json").version !== version
+    )
+      throw new Error(
+        "Installed React pair does not match the requested version",
+      );
+    return {
+      version,
+      alias: {
+        react: path.dirname(require.resolve("react/package.json")),
+        "react-dom": path.dirname(require.resolve("react-dom/package.json")),
+      },
+    };
+  } catch {
+    // Report the required setup without exposing filesystem resolution details.
   }
   throw new Error(
-    `React ${version} is not installed. Run npm ci --ignore-scripts from the repository or installed skill root, including its runtime workspace.`,
+    `React ${version} is not installed. Run npm ci --ignore-scripts from the repository or installed skill root.`,
   );
 }
 export async function authoringModel(root, model) {
@@ -245,14 +171,12 @@ export async function authoringModel(root, model) {
       throw new Error("Invalid legacy design-system namespace");
   }
   let globals = false;
-  let legacyApis = false;
   for (const relative of model.sourceFiles.filter(
     (file) => /\.(?:jsx|tsx|js|ts)$/.test(file) && !file.endsWith(".d.ts"),
   )) {
     const text = await fs.readFile(await safeFile(root, relative), "utf8");
     const source = sourceAST(relative, text).source;
     if (usesBrowserReact(source)) globals = true;
-    if (usesLegacyDom(source)) legacyApis = true;
   }
   const declarations = [],
     reactFiles = new Set();
@@ -265,26 +189,15 @@ export async function authoringModel(root, model) {
     const result = cardRuntime(
       await fs.readFile(await safeFile(root, card.path), "utf8"),
     );
-    if (result.legacy) legacyApis = true;
     if (result.react) reactFiles.add(card.path);
     for (const declaration of result.declarations)
       if (!declarations.some((item) => item.url === declaration.url))
         declarations.push(declaration);
   }
-  const legacy =
-    globals ||
-    legacyApis ||
-    declarations.some((item) => item.runtimeVersion === "18.3.1");
-  const version = model.spec.reactVersion ?? (legacy ? "18.3.1" : "19.2.4");
-  if (!["18.3.1", "19.2.4"].includes(version))
-    throw new Error(`Unsupported local React runtime: ${version}`);
-  if (
-    (legacyApis ||
-      declarations.some((item) => item.runtimeVersion === "18.3.1")) &&
-    version !== "18.3.1"
-  )
+  const version = model.spec.reactVersion ?? "18.3.1";
+  if (version !== "18.3.1")
     throw new Error(
-      "React 18 browser declarations require reactVersion 18.3.1; separate systems can use the native React 19 runtime",
+      `Unsupported local React runtime: ${version}; Forma uses React 18.3.1`,
     );
   return {
     sourceNamespaces: [...namespaces],

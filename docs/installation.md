@@ -13,7 +13,7 @@ node tools/install.mjs --global --dry-run
 node tools/install.mjs --global
 ```
 
-New destination: `~/.agents/skills/forma`. An existing `studio-design` installation in that root is reused by the installer; use `--update` after inspecting it. For one project:
+Destination: `~/.agents/skills/forma`. For one project:
 
 ```sh
 node tools/install.mjs --project /absolute/path/to/project --dry-run
@@ -71,7 +71,7 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-Use the actual selected installation folder instead when applicable. Keep npm workspace installation enabled: the packaged `runtimes/react18` workspace installs the matched React/ReactDOM 18.3.1 pair separately from the native 19.2.4 pair. Do not pass `--workspaces=false`, force peer dependencies, or install a second React version over the primary pair. Both the checkout and installed copy include pinned lockfiles for this graph. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio or adjusted PowerPoint media.
+Use the actual selected installation folder instead when applicable. React and ReactDOM 18.3.1 are direct dependencies in the repository and skill manifests. The same pair serves ordinary authoring and imported components. There are no extra runtime folders, nested React workspaces, or separate version setup commands. Both installation modes have complete pinned lockfiles. Package installation uses pinned versions and integrity hashes from the lockfile. `--ignore-scripts` disables lifecycle hooks; esbuild uses its platform package. Explicit Chromium installation downloads the browser. No model API key is required. Install FFmpeg with the OS package manager only when needed; that package normally includes FFprobe. Confirm `ffmpeg -version` and `ffprobe -version` before exporting marked audio or adjusted PowerPoint media.
 
 PowerPoint export uses pinned PptxGenJS and Chromium, with no Office installation or external service required. Both lockfiles pin the patched image-size 2.0.4 dependency through an override. Keep that override when updating packages. Supply explicit local static TTF/OTF files through `pptxFonts` to embed fonts for editable text. Unembedded fonts, or applications that ignore embedded fonts, need the corresponding local fonts. See the [PowerPoint guide](../skills/forma/references/powerpoint.md).
 
@@ -123,10 +123,10 @@ Geography dependencies are pinned with the other helpers: D3 7.9.0, topojson-cli
 
 Generated sound uses the Node.js helper and a configured provider credential; it adds no npm SDK dependency. Set `ELEVENLABS_API_KEY` through your process environment and follow the [sound workflow](../skills/forma/references/sound-effects.md) to review an offline plan before `--generate`. FFmpeg is checked before generation and decodes the downloaded MP3 before publication. FFprobe measures exact audio metadata when needed; both are also used by marked animation audio export.
 
-## Rename compatibility
+## Forma installation contract
 
-Forma replaces the Studio Design brand and skill name. New installations use `skills/forma` and `$forma` (or the harness equivalent). The [repository](https://github.com/j0nl1/forma), [published examples](https://j0nl1.github.io/forma/) and [tutorial](https://j0nl1.github.io/forma/tutorial/watch.html) now use the Forma URLs. Existing browser identifiers, `design.json`, audio manifests, helper filenames and the `podcast.mjs` alias remain unchanged.
+Use the [Forma repository](https://github.com/j0nl1/forma), `skills/forma`, and `$forma` (or the harness equivalent). The [published examples](https://j0nl1.github.io/forma/) and [tutorial](https://j0nl1.github.io/forma/tutorial/watch.html) use the same project name. The installer creates Forma installations and updates only folders carrying its `.forma-install.json` marker and package identity; arbitrary destinations remain available through `--dest`.
 
-The installer detects an existing `studio-design` folder in the selected harness root and keeps that path during a managed `--update`. It accepts the old managed marker and package identity, checks every recorded file for local edits, and writes the new `.forma-install.json` marker after a successful update. The updated entry point declares `name: forma`; reload the harness and verify discovery. Direct loading by its absolute `SKILL.md` path remains available if a harness requires a matching directory name. Moving an installation to a new path is a separate user choice; custom `--dest` paths continue to work. If both folders exist, inspect them and choose `--dest` explicitly.
+This unreleased project does not maintain earlier skill names, installer markers, or the `podcast.mjs` entry point. Use `source-to-audio.mjs` for all spoken-audio presets. Inspect any earlier installation and preserve needed customizations before choosing a fresh Forma destination. The installer never migrates, deletes, or overwrites an unmanaged folder.
 
-When running helpers from a repository checkout, update source paths from `skills/studio-design` to `skills/forma`. The GitHub repository is renamed separately; local inference services keep their existing setup. To save optional project preferences, follow the [configuration guide](../skills/forma/references/configuration.md); the installer never writes `forma.toml` into user projects.
+To save optional project preferences, follow the [configuration guide](../skills/forma/references/configuration.md); the installer never writes `forma.toml` into user projects. Generation services and local inference remain user-selected external capabilities.

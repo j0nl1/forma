@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Introduced Forma — Turn ideas into media — with updated skill/package names, source paths and examples, preserving local runtime contracts and conflict-checked updates of legacy installations.
+- Standardized all authoring on direct React/ReactDOM 18.3.1 dependencies in the repository and standalone skill, removing React 19, auxiliary React packages and runtime workspaces.
+- Removed earlier skill-name migration and the podcast CLI alias; Forma and source-to-audio are the current installation and audio entry points.
+
+- Introduced Forma — Turn ideas into media — with updated skill/package names, source paths and examples, retaining media contracts and conflict-checked updates of Forma installations.
 - Added optional `forma.toml` project preferences and offline initialization, validation and resolution, including explicit task precedence and current-session generation capability checks.
 
 - Made the skill workflow independent of the agent harness, with standard file, chat, browser, clipboard and provider fallbacks. Retained optional Codex input/preview conveniences and existing browser contracts.

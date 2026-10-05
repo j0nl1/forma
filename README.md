@@ -4,6 +4,16 @@
 
 A local design skill for editable prototypes, presentations, documents, motion and source-grounded audio with podcast, explanation, video narration, tutorial and summary presets. Use your preferred agent, keep your files local, and explore the [working examples](https://j0nl1.github.io/forma/).
 
+## Workflow and project preferences
+
+Give the agent a brief or source material and choose the intended result: a visual artifact or audio with podcast, explanation, video narration, tutorial, or summary guidance. The model interprets the sources and creates the content; local helpers handle repeatable build, validation, measurement, and assembly work.
+
+An optional `forma.toml` stores the output directory, artifact language, audio preset, and selected generation tools. The current brief takes precedence. Voice, image, video, and transcription production use the tools actually available in your harness, your selected local engine or provider, or supplied assets. See [project preferences](skills/forma/references/configuration.md) for setup.
+
+## Dependencies
+
+Run `npm ci --ignore-scripts` from the repository root for development, or from an installed skill folder for standalone use. React and ReactDOM 18.3.1 are ordinary pinned dependencies in both manifests. All React authoring and imported components use that single pair; there is no separate React package, runtime folder, or setup step. Browser exports additionally need Playwright Chromium; decoded audio and video operations need FFmpeg.
+
 ## Tutorial
 
 See how to let your agent install the skill, write a useful brief, compare design directions, build working flows, animate and export. The English walkthrough demonstrates Codex; the skill also supports other harnesses with local file and terminal access.
