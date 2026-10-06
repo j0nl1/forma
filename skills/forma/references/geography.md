@@ -4,11 +4,11 @@ Use ordinary HTML with local classic-script bundles for maps. A map intended for
 
 ## Local vector geography
 
-`assets/starters/geography-libraries.js` bundles the complete D3 7.9.0 and topojson-client 3.1.0 APIs with world-atlas 2.0.2's Natural Earth 1:110m country topology. It exposes `window.CodexMaps = {d3, topojson, world}`; `window.d3` remains available. Retain `chart-libraries.js`, its package notices and the geography entry when copying source, or produce one local bundle with the installed build helper:
+`packages/runtime/src/browser/data/geography-libraries.js` bundles the complete D3 7.9.0 and topojson-client 3.1.0 APIs with world-atlas 2.0.2's Natural Earth 1:110m country topology. It exposes `window.CodexMaps = {d3, topojson, world}`; `window.d3` remains available. Retain `chart-libraries.js`, its package notices and the geography entry when copying source, or produce one local bundle with the installed build helper:
 
 ```sh
 FORMA_SKILL="$HOME/.agents/skills/forma"
-node "$FORMA_SKILL/scripts/build.mjs" "$FORMA_SKILL/assets/starters/geography-libraries.js" /absolute/path/to/design/geography.bundle.js
+node "$FORMA_SKILL/scripts/forma.mjs" build "$FORMA_SKILL/packages/runtime/src/browser/data/geography-libraries.js" /absolute/path/to/design/geography.bundle.js
 ```
 
 Load `geography.bundle.js` before your authored map script. No CDN, remote boundary request, model API key or tile download is needed. The installed dependency lockfile includes the geography data and libraries.
@@ -23,10 +23,10 @@ The download contains the vector view with its background, title, projection and
 
 ## Interactive street maps
 
-`assets/starters/street-libraries.js` exposes the complete Leaflet 1.9.4 API as `window.CodexLeaflet`. Its CSS import produces **two build outputs**; link both. Default marker, retina marker and shadow PNGs are embedded in the JavaScript bundle, so authored `L.marker(...)` works without a separate images folder:
+`packages/runtime/src/browser/data/street-libraries.js` exposes the complete Leaflet 1.9.4 API as `window.CodexLeaflet`. Its CSS import produces **two build outputs**; link both. Default marker, retina marker and shadow PNGs are embedded in the JavaScript bundle, so authored `L.marker(...)` works without a separate images folder:
 
 ```sh
-node "$FORMA_SKILL/scripts/build.mjs" "$FORMA_SKILL/assets/starters/street-libraries.js" /absolute/path/to/design/street.bundle.js
+node "$FORMA_SKILL/scripts/forma.mjs" build "$FORMA_SKILL/packages/runtime/src/browser/data/street-libraries.js" /absolute/path/to/design/street.bundle.js
 ```
 
 ```html

@@ -1,31 +1,28 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import http from "node:http";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { captureSlide } from "../skills/forma/scripts/lib/pptx-capture.mjs";
-import { capturePptxImage } from "../skills/forma/scripts/lib/pptx-layers.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { captureSlide } from "../packages/exports/src/lib/pptx-capture.mjs";
+import { capturePptxImage } from "../packages/exports/src/lib/pptx-layers.mjs";
 import {
   preparePptxMedia,
   preparePptxMediaElements,
-} from "../skills/forma/scripts/lib/pptx-media.mjs";
+} from "../packages/exports/src/lib/pptx-media.mjs";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 async function fixture(
   t,
   content = `<section style="background:#faf9f5"><h1>A real editable title</h1><p>Useful <b>bold</b> words.</p><ul><li>One visible bullet</li></ul><aside data-notes>Private presenter notes</aside></section><section data-deck-skip><h1>Skipped</h1></section><section style="background:#112233;color:white" data-speaker-notes="Final note"><h1>Final slide</h1><div data-anim="fade-in">Finished build</div><div style="background:linear-gradient(red,blue);width:100px;height:70px">Preserved artwork</div><img alt="Local mark" width="50" height="40" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='40'%3E%3Crect width='50' height='40' fill='green'/%3E%3C/svg%3E"></section>`,
 ) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(
     path.join(dir, "index.html"),
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PowerPoint fixture</title><style>body{margin:0}section{padding:30px;font:22px Arial}h1{font-size:40px;margin:0 0 15px}p{margin:0 0 10px}</style></head><body><deck-stage width="800" height="500">${content}</deck-stage><script src="starters/deck.js"></script></body></html>`,
@@ -92,7 +89,7 @@ test("PowerPoint screenshot CLI embeds one finished image per slide and retains 
       execFile(
         process.execPath,
         [
-          path.join(root, "skills/forma/scripts/export.mjs"),
+          path.join(root, "packages/cli/src/commands/export.mjs"),
           "pptx",
           url,
           out,

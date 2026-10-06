@@ -10,8 +10,8 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { walk, readJson, exists } from "../skills/forma/scripts/lib/files.mjs";
+import { walk, readJson, exists } from "../packages/core/src/lib/files.mjs";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const skill = path.join(root, "skills/forma");
 const files = await walk(root);
@@ -39,7 +39,14 @@ if (new Set(types.projectTypes.map((t) => t.id)).size !== 13)
   issues.push("Expected 13 unique project types");
 for (const t of types.projectTypes)
   for (const relative of [t.reference, ...t.starters])
-    if (!(await exists(path.join(skill, relative))))
+    if (
+      !(await exists(
+        path.join(
+          /^(?:packages|catalog)\//.test(relative) ? root : skill,
+          relative,
+        ),
+      ))
+    )
       issues.push(`Missing routed resource: ${relative}`);
 const body = await fs.readFile(path.join(skill, "SKILL.md"), "utf8");
 if (!body.startsWith("---\nname: forma\ndescription:"))

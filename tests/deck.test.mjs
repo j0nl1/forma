@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -10,10 +11,10 @@ import {
   buildSteps,
   effectOptions,
   effectFrames,
-} from "../skills/forma/assets/starters/deck-effects.js";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+} from "../packages/runtime/src/browser/slides/deck-effects.js";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import { execFileSync } from "node:child_process";
 const parse = (effect, options = {}) =>
   parseEffect({
@@ -32,11 +33,7 @@ async function fixture(
 ) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-deck-test-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
-  await fs.cp(
-    path.resolve("skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(
     path.join(dir, "index.html"),
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>body{margin:0}deck-stage>section,deck-stage>article{background:#faf9f5;color:#152f37;padding:25px;font:20px system-ui}.tile{width:240px;height:160px;background:#fa6028;transform:translateX(12px);opacity:.65}h2{margin:0 0 10px}</style>${before}</head><body><deck-stage width="800" height="500" ${attributes}>${content}</deck-stage><script src="starters/deck.js"></script></body></html>`,

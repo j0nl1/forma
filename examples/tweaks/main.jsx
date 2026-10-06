@@ -13,7 +13,7 @@ import {
   TweakNumber,
   TweakColor,
   TweakButton,
-} from "../../skills/forma/assets/starters/tweaks-components.jsx";
+} from "../../packages/runtime/src/browser/controls/tweaks-components.jsx";
 const palettes = [
   ["#254f49", "#f6f3e9", "#e3a576"],
   ["#3d426b", "#f0eff8", "#b7addd"],

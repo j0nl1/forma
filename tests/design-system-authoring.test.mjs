@@ -10,14 +10,14 @@ import {
   preview,
   importSystem,
   wiring,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   sourceAST,
   declarationContracts,
-} from "../skills/forma/scripts/lib/system-contracts.mjs";
+} from "../packages/design-systems/src/source/contracts.mjs";
 
 const declaration = `type Variant = 'soft' | 'solid';
 type Alias = Variant;

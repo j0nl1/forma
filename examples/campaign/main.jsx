@@ -6,13 +6,13 @@ import {
   CampaignControls,
   campaignFormats,
   campaignDefaults,
-} from "../../skills/forma/assets/starters/campaign-components.jsx";
+} from "../../catalog/interfaces/campaign/campaign-components.jsx";
 import {
   useTweaks,
   readTweakDefaults,
   TweaksPanel,
-} from "../../skills/forma/assets/starters/tweaks-components.jsx";
-import "../../skills/forma/assets/starters/social.js";
+} from "../../packages/runtime/src/browser/controls/tweaks-components.jsx";
+import "../../packages/runtime/src/browser/interfaces/social.js";
 const copy = {
   instagramPost: "A good page leaves room.",
   instagramPortrait: "Stay with the next useful idea.",

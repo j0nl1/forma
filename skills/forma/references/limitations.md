@@ -23,11 +23,17 @@
 - Review and suggestion controls produce clipboard drafts. Automatic insertion into a harness composer requires a configured integration; clipboard and selectable-text handoff work without it.
 - Transfers to Figma, Canva or Google Slides require an available, authorized connector and verification of its actual result. A local handoff package does not perform a transfer.
 
+## Motion completion and audio
+
+- Async frame renderers must honor their signal and paint through the supplied commit guard. This prevents stale captured frames; it cannot undo arbitrary paints performed outside that contract.
+- Native clips supplement scene timing and do not migrate legacy source or infer clips from arbitrary page scripts. Connected clip undo/redo lasts for the preview process.
+- Native audio uses explicit local source ranges, sample schedules, gain envelopes and buses. Browser preview tempo changes alter pitch; exported tempo uses FFmpeg atempo and can introduce seams. No implicit effects, ducking or normalization are applied.
+
 ## Imports and output
 
 - Editable PowerPoint exports retain native text/shapes over eligible isolated CSS paint layers. Composed uniform positive 2D scaling/translation/rotation and safely inset rounded foreground retain editable objects. Explicit static TTF/OTF snapshots can embed used font families and variants; unembedded text and applications that ignore embedded fonts still require those fonts locally. LibreOffice needs version 25.8 or newer with EOT support to import PPTX embedded fonts. Screenshot mode preserves finished artwork as one image per slide.
 - PowerPoint scalar builds support authored pivots and base transforms. Eligible nested spin/grow/shrink/teeter/path builds use bounded sampled composition with explicit repeat resets. Disjoint group opacity and eligible leaf wipes retain native artwork; overlapping nested fade/wipe composition can use bounded transparent picture builds while surrounding objects remain editable. These captures approximate motion at 20 fps and are limited to 120 images per component and 32 MiB of PNG bytes per slide. Other nested mask/visibility families, unsafe paint interleaving, unsupported geometry, live surfaces and clipped/off-slide motion can still require static fallback. Inspect warnings and the native/raster/static animation counts. Native wipe directions follow Microsoft mapping, but the tested Impress 25.8 player reveals the opposite edge from the HTML effect.
-- PowerPoint local media can use bounded source-range/rate/gain copies. Eligible visible videos retain a conditional cover until a click starts playback, verified with concurrent builds and print in Impress 24.2 and 25.8. Native looping still plays once in both versions, including native ODP controls. Other manual-media variants retain direct trigger compatibility warnings and remain unverified; Microsoft PowerPoint playback remains unverified. Inseparable CSS can require static artwork, and CSS clipping/object fitting and codecs can differ in the native player. See the [PowerPoint guide](powerpoint.md).
+- PowerPoint local media can use bounded source-range/rate/gain copies. Eligible visible videos retain a conditional cover until a click starts playback, verified with concurrent builds and print in Impress 24.2 and 25.8. Native looping still plays once in both versions, including native ODP controls. Other manual-media variants retain direct trigger compatibility warnings and remain unverified; Microsoft PowerPoint playback remains unverified. Inseparable CSS can require static artwork, and CSS clipping/object fitting and codecs can differ in the native player. See the [PowerPoint guide](../generations/slides/powerpoint.md).
 - Figma import reports unsupported and approximate paints, masks, typography, variable wiring and instance properties. Inspect its warnings and compare a real design export when exact fidelity matters.
 - Design-system checks are advisory source analysis, not complete type checking or brand certification. External/ambient types, package export maps and unsupported legacy formats can require manual conversion.
 - HTML email requires testing in the actual target clients. Browser preview does not establish Outlook, Gmail or Apple Mail compatibility.
@@ -35,3 +41,8 @@
 - Browser checks primarily use Chromium. Physical gestures, Safari printing, complex fonts/color profiles and additional material/media combinations need checks on the intended environment.
 
 Preserve functioning controls and saved state when refining a deliverable. Report limitations that materially affect the user's requested output.
+
+## Package and catalog distribution
+
+- Package separation does not imply faster rendering or audio inference. The native fast-capture option retains its bounded equivalence checks and standard fallback; Chromium and FFmpeg still perform execution. No Rust renderer or bundled speech engine is provided.
+- The local catalog owns resource source and manifests, then copies the declared dependencies and editorial guidance with provenance. Literal module paths are rebased as data; dynamic computed imports and automatic package installation are not provided. Its declared targets and requirements do not certify every export format or install a capability. Complete examples remain separate. Generated resource previews work locally. Optional repository-reference links require network access; inventory and copying do not fetch them.

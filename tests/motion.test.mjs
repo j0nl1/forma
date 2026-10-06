@@ -5,14 +5,14 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary } from "./helpers.mjs";
 import { prepareDemo } from "../tools/demo.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import {
   readMotionSource,
   saveMotionSource,
   motionBindings,
-} from "../skills/forma/scripts/lib/motion-source.mjs";
+} from "../packages/runtime/src/node/motion-source.mjs";
 import {
   deriveScenes,
   authoredTime,
@@ -23,7 +23,7 @@ import {
   Easing,
   interpolate,
   animate,
-} from "../skills/forma/assets/starters/motion-model.js";
+} from "../packages/core/src/timeline/motion-model.js";
 
 test("retiming preserves authored cues, all choreography and cross-section motion", () => {
   const scenes = [

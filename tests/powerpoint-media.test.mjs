@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -6,13 +7,13 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { temporary, root } from "./helpers.mjs";
 import { unzipSync, strFromU8 } from "fflate";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 import {
   pptxMediaSettings,
   preparePptxPlayback,
-} from "../skills/forma/scripts/lib/pptx-media-playback.mjs";
+} from "../packages/exports/src/lib/pptx-media-playback.mjs";
 
 const run = promisify(execFile);
 const base = {
@@ -264,11 +265,7 @@ test("PowerPoint loop copies retain the initial position and the complete subseq
 
 test("PowerPoint exports adjusted playable bytes beside editable builds and explicit native-loop diagnostics", async (t) => {
   const { dir, file, bytes } = await clip(t);
-  await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const html =
     '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Authored media playback</title><style>body{margin:0}section{background:white;padding:30px}h1{font:28px Arial}</style></head><body><deck-stage width="800" height="500"><section><h1 data-anim="fade-in">Editable heading</h1><video width="192" height="128" src="source.mp4" muted data-codex-exportable-video-play-start="0.5" data-codex-exportable-video-play-end="1.5" data-codex-exportable-video-play-speed="2" data-codex-exportable-video-volume="0.25"></video></section></deck-stage><script src="starters/deck.js"></script></body></html>';
   await fs.writeFile(path.join(dir, "index.html"), html);
@@ -512,11 +509,7 @@ test(
   { skip: process.env.STUDIO_TEST_IMPRESS !== "1" },
   async (t) => {
     const { dir } = await clip(t);
-    await fs.cp(
-      path.join(root, "skills/forma/assets/starters"),
-      path.join(dir, "starters"),
-      { recursive: true },
-    );
+    await copyCatalogResource("slide-deck", path.join(dir, "starters"));
     await fs.writeFile(
       path.join(dir, "index.html"),
       `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Native media playback regression</title><style>body{margin:0}section{background:#333;padding:30px}h1{font:32px Arial;color:white;margin:0}</style></head><body><deck-stage width="1280" height="720"><section><h1>Playback preparation</h1></section><section><h1 data-anim="fade-in" data-anim-trigger="after" data-anim-duration="1200">Editable media playback</h1><video width="672" height="384" style="position:absolute;left:288px;top:144px" src="source.mp4" muted autoplay data-codex-exportable-video-play-start="0.5" data-codex-exportable-video-play-end="1.5" data-codex-exportable-video-play-speed="0.5" data-codex-exportable-video-volume="0"></video></section></deck-stage><script src="starters/deck.js"></script></body></html>`,
@@ -564,11 +557,7 @@ test(
   { skip: process.env.STUDIO_TEST_IMPRESS !== "1" },
   async (t) => {
     const { dir } = await clip(t);
-    await fs.cp(
-      path.join(root, "skills/forma/assets/starters"),
-      path.join(dir, "starters"),
-      { recursive: true },
-    );
+    await copyCatalogResource("slide-deck", path.join(dir, "starters"));
     await fs.writeFile(
       path.join(dir, "index.html"),
       `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Manual media activation regression</title><style>body{margin:0}section{background:#333;padding:30px}h1{font:32px Arial;color:white;margin:0}</style></head><body><deck-stage width="1280" height="720"><section><h1>Playback preparation</h1></section><section><h1 data-anim="fade-in" data-anim-trigger="after" data-anim-duration="1200">Editable media playback</h1><video width="672" height="384" style="position:absolute;left:288px;top:144px" src="source.mp4" muted></video></section></deck-stage><script src="starters/deck.js"></script></body></html>`,

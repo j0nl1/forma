@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "id": "platforms",
+  "kind": "component",
+  "description": "Combinable mobile and desktop interface frames.",
+  "targets": ["interfaces"],
+  "tags": ["interfaces", "component"],
+  "entry": "platform-components.jsx",
+  "requirements": ["react", "node-bundle"],
+  "license": "MIT",
+  "export": "ChromeWindow",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "width": {
+        "type": "number",
+        "default": 900,
+        "description": "Frame width in pixels."
+      },
+      "height": {
+        "type": "number",
+        "default": 620,
+        "description": "Frame height in pixels."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [
+    "android-frame",
+    "browser-window",
+    "ios-frame",
+    "macos-window",
+    "platform-materials"
+  ],
+  "previewEntry": "preview.jsx",
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/interfaces/android-frame/README.md",
+      "target": "dependencies/android-frame/README.md"
+    },
+    {
+      "source": "catalog/interfaces/android-frame/android-frame.jsx",
+      "target": "dependencies/android-frame/android-frame.jsx"
+    },
+    {
+      "source": "catalog/interfaces/android-frame/manifest.json",
+      "target": "dependencies/android-frame/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/android-frame/preview.html",
+      "target": "dependencies/android-frame/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/android-frame/preview.jsx",
+      "target": "dependencies/android-frame/preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/browser-window/README.md",
+      "target": "dependencies/browser-window/README.md"
+    },
+    {
+      "source": "catalog/interfaces/browser-window/browser-window.jsx",
+      "target": "dependencies/browser-window/browser-window.jsx"
+    },
+    {
+      "source": "catalog/interfaces/browser-window/manifest.json",
+      "target": "dependencies/browser-window/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/browser-window/preview.html",
+      "target": "dependencies/browser-window/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/browser-window/preview.jsx",
+      "target": "dependencies/browser-window/preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/README.md",
+      "target": "dependencies/ios-frame/README.md"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/ios-frame.jsx",
+      "target": "dependencies/ios-frame/ios-frame.jsx"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/manifest.json",
+      "target": "dependencies/ios-frame/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/preview.html",
+      "target": "dependencies/ios-frame/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/preview.jsx",
+      "target": "dependencies/ios-frame/preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/macos-window/README.md",
+      "target": "dependencies/macos-window/README.md"
+    },
+    {
+      "source": "catalog/interfaces/macos-window/macos-window.jsx",
+      "target": "dependencies/macos-window/macos-window.jsx"
+    },
+    {
+      "source": "catalog/interfaces/macos-window/manifest.json",
+      "target": "dependencies/macos-window/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/macos-window/preview.html",
+      "target": "dependencies/macos-window/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/macos-window/preview.jsx",
+      "target": "dependencies/macos-window/preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/README.md",
+      "target": "dependencies/platform-materials/README.md"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/manifest.json",
+      "target": "dependencies/platform-materials/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/platform-primitives.jsx",
+      "target": "dependencies/platform-materials/platform-primitives.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/preview.html",
+      "target": "dependencies/platform-materials/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/preview.jsx",
+      "target": "dependencies/platform-materials/preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platforms/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/interfaces/platforms/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/platforms/platform-components.jsx",
+      "target": "platform-components.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platforms/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/interfaces/platforms/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-export.js",
+      "target": "runtime/canvas/canvas-export.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/interfaces/platform-shells.js",
+      "target": "runtime/interfaces/platform-shells.js"
+    }
+  ]
+}

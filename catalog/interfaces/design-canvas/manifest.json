@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "design-canvas",
+  "kind": "component",
+  "description": "An editable canvas for boards, notes and interface studies.",
+  "targets": ["interfaces"],
+  "tags": ["component", "interfaces"],
+  "entry": "canvas-components.jsx",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/canvas-components.jsx",
+      "target": "canvas-components.jsx"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/canvas.js",
+      "target": "canvas.js"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/interfaces/design-canvas/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-export.js",
+      "target": "runtime/canvas/canvas-export.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-focus.js",
+      "target": "runtime/canvas/canvas-focus.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-model.js",
+      "target": "runtime/canvas/canvas-model.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-runtime.js",
+      "target": "runtime/canvas/canvas-runtime.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/canvas/canvas-viewport.js",
+      "target": "runtime/canvas/canvas-viewport.js"
+    }
+  ],
+  "requirements": ["react", "node-bundle"],
+  "preview": "preview.html",
+  "license": "MIT",
+  "guide": "references/canvas.md",
+  "export": "DesignCanvas",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "minScale": {
+        "type": "number",
+        "default": 0.1,
+        "description": "Minimum zoom."
+      },
+      "maxScale": {
+        "type": "number",
+        "default": 8,
+        "description": "Maximum zoom."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.jsx"
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "templateType": "audio-authoring",
+  "preset": "video-narration",
+  "language": null,
+  "duration": {
+    "mode": "source-estimate",
+    "targetSeconds": null
+  },
+  "speakerRoles": [
+    {
+      "id": "narrator",
+      "role": "Guide the listener through the source-grounded material."
+    }
+  ],
+  "sources": [],
+  "segments": []
+}

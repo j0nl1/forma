@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "ios-frame",
+  "kind": "primitive",
+  "description": "An editable ios frame interface frame.",
+  "targets": ["interfaces"],
+  "tags": ["interfaces", "primitive"],
+  "entry": "ios-frame.jsx",
+  "requirements": ["react", "node-bundle"],
+  "license": "MIT",
+  "export": "IOSDevice",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "width": {
+        "type": "number",
+        "default": 402,
+        "description": "Frame width in pixels."
+      },
+      "height": {
+        "type": "number",
+        "default": 874,
+        "description": "Frame height in pixels."
+      },
+      "dark": {
+        "type": "boolean",
+        "default": false,
+        "description": "Use the dark frame variant."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": ["platform-materials"],
+  "previewEntry": "preview.jsx",
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/ios-frame.jsx",
+      "target": "ios-frame.jsx"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/interfaces/ios-frame/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/README.md",
+      "target": "dependencies/platform-materials/README.md"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/manifest.json",
+      "target": "dependencies/platform-materials/manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/platform-primitives.jsx",
+      "target": "dependencies/platform-materials/platform-primitives.jsx"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/preview.html",
+      "target": "dependencies/platform-materials/preview.html"
+    },
+    {
+      "source": "catalog/interfaces/platform-materials/preview.jsx",
+      "target": "dependencies/platform-materials/preview.jsx"
+    }
+  ]
+}

@@ -4,15 +4,15 @@ Forma uses the Agent Skills directory format and ordinary local files. Read this
 
 ## Required access and fallbacks
 
-An optional [project profile](configuration.md) records reusable output, language and generation preferences. Check its selected capabilities against this session, using the offline `scripts/config.mjs` resolver when useful. Saved tool names do not establish availability. Recommend missing capabilities from actual harness tools and current provider documentation; retain supplied-media and script/handoff fallbacks.
+An optional [project profile](configuration.md) records reusable output, language and generation preferences. Check its selected capabilities against this session, using the offline `scripts/forma.mjs config` resolver when useful. Saved tool names do not establish availability. Recommend missing capabilities from actual harness tools and current provider documentation; retain supplied-media and script/handoff fallbacks.
 
 | Operation | Prefer when available | Standard fallback |
 | --- | --- | --- |
 | Load instructions | Native skill discovery and activation | Ask the agent to read the absolute `SKILL.md` path and resolve linked resources from that folder |
 | Clarify the brief | Structured input; asynchronous questions when supported | A concise question in chat; continue independent work when the answer is optional |
 | Read and edit source | Harness filesystem tools | Terminal file operations; resolve paths from the installed skill directory |
-| Preview | Harness browser panel or browser automation | Run `scripts/preview.mjs` and open its URL in a standard browser |
-| Verify | Browser automation with clicks, keyboard, DOM, errors and screenshots | Run `scripts/verify.mjs` with local Playwright; inspect its captures and exercise the actual flow |
+| Preview | Harness browser panel or browser automation | Run `scripts/forma.mjs preview` and open its URL in a standard browser |
+| Verify | Browser automation with clicks, keyboard, DOM, errors and screenshots | Run `scripts/forma.mjs verify` with local Playwright; inspect its captures and exercise the actual flow |
 | Send a review draft | An explicitly configured `onRequest` callback or local event consumer | Copy the draft, review it and paste it into the agent chat; selectable text remains available if clipboard access fails |
 | Generate images/audio or transfer a design | Available, authorized tools or configured providers | Use supplied local assets or deliver an explicit local handoff; disclose when generation or transfer was not performed |
 | Produce spoken audio for any preset | The user's selected MCP, harness tool, local speech engine or configured provider, with supported voices and language | Use supplied recordings or deliver the editable script and clip handoff; the offline audio helper does not synthesize speech |
@@ -22,9 +22,9 @@ Full local execution requires source read/write access and a terminal with Node.
 
 ## Preview and verification
 
-Start `node <skill>/scripts/preview.mjs <output-folder> --port 0`. The helper binds `127.0.0.1`, rejects paths and symlinks outside the root, and prints its actual URL. Keep the process running while the preview is in use. It never publishes or creates a public tunnel. If the process runs on another host, use an authorized port forward to reach it from the user's browser.
+Start `node <skill>/scripts/forma.mjs preview <output-folder> --port 0`. The helper binds `127.0.0.1`, rejects paths and symlinks outside the root, and prints its actual URL. Keep the process running while the preview is in use. It never publishes or creates a public tunnel. If the process runs on another host, use an authorized port forward to reach it from the user's browser.
 
-Follow the current browser tool's own documentation. Exercise behavior through real clicks and keyboard input. Without a browser tool, run `node <skill>/scripts/verify.mjs <url>` after installing Playwright. Keep captures in the user's artifact directory or an OS temporary directory. Automated error/overflow checks do not exercise every user flow or establish visual quality. Without screenshot inspection or runtime verification, report the missing checks explicitly.
+Follow the current browser tool's own documentation. Exercise behavior through real clicks and keyboard input. Without a browser tool, run `node <skill>/scripts/forma.mjs verify <url>` after installing Playwright. Keep captures in the user's artifact directory or an OS temporary directory. Automated error/overflow checks do not exercise every user flow or establish visual quality. Without screenshot inspection or runtime verification, report the missing checks explicitly.
 
 ## Integration and portability
 

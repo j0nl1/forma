@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "email",
+  "kind": "template",
+  "description": "An editable HTML email starting point.",
+  "targets": ["documents"],
+  "tags": ["documents", "template"],
+  "entry": "email.html",
+  "requirements": ["browser"],
+  "license": "MIT",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "subject": {
+        "type": "string",
+        "default": "A useful update",
+        "description": "Email subject, authored in HTML."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/documents/email/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/documents/email/email.html",
+      "target": "email.html"
+    },
+    {
+      "source": "catalog/documents/email/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/documents/email/preview.html",
+      "target": "preview.html"
+    }
+  ]
+}

@@ -13,10 +13,10 @@ import {
   wiring,
   discoverSystems,
   setPrimary,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 async function system(directory, name, color) {
   await fs.mkdir(directory, { recursive: true });
@@ -386,7 +386,7 @@ test("CLI discovery, update, primary selection and wiring work from a compiled s
       execFileSync(
         process.execPath,
         [
-          path.join(root, "skills/forma/scripts/design-system.mjs"),
+          path.join(root, "packages/cli/src/commands/design-system.mjs"),
           ...args,
         ],
         { encoding: "utf8" },

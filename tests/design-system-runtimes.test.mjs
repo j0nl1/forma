@@ -13,16 +13,16 @@ import {
   inspect,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
 import {
   runtimeDeclaration,
   reactRuntime,
   usesBrowserReact,
   rewriteCardGlobals,
-} from "../skills/forma/scripts/lib/system-authoring.mjs";
-import { sourceAST } from "../skills/forma/scripts/lib/system-contracts.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+} from "../packages/design-systems/src/compiler/authoring.mjs";
+import { sourceAST } from "../packages/design-systems/src/source/contracts.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),
@@ -475,7 +475,11 @@ test("installed skill uses its direct React 18 dependency without runtime folder
   const output = JSON.parse(
     execFileSync(
       process.execPath,
-      [path.join(destination, "scripts/design-system.mjs"), "compile", source],
+      [
+        path.join(destination, "packages/cli/src/commands/design-system.mjs"),
+        "compile",
+        source,
+      ],
       { encoding: "utf8" },
     ),
   );

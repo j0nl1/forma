@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   campaignDefaults,
   campaignFormats,
   validateCampaignUnits,
-} from "../skills/forma/assets/starters/campaign-model.js";
+} from "../packages/runtime/src/browser/interfaces/campaign-model.js";
 const keys = [
   "instagramPost",
   "instagramPortrait",
@@ -62,16 +62,14 @@ async function fixture(
         'import portrait from "../social/portrait.svg";',
         `const portrait = ${JSON.stringify(blue)};`,
       )
-      .replaceAll(
-        '"../../skills/forma/',
-        `"${path.join(root, "skills/forma")}/`,
-      );
+      .replaceAll('"../../catalog/', `"${path.join(root, "catalog")}/`)
+      .replaceAll('"../../packages/', `"${path.join(root, "packages")}/`);
     entry = path.join(dir, "solid.jsx");
     await fs.writeFile(entry, authored);
   }
   await bundle(entry, path.join(dir, "campaign.bundle.js"));
   await bundle(
-    path.join(root, "skills/forma/assets/starters/plain-canvas.js"),
+    path.join(root, "packages/runtime/src/browser/canvas/plain-canvas.js"),
     path.join(dir, "starters/plain-canvas.js"),
   );
   if (portable) {

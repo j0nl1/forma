@@ -1,20 +1,17 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 const html =
   '<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0}deck-stage{height:700px}section{background:white;color:#16392d;padding:40px;font:32px Arial}footer{height:120px}input{font:20px Arial}</style><deck-stage width="800" height="500"><section data-label="Opening"><h1>Opening</h1><input id="typing" value="Author input"><p data-anim="appear" data-anim-trigger="click">Click build</p></section><section data-label="Details"><h1>Details</h1></section></deck-stage><footer><button id="outside">Outside deck</button></footer><script src="starters/deck.js"></script></html>';
 async function fixture(t) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.resolve("skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(path.join(dir, "deck.html"), html);
   const { server, url } = await serve(dir, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));

@@ -1,0 +1,28 @@
+{
+  "name": "@forma/runtime",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@forma/core": "1.0.0",
+    "parse5": "8.0.1",
+    "esbuild": "0.28.2",
+    "postcss": "8.5.28",
+    "react": "18.3.1",
+    "three": "0.184.0",
+    "react-dom": "18.3.1",
+    "leaflet": "1.9.4",
+    "fflate": "0.8.3",
+    "topojson-client": "3.1.0",
+    "world-atlas": "2.0.2",
+    "d3": "7.9.0",
+    "d3-sankey": "0.12.3"
+  }
+}

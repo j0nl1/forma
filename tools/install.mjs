@@ -11,7 +11,7 @@ import {
   walk,
   readJson,
   writeJson,
-} from "../skills/forma/scripts/lib/files.mjs";
+} from "../packages/core/src/lib/files.mjs";
 const source = fileURLToPath(new URL("../skills/forma", import.meta.url));
 const digest = (data) => createHash("sha256").update(data).digest("hex");
 const marker = ".forma-install.json";
@@ -50,8 +50,16 @@ export async function install(
   { update = false, dryRun = false } = {},
 ) {
   destination = path.resolve(destination);
-  const files = await walk(source);
-  const names = files.map((f) => path.relative(source, f));
+  const checkout = fileURLToPath(new URL("..", import.meta.url));
+  const files = (await walk(source)).map((file) => ({
+    file,
+    name: path.relative(source, file),
+  }));
+  for (const directory of ["packages", "catalog"])
+    for (const file of await walk(path.join(checkout, directory)))
+      files.push({ file, name: path.relative(checkout, file) });
+  files.push({ file: path.join(checkout, "LICENSE"), name: "LICENSE" });
+  const names = files.map(({ name }) => name);
   if (await exists(destination)) {
     if (!update)
       throw new Error(
@@ -88,11 +96,27 @@ export async function install(
   const hashes = {};
   await fs.mkdir(staged);
   try {
-    for (const file of files) {
-      const rel = path.relative(source, file);
+    for (const { file, name: rel } of files) {
       const dest = path.join(staged, rel);
       await fs.mkdir(path.dirname(dest), { recursive: true });
-      const bytes = await fs.readFile(file);
+      let bytes = await fs.readFile(file);
+      if (file.startsWith(source + path.sep) && file.endsWith(".md")) {
+        const text = bytes
+          .toString("utf8")
+          .replace(/\]\(([^)]+)\)/g, (match, link) => {
+            if (/^(?:\w+:|#)/.test(link)) return match;
+            const [relative, ...fragment] = link.split("#");
+            const target = path.resolve(path.dirname(file), relative);
+            const item = files.find((entry) => entry.file === target);
+            if (!item) return match;
+            const installedLink = path
+              .relative(path.dirname(rel), item.name)
+              .split(path.sep)
+              .join("/");
+            return `](${installedLink}${fragment.length ? "#" + fragment.join("#") : ""})`;
+          });
+        bytes = Buffer.from(text);
+      }
       hashes[rel] = digest(bytes);
       await fs.writeFile(dest, bytes);
     }

@@ -7,10 +7,10 @@
 Install the skill's pinned dependencies with `npm ci --ignore-scripts` in the installed skill directory. D3 7.9.0 and D3 Sankey 0.12.3 are declared in both lockfiles. Build the editable library entry locally:
 
 ```sh
-node /path/to/forma/scripts/build.mjs \
-  /path/to/forma/assets/starters/chart-libraries.js \
+node /path/to/forma/scripts/forma.mjs build \
+  /path/to/forma/packages/runtime/src/browser/data/chart-libraries.js \
   /path/to/output/chart-libraries.bundle.js
-cp /path/to/forma/assets/starters/chart-stage.js /path/to/output/
+cp /path/to/forma/packages/runtime/src/browser/data/chart-stage.js /path/to/output/
 ```
 
 Load both local scripts, in order, before authoring the chart. No CDN or remote service is required. The library bundle exposes the full D3 API and Sankey helpers as `window.d3`. You may supply another reviewed local D3 build through that same global. An absent library rejects readiness and displays an actionable error.

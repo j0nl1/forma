@@ -4,11 +4,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { unzipSync } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
-const starters = path.join(root, "skills/forma/assets/starters");
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
+const starters = path.join(root, "packages/runtime/src/browser/interfaces");
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -29,11 +29,13 @@ async function fixture(
   const dir = await temporary(t),
     file = path.join(dir, "index.html");
   if (raw)
-    await fs.cp(starters, path.join(dir, "starters"), { recursive: true });
+    await fs.cp(path.dirname(starters), path.join(dir, "starters"), {
+      recursive: true,
+    });
   else await bundle(path.join(starters, entry), path.join(dir, "app.js"));
   await fs.writeFile(
     file,
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Feed phone contracts</title><style>body{margin:0;background:#eee}.author-overlay{position:absolute;top:32px;left:24px;z-index:45}.author-overlay input{width:100px}.art{position:absolute;left:45%;top:45%;width:10%;height:10%;background:#269d80;pointer-events:none}</style></head><body>${html}<script src="${raw ? "starters/" + entry : "app.js"}"></script></body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Feed phone contracts</title><style>body{margin:0;background:#eee}.author-overlay{position:absolute;top:32px;left:24px;z-index:45}.author-overlay input{width:100px}.art{position:absolute;left:45%;top:45%;width:10%;height:10%;background:#269d80;pointer-events:none}</style></head><body>${html}<script src="${raw ? "starters/interfaces/" + entry : "app.js"}"></script></body></html>`,
   );
   if (portable) {
     await fs.writeFile(path.join(dir, "portable.html"), await inlineHtml(file));

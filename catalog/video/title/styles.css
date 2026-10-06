@@ -1,0 +1,22 @@
+.forma-title {
+  font-family: Inter, system-ui, sans-serif;
+  max-width: 840px;
+  padding: 48px;
+}
+.forma-title h1 {
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin: 24px 0;
+}
+.forma-title p {
+  font-size: 24px;
+  line-height: 1.5;
+  margin: 0;
+}
+.forma-title-accent {
+  display: block;
+  width: 64px;
+  height: 5px;
+  border-radius: 3px;
+}

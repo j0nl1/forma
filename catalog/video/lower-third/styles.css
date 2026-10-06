@@ -1,0 +1,19 @@
+.forma-lower-third {
+  position: absolute;
+  left: 40px;
+  bottom: 40px;
+  display: grid;
+  gap: 6px;
+  border-left: 5px solid;
+  padding: 18px 24px;
+  background: #ffffffed;
+  color: #202925;
+  font-family: Inter, system-ui, sans-serif;
+  box-shadow: 0 6px 30px #00000012;
+}
+.forma-lower-third strong {
+  font-size: 28px;
+}
+.forma-lower-third span {
+  font-size: 18px;
+}

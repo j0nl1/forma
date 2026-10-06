@@ -11,17 +11,17 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
 import {
   loadFig,
   outline,
   select,
   renderDocument,
-} from "../skills/forma/scripts/lib/figma.mjs";
-import { importFig } from "../skills/forma/scripts/figma.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
-import { record } from "../skills/forma/scripts/project.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
+} from "../packages/figma/src/decode/document.mjs";
+import { importFig } from "../packages/cli/src/commands/figma.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
+import { record } from "../packages/cli/src/commands/project.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
 
 test("installation stages a standalone skill and refuses destructive updates", async (t) => {
   const dir = await temporary(t),
@@ -308,19 +308,23 @@ test("installed skill lockfile and helpers work in a non-Codex root independentl
   });
   const output = execFileSync(
     process.execPath,
-    [path.join(dest, "scripts/design-system.mjs"), "compile", source],
+    [
+      path.join(dest, "packages/cli/src/commands/design-system.mjs"),
+      "compile",
+      source,
+    ],
     { encoding: "utf8" },
   );
   assert.equal(JSON.parse(output).slug, "harbor");
   const configured = execFileSync(
     process.execPath,
-    [path.join(dest, "scripts/config.mjs"), "init", dir],
+    [path.join(dest, "packages/cli/src/commands/config.mjs"), "init", dir],
     { encoding: "utf8" },
   );
   assert.equal(JSON.parse(configured).created, true);
   const checked = execFileSync(
     process.execPath,
-    [path.join(dest, "scripts/config.mjs"), "check", dir],
+    [path.join(dest, "packages/cli/src/commands/config.mjs"), "check", dir],
     { encoding: "utf8" },
   );
   assert.equal(JSON.parse(checked).preferences.output.directory, "designs");

@@ -8,11 +8,11 @@ import {
   initConfig,
   checkConfig,
   resolveConfig,
-} from "../skills/forma/scripts/config.mjs";
+} from "../packages/cli/src/commands/config.mjs";
 import {
   resolvePreferences,
   validatePreferences,
-} from "../skills/forma/scripts/lib/config-model.mjs";
+} from "../packages/core/src/lib/config-model.mjs";
 
 const profile = {
   schema_version: 1,
@@ -63,7 +63,7 @@ test("template and CLI round trip, refusing replacement and symlink destinations
   const original = await fs.readFile(result.file);
   await assert.rejects(initConfig(dir), { code: "EEXIST" });
   assert.deepEqual(await fs.readFile(result.file), original);
-  const cli = path.join(root, "skills/forma/scripts/config.mjs");
+  const cli = path.join(root, "packages/cli/src/commands/config.mjs");
   const run = (...args) =>
     spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
   const checked = run("check", dir);
@@ -231,7 +231,7 @@ test("file companions resolve mechanically and cannot escape the selected projec
   const cli = spawnSync(
     process.execPath,
     [
-      path.join(root, "skills/forma/scripts/config.mjs"),
+      path.join(root, "packages/cli/src/commands/config.mjs"),
       "resolve",
       dir,
       "--request",

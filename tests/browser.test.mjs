@@ -5,14 +5,14 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
 import { prepareDemo } from "../tools/demo.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import {
   compile,
   preview,
-} from "../skills/forma/scripts/design-system.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
 
 test("native examples load without runtime errors and fit narrow layouts", async (t) => {
   const dir = await temporary(t);
@@ -297,7 +297,7 @@ test("3D source bundles locally and provides real model export controls", async 
     path.join(dir, "index.html"),
   );
   await bundle(
-    path.join(root, "skills/forma/assets/starters/three-stage.js"),
+    path.join(root, "packages/runtime/src/browser/three-d/three-stage.js"),
     path.join(dir, "three-stage.bundle.js"),
   );
   const { server, url } = await serve(dir, 0);

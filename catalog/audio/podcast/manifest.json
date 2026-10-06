@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "audio-podcast",
+  "kind": "preset",
+  "description": "Source-grounded dialogue between two hosts.",
+  "targets": ["audio"],
+  "tags": ["audio", "podcast"],
+  "guide": "generations/audio/podcast.md",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/audio/podcast/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/audio/podcast/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/audio/podcast/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/audio/podcast/template.json",
+      "target": "template.json"
+    }
+  ],
+  "requirements": ["speech-or-supplied-recording"],
+  "license": "MIT",
+  "entry": "template.json",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "language": {
+        "type": ["string", "null"],
+        "default": null,
+        "description": "Choose a language with the user."
+      },
+      "targetSeconds": {
+        "type": ["number", "null"],
+        "default": null,
+        "description": "Requested duration; null means estimate from the source."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "preview": "preview.html"
+}

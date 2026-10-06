@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -5,19 +6,19 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { unzipSync, strFromU8 } from "fflate";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 import {
   parseEffect,
   buildSteps,
-} from "../skills/forma/assets/starters/deck-effects.js";
-import { tracksFor } from "../skills/forma/scripts/lib/pptx-motion-effects.mjs";
+} from "../packages/runtime/src/browser/slides/deck-effects.js";
+import { tracksFor } from "../packages/exports/src/lib/pptx-motion-effects.mjs";
 import {
   composedTargets,
   composeSteps,
-} from "../skills/forma/scripts/lib/pptx-motion-compose.mjs";
+} from "../packages/exports/src/lib/pptx-motion-compose.mjs";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 const repeatCases = [
   {
@@ -39,11 +40,7 @@ const repeatCases = [
 ];
 async function repeatedFixture(t, cases = repeatCases.slice(0, 1)) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const attributes = (value, parent) =>
     `data-anim="${value.effect}" data-anim-path="M0 0 L${parent ? "160 0" : "0 80"}" data-anim-repeat="${value.repeat ?? 1}" data-anim-duration="${value.duration}" data-anim-trigger="${value.trigger ?? "click"}" data-anim-rotate="90" data-anim-scale="1.5" ${value.reverse ? 'data-anim-auto-reverse="true"' : ""}`;
   await fs.writeFile(
@@ -171,7 +168,7 @@ async function browserEndpoints(url) {
     await page.emulateMedia({ media: "print" });
     return page.evaluate(async () => {
       const { parseEffect, buildSteps, effectFrames, effectOptions } =
-        await import("./starters/deck-effects.js");
+        await import("./starters/runtime/slides/deck-effects.js");
       return [...document.querySelector("deck-stage").slides].map((slide) => {
         const entries = [...slide.querySelectorAll("[data-anim]")].map(
           (element, documentIndex) => ({

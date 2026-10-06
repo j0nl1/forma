@@ -11,7 +11,7 @@ import {
   planAudio,
   measureAudio,
   assembleAudio,
-} from "../skills/forma/scripts/source-to-audio.mjs";
+} from "../packages/cli/src/commands/source-to-audio.mjs";
 
 const hash = (data) => createHash("sha256").update(data).digest("hex");
 const writeJSON = (file, value) => fs.writeFile(file, JSON.stringify(value));
@@ -95,7 +95,10 @@ test("source-to-audio CLI returns the canonical plan and rejects invalid flags",
   const { episodeFile, clipsFile } = await fixture(t);
   const expected = await planAudio(episodeFile);
   const script = fileURLToPath(
-    new URL("../skills/forma/scripts/source-to-audio.mjs", import.meta.url),
+    new URL(
+      "../packages/cli/src/commands/source-to-audio.mjs",
+      import.meta.url,
+    ),
   );
   const result = spawnSync(process.execPath, [script, "plan", episodeFile], {
     encoding: "utf8",

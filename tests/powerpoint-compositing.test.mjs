@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -6,15 +7,15 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { parseEffect } from "../skills/forma/assets/starters/deck-effects.js";
-import { tracksFor } from "../skills/forma/scripts/lib/pptx-motion-effects.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { parseEffect } from "../packages/runtime/src/browser/slides/deck-effects.js";
+import { tracksFor } from "../packages/exports/src/lib/pptx-motion-effects.mjs";
 import {
   compositingIssue,
   cohortOpacity,
   cohortInitialState,
-} from "../skills/forma/scripts/lib/pptx-motion-compositing.mjs";
+} from "../packages/exports/src/lib/pptx-motion-compositing.mjs";
 
 const slide = { width: 640, height: 360 };
 const run = promisify(execFile);
@@ -124,11 +125,7 @@ test("opacity products preserve pending child clicks and repeated source phases"
 
 test("PowerPoint exports disjoint nested opacity and leaf masks as editable native builds", async (t) => {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const source = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Native compositing regression</title><style>body{margin:0}section{background:white}</style></head><body><deck-stage width="640" height="360"><section><p style="margin:10px;font:20px Arial">Editable outside artwork</p><div style="position:absolute;left:100px;top:70px;width:350px;height:200px" data-anim="fade-in" data-anim-trigger="click" data-anim-duration="1000"><div style="position:absolute;left:0;top:0;width:140px;height:50px;background:red"></div><div style="position:absolute;left:80px;top:110px;width:100px;height:50px;background:blue" data-anim="path" data-anim-path="M0 0 L60 0" data-anim-trigger="with" data-anim-duration="1000"></div></div></section><section><div style="position:absolute;left:100px;top:70px;width:300px;height:200px" data-anim="path" data-anim-path="M0 0 L60 0" data-anim-trigger="click" data-anim-duration="1000"><div style="position:absolute;left:0;top:0;width:100px;height:50px;background:red"></div><div style="position:absolute;left:80px;top:80px;width:100px;height:60px;background:blue" data-anim="wipe-in" data-anim-dir="left" data-anim-trigger="with" data-anim-duration="1000"></div></div></section></deck-stage><script src="starters/deck.js"></script></body></html>`;
   await fs.writeFile(path.join(dir, "index.html"), source);
   const { server, url } = await serve(dir, 0);
@@ -153,11 +150,7 @@ test(
   },
   async (t) => {
     const dir = await temporary(t);
-    await fs.cp(
-      path.join(root, "skills/forma/assets/starters"),
-      path.join(dir, "starters"),
-      { recursive: true },
-    );
+    await copyCatalogResource("slide-deck", path.join(dir, "starters"));
     const specimen = (parent, child, trigger) =>
       `<section><div style="position:absolute;left:100px;top:70px;width:350px;height:220px" data-anim="${parent}" data-anim-trigger="click" data-anim-path="M0 0 L60 0" data-anim-duration="800"><div style="position:absolute;left:0;top:0;width:140px;height:50px;background:#ff0000"></div><div style="position:absolute;left:80px;top:110px;width:100px;height:60px;background:#0000ff" data-anim="${child}" data-anim-dir="left" data-anim-path="M0 0 L60 0" data-anim-trigger="${trigger}" data-anim-duration="800"></div></div></section>`;
     const slides = [

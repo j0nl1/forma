@@ -1,0 +1,26 @@
+{
+  "name": "@forma/design-systems",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@forma/core": "1.0.0",
+    "@forma/runtime": "1.0.0",
+    "typescript": "6.0.3",
+    "parse5": "8.0.1",
+    "esbuild": "0.28.2",
+    "postcss": "8.5.28",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@forma/exports": "1.0.0",
+    "marked": "18.0.14",
+    "postcss-selector-parser": "7.1.6"
+  }
+}

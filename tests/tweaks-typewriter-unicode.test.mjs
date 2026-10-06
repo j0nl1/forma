@@ -3,16 +3,16 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 async function fixture(t, bar) {
   const dir = await temporary(t);
   const react = path.resolve("node_modules/react/index.js");
   const dom = path.resolve("node_modules/react-dom/client.js");
   const hooks = path.resolve(
-    "skills/forma/assets/starters/tweaks-suggestions.jsx",
+    "packages/runtime/src/browser/controls/tweaks-suggestions.jsx",
   );
   const authored = bar ? ["Add 🚀 spacing"] : ["A🚀B", "Tune 🚀"];
   const timing = {

@@ -9,7 +9,7 @@ import {
   ImageSprite,
   RectSprite,
   Easing,
-} from "../../skills/forma/assets/starters/animations.jsx";
+} from "../../packages/runtime/src/browser/motion/animations.jsx";
 
 const chapters = [
   {

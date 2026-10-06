@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "id": "video-lower-third",
+  "kind": "primitive",
+  "description": "A timed presenter label with an entry and exit fade.",
+  "targets": ["video"],
+  "tags": ["video", "primitive"],
+  "entry": "lower-third.jsx",
+  "requirements": ["react", "node-bundle"],
+  "license": "MIT",
+  "export": "LowerThird",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "default": "Alex Morgan",
+        "description": "Presenter name."
+      },
+      "detail": {
+        "type": "string",
+        "default": "Researcher",
+        "description": "Role or context."
+      },
+      "time": {
+        "type": "number",
+        "default": 1,
+        "description": "Authored time in seconds."
+      },
+      "startSeconds": {
+        "type": "number",
+        "default": 0,
+        "description": "Visible range start."
+      },
+      "endSeconds": {
+        "type": "number",
+        "default": 8,
+        "description": "Visible range end."
+      },
+      "accent": {
+        "type": "string",
+        "default": "#397758",
+        "description": "Accent color."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.jsx",
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/video/lower-third/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/video/lower-third/lower-third.jsx",
+      "target": "lower-third.jsx"
+    },
+    {
+      "source": "catalog/video/lower-third/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/video/lower-third/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/video/lower-third/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "catalog/video/lower-third/styles.css",
+      "target": "styles.css"
+    }
+  ]
+}

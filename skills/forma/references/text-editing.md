@@ -5,7 +5,7 @@ The editor permits direct editing of literal static headings, paragraphs and rep
 ## Start a source editor
 
 ```sh
-node skills/forma/scripts/preview.mjs /path/to/artifact --text-file document.html --port 4311
+node packages/cli/src/commands/preview.mjs /path/to/artifact --text-file document.html --port 4311
 ```
 
 Open the reported origin and `document.html`. The service injects its owned runtime and temporary source identity markers into that response. No authoring library or extra script is required in the document. Source markers, editor controls and credentials are never written to the original HTML. For an installed skill, use its absolute script path.

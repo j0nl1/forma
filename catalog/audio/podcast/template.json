@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "templateType": "audio-authoring",
+  "preset": "podcast",
+  "language": null,
+  "duration": {
+    "mode": "source-estimate",
+    "targetSeconds": null
+  },
+  "speakerRoles": [
+    {
+      "id": "host",
+      "role": "Explain the source-grounded mechanism."
+    },
+    {
+      "id": "listener",
+      "role": "Ask useful questions and test distinctions."
+    }
+  ],
+  "sources": [],
+  "segments": []
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "campaign",
+  "kind": "component",
+  "description": "Authored campaign placements with grouped format controls.",
+  "targets": ["interfaces"],
+  "tags": ["interfaces", "component"],
+  "entry": "campaign-components.jsx",
+  "requirements": ["react", "node-bundle"],
+  "license": "MIT",
+  "export": "CampaignBoard",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "label": {
+        "type": "string",
+        "default": "Campaign",
+        "description": "Placement board label."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.jsx",
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/interfaces/campaign/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/interfaces/campaign/campaign-components.jsx",
+      "target": "campaign-components.jsx"
+    },
+    {
+      "source": "catalog/interfaces/campaign/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/interfaces/campaign/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/interfaces/campaign/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/controls/tweaks-components.jsx",
+      "target": "runtime/controls/tweaks-components.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/controls/tweaks-model.js",
+      "target": "runtime/controls/tweaks-model.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/controls/tweaks-panel.js",
+      "target": "runtime/controls/tweaks-panel.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/controls/tweaks-store.js",
+      "target": "runtime/controls/tweaks-store.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/controls/tweaks-suggestions.jsx",
+      "target": "runtime/controls/tweaks-suggestions.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/interfaces/campaign-model.js",
+      "target": "runtime/interfaces/campaign-model.js"
+    }
+  ]
+}

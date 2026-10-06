@@ -7,7 +7,7 @@ import {
   Captions,
   Easing,
   animate,
-} from "../../skills/forma/assets/starters/animations.jsx";
+} from "../../packages/runtime/src/browser/motion/animations.jsx";
 
 const MOTION = {
   enter: (from, to, start, end, time) =>

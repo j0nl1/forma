@@ -3,23 +3,23 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 import {
   fileGeometry,
   fileName,
   fileUrl,
   sameFilePath,
   modalGeometry,
-} from "../skills/forma/assets/starters/file-window-model.js";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+} from "../packages/runtime/src/browser/editing/file-window-model.js";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 const target = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Live project</title><style>html,body{margin:0}section{height:600px;background:#cf362f}section:nth-child(2){background:#269d80}section:nth-child(3){background:#365bcf}section:nth-child(4){height:900px;background:#e4b754}button{position:absolute;top:620px;left:180px}.vh{position:fixed;width:5px;height:100vh}</style></head><body><section>First</section><section>Second</section><section>Third</section><section>Last strip</section><button onclick="window.clicked=true">Embedded action</button><div class="vh"></div></body></html>`;
 async function fixture(t, html = "", files = { "project.html": target }) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/forma/assets/starters/file-window.js"),
+    path.join(root, "packages/runtime/src/browser/editing/file-window.js"),
     path.join(dir, "app.js"),
   );
   for (const [name, content] of Object.entries(files)) {

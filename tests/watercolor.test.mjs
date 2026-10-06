@@ -4,9 +4,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
 import { prepareDemo } from "../tools/demo.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 async function setup(t) {
   const dir = await temporary(t);

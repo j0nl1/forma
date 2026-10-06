@@ -9,8 +9,8 @@ Every platform and aspect uses one fixed phone height: 428 × 900 px by default,
 Bundle `social.js` for all currently implemented social components and actual PNG/ZIP board downloads. For an individual phone, copy its classic `<platform>-shell.js` loader and editable companions, or bundle that entry:
 
 ```sh
-node skills/forma/scripts/build.mjs \
-  skills/forma/assets/starters/x-shell.js /absolute/project/x.bundle.js
+node packages/cli/src/commands/build.mjs \
+  packages/runtime/src/browser/interfaces/x-shell.js /absolute/project/x.bundle.js
 ```
 
 ```html
@@ -52,7 +52,7 @@ Attribute updates are live and preserve authored state without rebuilding the co
 For actual project-file persistence, serve the selected HTML with the existing source service:
 
 ```sh
-node skills/forma/scripts/preview.mjs /absolute/project --image-file campaign.html
+node packages/cli/src/commands/preview.mjs /absolute/project --image-file campaign.html
 ```
 
 Uploads and crop/zoom edits share the directory's `image-slots.state.json`, with separate records for each stable phone id. Reload restores the uploaded bytes. Static pages without explicit session editing remain read-only. See [images](images.md) for conflict recovery, gestures and portable state. Source-sidecar editing does not require setting `editable="session"`.

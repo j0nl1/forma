@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 async function fixture(t) {
   const dir = await temporary(t);
@@ -18,11 +18,11 @@ async function fixture(t) {
       path.join(source, name),
     );
   for (const [entry, output] of [
-    ["geography-libraries.js", "geography.bundle.js"],
-    ["street-libraries.js", "street.bundle.js"],
+    ["data/geography-libraries.js", "geography.bundle.js"],
+    ["data/street-libraries.js", "street.bundle.js"],
   ])
     await bundle(
-      path.join(root, "skills/forma/assets/starters", entry),
+      path.join(root, "packages/runtime/src/browser", entry),
       path.join(source, output),
     );
   const { server, url } = await serve(dir, 0);

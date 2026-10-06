@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "audio-explanation",
+  "kind": "preset",
+  "description": "A guided explanation with examples and a coherent teaching arc.",
+  "targets": ["audio"],
+  "tags": ["audio", "explanation"],
+  "guide": "generations/audio/explanation.md",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/audio/explanation/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/audio/explanation/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/audio/explanation/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/audio/explanation/template.json",
+      "target": "template.json"
+    }
+  ],
+  "requirements": ["speech-or-supplied-recording"],
+  "license": "MIT",
+  "entry": "template.json",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "language": {
+        "type": ["string", "null"],
+        "default": null,
+        "description": "Choose a language with the user."
+      },
+      "targetSeconds": {
+        "type": ["number", "null"],
+        "default": null,
+        "description": "Requested duration; null means estimate from the source."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "preview": "preview.html"
+}
