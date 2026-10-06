@@ -7,12 +7,12 @@ import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
-import { loadFig } from "../packages/exports/src/lib/figma.mjs";
+import { loadFig } from "../packages/figma/src/decode/document.mjs";
 import {
   componentModel,
   componentEntries,
-} from "../packages/exports/src/lib/figma-component-model.mjs";
-import { sourceAST } from "../packages/exports/src/lib/system-contracts.mjs";
+} from "../packages/figma/src/components/model.mjs";
+import { sourceAST } from "../packages/design-systems/src/source/contracts.mjs";
 import {
   compile,
   preview,

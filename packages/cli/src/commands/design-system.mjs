@@ -10,8 +10,8 @@ import {
   wiring,
   discoverSystems,
   setPrimary,
-} from "../../../exports/src/design-system.mjs";
-export * from "../../../exports/src/design-system.mjs";
+} from "../../../design-systems/src/pipeline.mjs";
+export * from "../../../design-systems/src/pipeline.mjs";
 export async function run(argv = process.argv.slice(2)) {
   const { positional: p, flags } = args(argv, {
     "--primary": "boolean",

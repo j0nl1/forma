@@ -26,7 +26,7 @@ The watercolor kit includes public pigment names, RGB transmittance values and o
 
 Versions and integrity hashes are locked. Use `npm ci --ignore-scripts`; explicit Chromium installation is separate. FFmpeg comes from the OS. Dependencies remain a supply-chain boundary.
 
-The default caption font is Inter Medium 4.1, independently obtained from the [font author's website](https://rsms.me/inter/) and distributed under the SIL Open Font License 1.1. Its [asset notes](../packages/runtime/src/browser/fonts/README.md) record the download URL, retrieval date, checksum and included license. The build embeds this font locally; it requires no CDN request.
+The default caption font is Inter Medium 4.1, independently obtained from the [font author's website](https://rsms.me/inter/) and distributed under the SIL Open Font License 1.1. Its [asset notes](../packages/runtime/src/browser/shared/fonts/README.md) record the download URL, retrieval date, checksum and included license. The build embeds this font locally; it requires no CDN request.
 
 There is no telemetry, background updater, hosted asset proxy, model selection change, credential collector, or remote install hook. Preview binds to loopback; exports write local files and refuse existing outputs. Browsing, generation, publishing, and transfers use the actual available harness tools under the user's authorization.
 

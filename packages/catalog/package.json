@@ -11,6 +11,8 @@
     "./*": "./src/*"
   },
   "dependencies": {
-    "@forma/core": "1.0.0"
+    "@forma/core": "1.0.0",
+    "typescript": "6.0.3",
+    "@forma/runtime": "1.0.0"
   }
 }

@@ -3,7 +3,7 @@ import {
   compositingIssue,
   cohortOpacity,
 } from "./pptx-motion-compositing.mjs";
-import { buildSteps } from "../../../runtime/src/browser/deck-effects.js";
+import { buildSteps } from "../../../runtime/src/browser/slides/deck-effects.js";
 import {
   composedProgress,
   cycleDuration,

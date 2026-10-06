@@ -13,8 +13,8 @@ import {
 } from "../packages/cli/src/commands/design-system.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
-import { shadowCss } from "../packages/exports/src/lib/system-review-data.mjs";
-import { scriptBindings } from "../packages/exports/src/lib/system-card-scripts.mjs";
+import { shadowCss } from "../packages/design-systems/src/review/review-data.mjs";
+import { scriptBindings } from "../packages/design-systems/src/compiler/card-scripts.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),
@@ -22,7 +22,10 @@ async function fixture(t) {
   await fs.mkdir(path.join(source, "cards"), { recursive: true });
   await fs.mkdir(path.join(source, "assets"));
   await fs.copyFile(
-    path.join(root, "packages/runtime/src/browser/fonts/inter-medium.woff2"),
+    path.join(
+      root,
+      "packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
+    ),
     path.join(source, "assets/font.woff2"),
   );
   await fs.writeFile(

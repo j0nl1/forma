@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "data-chart",
+  "kind": "primitive",
+  "description": "An accessible bar or line chart with local data.",
+  "targets": ["slides", "video", "data"],
+  "tags": ["component", "slides", "video", "data"],
+  "entry": "chart.js",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/data/data-chart/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/data/data-chart/chart.js",
+      "target": "chart.js"
+    },
+    {
+      "source": "catalog/data/data-chart/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/data/data-chart/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/data/data-chart/preview.js",
+      "target": "preview.js"
+    }
+  ],
+  "requirements": ["browser", "node-bundle"],
+  "preview": "preview.html",
+  "license": "MIT",
+  "guide": "references/charts.md",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "enum": ["bar", "line"],
+        "default": "bar",
+        "description": "Chart geometry."
+      },
+      "label": {
+        "type": "string",
+        "default": "Quarterly output",
+        "description": "Accessible chart description."
+      },
+      "unit": {
+        "type": "string",
+        "default": " units",
+        "description": "Value unit."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.js"
+}

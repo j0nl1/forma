@@ -37,7 +37,7 @@ Gain is the product of `gain`, the bus gain, the linear envelope, and linear fad
 
 ## Runtime interfaces
 
-- `compileAudioSchedule(plan, { start, duration, sampleRate = 48000, busConfig })` in `packages/runtime/src/browser/audio-plan.js` is a pure transformation of the compiled composition plan. It returns clips with half-open sample intervals and piecewise windows. Start/end boundaries round up to the first sample whose time falls inside the interval.
+- `compileAudioSchedule(plan, { start, duration, sampleRate = 48000, busConfig })` in `packages/core/src/timeline/audio-plan.js` is a pure transformation of the compiled composition plan. It returns clips with half-open sample intervals and piecewise windows. Start/end boundaries round up to the first sample whose time falls inside the interval.
 - `audioGainAt(clip, localTime)` evaluates compiled gain, fades, and envelopes. `addScheduledWindow(schedule, clip, window, decodedPCM, mixedPCM, sourceDuration, channels = 2)` adds to a caller-owned float accumulator.
 - `createAudioExport({ format, audio, declaredPlan, busConfig })` in `packages/media/src/lib/audio.mjs` retains `record`, `mix`, and `dispose`, and adds `snapshot(page)`. Call `snapshot` while blob URLs remain valid, before frame capture can unmount or revoke their source. `mix` can snapshot missing sources, but cannot restore a revoked URL.
 - A compiled clip window has `playbackStart`, `playbackEnd`, `authoredStart`, `authoredEnd`, `localStart`, `localEnd`, and `rate`. `rate` is local clip seconds per playback second. The window's effective audio tempo is `media.playbackRate * rate`.

@@ -10,8 +10,8 @@ import {
   loadFig,
   select,
   renderDocument,
-} from "../packages/exports/src/lib/figma.mjs";
-import { applyNodeLayout } from "../packages/exports/src/lib/figma-layout.mjs";
+} from "../packages/figma/src/decode/document.mjs";
+import { applyNodeLayout } from "../packages/figma/src/render/layout.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import { bundle } from "../packages/cli/src/commands/build.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";

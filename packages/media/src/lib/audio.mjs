@@ -7,7 +7,7 @@ import { promisify } from "node:util";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { localUrl } from "../../../core/src/lib/files.mjs";
-import { compileAudioSchedule } from "../../../runtime/src/browser/audio-plan.js";
+import { compileAudioSchedule } from "../../../core/src/timeline/audio-plan.js";
 import { mixScheduledAudio, tempoFilters } from "./scheduled-audio.mjs";
 
 const run = promisify(execFile),

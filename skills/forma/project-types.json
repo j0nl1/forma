@@ -6,15 +6,15 @@
       "name": "Presentations",
       "reference": "generations/slides/slides.md",
       "starters": [
-        "packages/runtime/src/browser/deck.js",
-        "packages/runtime/src/browser/deck-runtime.js",
-        "packages/runtime/src/browser/deck-builds.js",
-        "packages/runtime/src/browser/deck-effects.js",
-        "packages/runtime/src/browser/deck-masks.js",
-        "packages/runtime/src/browser/deck-editor.js",
-        "packages/runtime/src/browser/deck-thumbnails.js",
-        "packages/runtime/src/browser/deck-operations.js",
-        "packages/runtime/src/browser/deck-labels.js"
+        "catalog/slides/slide-deck/deck.js",
+        "packages/runtime/src/browser/slides/deck-runtime.js",
+        "packages/runtime/src/browser/slides/deck-builds.js",
+        "packages/runtime/src/browser/slides/deck-effects.js",
+        "packages/runtime/src/browser/slides/deck-masks.js",
+        "packages/runtime/src/browser/slides/deck-editor.js",
+        "packages/runtime/src/browser/slides/deck-thumbnails.js",
+        "packages/runtime/src/browser/slides/deck-operations.js",
+        "packages/runtime/src/browser/slides/deck-labels.js"
       ],
       "catalog": ["slide-deck"]
     },
@@ -22,20 +22,20 @@
       "id": "mobile-app-design",
       "name": "Mobile app design",
       "reference": "generations/interfaces/mobile.md",
-      "starters": ["packages/runtime/src/browser/frames.js"]
+      "starters": ["packages/runtime/src/browser/interfaces/frames.js"]
     },
     {
       "id": "wireframe",
       "name": "Wireframe",
       "reference": "generations/interfaces/wireframe.md",
       "starters": [
-        "packages/runtime/src/browser/canvas.js",
-        "packages/runtime/src/browser/canvas-runtime.js",
-        "packages/runtime/src/browser/canvas-components.jsx",
-        "packages/runtime/src/browser/canvas-model.js",
-        "packages/runtime/src/browser/canvas-viewport.js",
-        "packages/runtime/src/browser/canvas-focus.js",
-        "packages/runtime/src/browser/canvas-export.js"
+        "catalog/interfaces/design-canvas/canvas.js",
+        "packages/runtime/src/browser/canvas/canvas-runtime.js",
+        "catalog/interfaces/design-canvas/canvas-components.jsx",
+        "packages/runtime/src/browser/canvas/canvas-model.js",
+        "packages/runtime/src/browser/canvas/canvas-viewport.js",
+        "packages/runtime/src/browser/canvas/canvas-focus.js",
+        "packages/runtime/src/browser/canvas/canvas-export.js"
       ],
       "catalog": ["design-canvas"]
     },
@@ -44,11 +44,11 @@
       "name": "Document",
       "reference": "generations/documents/documents.md",
       "starters": [
-        "packages/runtime/src/browser/document.js",
-        "packages/runtime/src/browser/document-runtime.js",
-        "packages/runtime/src/browser/document-model.js",
-        "packages/runtime/src/browser/document-style.js",
-        "packages/runtime/src/browser/document-print.js"
+        "catalog/documents/document-pages/document.js",
+        "packages/runtime/src/browser/documents/document-runtime.js",
+        "packages/runtime/src/browser/documents/document-model.js",
+        "packages/runtime/src/browser/documents/document-style.js",
+        "packages/runtime/src/browser/documents/document-print.js"
       ],
       "catalog": ["document-pages"]
     },
@@ -57,21 +57,21 @@
       "name": "Animation",
       "reference": "generations/video/motion.md",
       "starters": [
-        "packages/runtime/src/browser/animations.jsx",
-        "packages/runtime/src/browser/motion-model.js",
-        "packages/runtime/src/browser/motion-fonts.js",
-        "packages/runtime/src/browser/font-css.js",
-        "packages/runtime/src/browser/fonts/inter-medium.woff2",
-        "packages/runtime/src/browser/fonts/OFL.txt",
-        "packages/runtime/src/browser/fonts/README.md",
-        "packages/runtime/src/browser/scene-components.jsx",
-        "packages/runtime/src/browser/watercolor-components.jsx",
-        "packages/runtime/src/browser/watercolor-kit.js",
-        "packages/runtime/src/browser/motion-frame.js",
-        "packages/runtime/src/browser/motion-export.jsx",
-        "packages/runtime/src/browser/composition-model.js",
-        "packages/runtime/src/browser/composition-components.jsx",
-        "packages/runtime/src/browser/audio-plan.js"
+        "packages/runtime/src/browser/motion/animations.jsx",
+        "packages/core/src/timeline/motion-model.js",
+        "packages/runtime/src/browser/motion/motion-fonts.js",
+        "packages/runtime/src/browser/shared/font-css.js",
+        "packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
+        "packages/runtime/src/browser/shared/fonts/OFL.txt",
+        "packages/runtime/src/browser/shared/fonts/README.md",
+        "packages/runtime/src/browser/motion/scene-components.jsx",
+        "packages/runtime/src/browser/motion/watercolor-components.jsx",
+        "packages/runtime/src/browser/motion/watercolor-kit.js",
+        "packages/runtime/src/browser/motion/motion-frame.js",
+        "packages/runtime/src/browser/motion/motion-export.jsx",
+        "packages/core/src/timeline/composition-model.js",
+        "packages/runtime/src/browser/motion/composition-components.jsx",
+        "packages/core/src/timeline/audio-plan.js"
       ],
       "catalog": ["native-composition"]
     },
@@ -80,14 +80,14 @@
       "name": "UI mockups",
       "reference": "generations/interfaces/interface.md",
       "starters": [
-        "packages/runtime/src/browser/canvas.js",
-        "packages/runtime/src/browser/canvas-runtime.js",
-        "packages/runtime/src/browser/canvas-components.jsx",
-        "packages/runtime/src/browser/canvas-model.js",
-        "packages/runtime/src/browser/canvas-viewport.js",
-        "packages/runtime/src/browser/canvas-focus.js",
-        "packages/runtime/src/browser/canvas-export.js",
-        "packages/runtime/src/browser/image-slot.js"
+        "catalog/interfaces/design-canvas/canvas.js",
+        "packages/runtime/src/browser/canvas/canvas-runtime.js",
+        "catalog/interfaces/design-canvas/canvas-components.jsx",
+        "packages/runtime/src/browser/canvas/canvas-model.js",
+        "packages/runtime/src/browser/canvas/canvas-viewport.js",
+        "packages/runtime/src/browser/canvas/canvas-focus.js",
+        "packages/runtime/src/browser/canvas/canvas-export.js",
+        "packages/runtime/src/browser/images/image-slot.js"
       ],
       "catalog": ["design-canvas"]
     },
@@ -96,11 +96,11 @@
       "name": "Resume",
       "reference": "generations/documents/documents.md",
       "starters": [
-        "packages/runtime/src/browser/document.js",
-        "packages/runtime/src/browser/document-runtime.js",
-        "packages/runtime/src/browser/document-model.js",
-        "packages/runtime/src/browser/document-style.js",
-        "packages/runtime/src/browser/document-print.js"
+        "catalog/documents/document-pages/document.js",
+        "packages/runtime/src/browser/documents/document-runtime.js",
+        "packages/runtime/src/browser/documents/document-model.js",
+        "packages/runtime/src/browser/documents/document-style.js",
+        "packages/runtime/src/browser/documents/document-print.js"
       ],
       "catalog": ["document-pages"]
     },
@@ -109,10 +109,10 @@
       "name": "3D object",
       "reference": "generations/video/three-dimensional.md",
       "starters": [
-        "packages/runtime/src/browser/three-stage.js",
-        "packages/runtime/src/browser/three-stage-model.js",
-        "packages/runtime/src/browser/three-stage-export.js",
-        "packages/runtime/src/browser/three-stage-style.js"
+        "packages/runtime/src/browser/three-d/three-stage.js",
+        "packages/runtime/src/browser/three-d/three-stage-model.js",
+        "packages/runtime/src/browser/three-d/three-stage-export.js",
+        "packages/runtime/src/browser/three-d/three-stage-style.js"
       ]
     },
     {
@@ -120,35 +120,35 @@
       "name": "Research",
       "reference": "generations/data/research.md",
       "starters": [
-        "packages/runtime/src/browser/sources.js",
-        "packages/runtime/src/browser/data-overlay-controls.js",
-        "packages/runtime/src/browser/data-overlay-dom.js",
-        "packages/runtime/src/browser/data-overlay-geometry.js",
-        "packages/runtime/src/browser/data-overlay-layout.js",
-        "packages/runtime/src/browser/data-overlay-model.js",
-        "packages/runtime/src/browser/data-overlay-paint.js",
-        "packages/runtime/src/browser/data-overlay-runtime.js",
-        "packages/runtime/src/browser/data-overlay-style.js",
-        "packages/runtime/src/browser/data-overlay.js"
+        "packages/runtime/src/browser/data/sources.js",
+        "packages/runtime/src/browser/data/data-overlay-controls.js",
+        "packages/runtime/src/browser/data/data-overlay-dom.js",
+        "packages/runtime/src/browser/data/data-overlay-geometry.js",
+        "packages/runtime/src/browser/data/data-overlay-layout.js",
+        "packages/runtime/src/browser/data/data-overlay-model.js",
+        "packages/runtime/src/browser/data/data-overlay-paint.js",
+        "packages/runtime/src/browser/data/data-overlay-runtime.js",
+        "packages/runtime/src/browser/data/data-overlay-style.js",
+        "packages/runtime/src/browser/data/data-overlay.js"
       ]
     },
     {
       "id": "html-email",
       "name": "HTML email",
       "reference": "generations/documents/email.md",
-      "starters": ["packages/runtime/src/browser/email.html"]
+      "starters": ["catalog/documents/email/email.html"]
     },
     {
       "id": "color-type-system",
       "name": "Color and type system",
       "reference": "references/design-systems.md",
       "starters": [
-        "packages/runtime/src/browser/controls.js",
-        "packages/runtime/src/browser/tweaks-components.jsx",
-        "packages/runtime/src/browser/tweaks-suggestions.jsx",
-        "packages/runtime/src/browser/tweaks-panel.js",
-        "packages/runtime/src/browser/tweaks-model.js",
-        "packages/runtime/src/browser/tweaks-store.js"
+        "packages/runtime/src/browser/controls/controls.js",
+        "packages/runtime/src/browser/controls/tweaks-components.jsx",
+        "packages/runtime/src/browser/controls/tweaks-suggestions.jsx",
+        "packages/runtime/src/browser/controls/tweaks-panel.js",
+        "packages/runtime/src/browser/controls/tweaks-model.js",
+        "packages/runtime/src/browser/controls/tweaks-store.js"
       ]
     },
     {
@@ -156,20 +156,20 @@
       "name": "Diagram",
       "reference": "generations/data/data.md",
       "starters": [
-        "packages/runtime/src/browser/chart.js",
-        "packages/runtime/src/browser/chart-stage.js",
-        "packages/runtime/src/browser/chart-libraries.js",
-        "packages/runtime/src/browser/data-overlay-controls.js",
-        "packages/runtime/src/browser/data-overlay-dom.js",
-        "packages/runtime/src/browser/data-overlay-geometry.js",
-        "packages/runtime/src/browser/data-overlay-layout.js",
-        "packages/runtime/src/browser/data-overlay-model.js",
-        "packages/runtime/src/browser/data-overlay-paint.js",
-        "packages/runtime/src/browser/data-overlay-runtime.js",
-        "packages/runtime/src/browser/data-overlay-style.js",
-        "packages/runtime/src/browser/data-overlay.js",
-        "packages/runtime/src/browser/geography-libraries.js",
-        "packages/runtime/src/browser/street-libraries.js"
+        "catalog/data/data-chart/chart.js",
+        "packages/runtime/src/browser/data/chart-stage.js",
+        "packages/runtime/src/browser/data/chart-libraries.js",
+        "packages/runtime/src/browser/data/data-overlay-controls.js",
+        "packages/runtime/src/browser/data/data-overlay-dom.js",
+        "packages/runtime/src/browser/data/data-overlay-geometry.js",
+        "packages/runtime/src/browser/data/data-overlay-layout.js",
+        "packages/runtime/src/browser/data/data-overlay-model.js",
+        "packages/runtime/src/browser/data/data-overlay-paint.js",
+        "packages/runtime/src/browser/data/data-overlay-runtime.js",
+        "packages/runtime/src/browser/data/data-overlay-style.js",
+        "packages/runtime/src/browser/data/data-overlay.js",
+        "packages/runtime/src/browser/data/geography-libraries.js",
+        "packages/runtime/src/browser/data/street-libraries.js"
       ],
       "catalog": ["data-chart"]
     },
@@ -178,11 +178,11 @@
       "name": "Flier",
       "reference": "generations/documents/documents.md",
       "starters": [
-        "packages/runtime/src/browser/document.js",
-        "packages/runtime/src/browser/document-runtime.js",
-        "packages/runtime/src/browser/document-model.js",
-        "packages/runtime/src/browser/document-style.js",
-        "packages/runtime/src/browser/document-print.js"
+        "catalog/documents/document-pages/document.js",
+        "packages/runtime/src/browser/documents/document-runtime.js",
+        "packages/runtime/src/browser/documents/document-model.js",
+        "packages/runtime/src/browser/documents/document-style.js",
+        "packages/runtime/src/browser/documents/document-print.js"
       ],
       "catalog": ["document-pages"]
     }

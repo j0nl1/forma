@@ -47,7 +47,7 @@ Custom units may use another format key and their own nominal dimensions. Severa
 
 ```sh
 node packages/cli/src/commands/build.mjs examples/campaign/main.jsx /absolute/project/campaign.bundle.js
-node packages/cli/src/commands/build.mjs packages/runtime/src/browser/plain-canvas.js /absolute/project/starters/plain-canvas.js
+node packages/cli/src/commands/build.mjs packages/runtime/src/browser/canvas/plain-canvas.js /absolute/project/starters/plain-canvas.js
 node packages/cli/src/commands/preview.mjs /absolute/project --tweaks-file campaign.html --image-file campaign.html
 node packages/cli/src/commands/export.mjs html /absolute/project/campaign.html /absolute/project/campaign-portable.html
 ```

@@ -297,7 +297,7 @@ test("3D source bundles locally and provides real model export controls", async 
     path.join(dir, "index.html"),
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/three-stage.js"),
+    path.join(root, "packages/runtime/src/browser/three-d/three-stage.js"),
     path.join(dir, "three-stage.bundle.js"),
   );
   const { server, url } = await serve(dir, 0);

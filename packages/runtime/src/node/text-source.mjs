@@ -48,7 +48,9 @@ export async function textSource(root, filename, token) {
   try {
     const output = path.join(folder, "editor.js");
     await bundle(
-      fileURLToPath(new URL("../browser/text-editor.js", import.meta.url)),
+      fileURLToPath(
+        new URL("../browser/editing/text-editor.js", import.meta.url),
+      ),
       output,
     );
     script = await fs.readFile(output);

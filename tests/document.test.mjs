@@ -14,11 +14,11 @@ import {
   pixels,
   geometry,
   printOptions,
-} from "../packages/runtime/src/browser/document-model.js";
+} from "../packages/runtime/src/browser/documents/document-model.js";
 async function fixture(t, content, attributes = "", style = "", before = "") {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/document.js"),
+    path.join(root, "catalog/documents/document-pages/document.js"),
     path.join(dir, "document.js"),
   );
   await fs.writeFile(
@@ -830,7 +830,7 @@ test("paper laboratory modes preserve named-paper geometry, panel order and nati
     path.join(dir, "documents.js"),
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/document.js"),
+    path.join(root, "catalog/documents/document-pages/document.js"),
     path.join(dir, "starters/document.js"),
   );
   const { server, url } = await serve(dir, 0);

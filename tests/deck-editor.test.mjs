@@ -1,3 +1,5 @@
+import { copyCatalogResource } from "./helpers.mjs";
+import { bundle } from "../packages/runtime/src/node/build.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -6,7 +8,6 @@ import path from "node:path";
 import { applyDeckSource } from "../packages/runtime/src/node/deck-source.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
-const starters = path.resolve("packages/runtime/src/browser");
 const notes =
   '<script id="speaker-notes" type="application/json">["One note","Two note","Three note","Four note"]</script>';
 const content =
@@ -16,7 +17,12 @@ const source = (body = content, head = "", tail = notes) =>
 async function fixture(t, html = source(), connected = false) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-deck-editor-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
-  await fs.cp(starters, path.join(dir, "starters"), { recursive: true });
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
+  if (html.includes("starters/image-slot.js"))
+    await bundle(
+      path.resolve("packages/runtime/src/browser/images/image-slot.js"),
+      path.join(dir, "starters/image-slot.js"),
+    );
   await fs.writeFile(path.join(dir, "deck.html"), html);
   const { server, url } = await serve(
     dir,

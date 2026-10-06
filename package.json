@@ -12,7 +12,7 @@
     "check": "node tools/validate.mjs",
     "test:browser": "node --test tests/browser.test.mjs",
     "install:skill": "node tools/install.mjs",
-    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'packages/**/*.{mjs,js,jsx,json}' 'skills/forma/scripts/*.mjs' 'catalog/**/*.json' package.json skills/forma/package.json skills/forma/project-types.json",
+    "format:check": "prettier --check 'tools/*.mjs' 'tests/*.mjs' 'packages/**/*.{mjs,js,jsx,json}' 'skills/forma/scripts/*.mjs' 'catalog/**/*.{json,js,jsx,css,html,md}' package.json skills/forma/package.json skills/forma/project-types.json",
     "catalog:site": "node tools/catalog-site.mjs"
   },
   "devDependencies": {

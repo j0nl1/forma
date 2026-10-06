@@ -17,7 +17,7 @@ import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   sourceAST,
   declarationContracts,
-} from "../packages/exports/src/lib/system-contracts.mjs";
+} from "../packages/design-systems/src/source/contracts.mjs";
 
 const declaration = `type Variant = 'soft' | 'solid';
 type Alias = Variant;

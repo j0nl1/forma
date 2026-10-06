@@ -9,7 +9,10 @@ import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 test("connected export UI reports real frame progress and cancels a pending renderer", async (t) => {
   const dir = await temporary(t),
-    runtime = path.join(root, "packages/runtime/src/browser/animations.jsx");
+    runtime = path.join(
+      root,
+      "packages/runtime/src/browser/motion/animations.jsx",
+    );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
     `import React from 'react';import {createRoot} from 'react-dom/client';import {CompositionStage,useFrameRenderer} from ${JSON.stringify(runtime)};function Art(){useFrameRenderer(ctx=>ctx.time>0?new Promise(()=>{}):undefined,{id:'pending'});return <div/>;}createRoot(document.getElementById('root')).render(<CompositionStage scenes={window.CODEX_SCENES} playback={window.CODEX_PLAYBACK} width={160} height={120} source autoplay={false}><Art/></CompositionStage>);`,

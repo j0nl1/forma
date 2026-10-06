@@ -41,7 +41,10 @@ for (const t of types.projectTypes)
   for (const relative of [t.reference, ...t.starters])
     if (
       !(await exists(
-        path.join(relative.startsWith("packages/") ? root : skill, relative),
+        path.join(
+          /^(?:packages|catalog)\//.test(relative) ? root : skill,
+          relative,
+        ),
       ))
     )
       issues.push(`Missing routed resource: ${relative}`);

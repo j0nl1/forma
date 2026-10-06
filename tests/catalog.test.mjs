@@ -41,7 +41,9 @@ test("catalog add copies complete module closures that bundle without the reposi
       custom: "keep",
     }),
   );
-  for (const item of await catalogList({ kind: "component" })) {
+  for (const item of (await catalogList()).filter(
+    (item) => item.kind !== "preset" && item.id !== "email",
+  )) {
     const result = await catalogAdd(item.id, project);
     await bundle(
       path.join(project, result.entry),
@@ -65,7 +67,12 @@ test("catalog add copies complete module closures that bundle without the reposi
     await fs.readFile(path.join(project, "design.json"), "utf8"),
   );
   assert.equal(metadata.custom, "keep");
-  assert.equal(metadata.assets.length, 5);
+  assert.equal(
+    metadata.assets.length,
+    (await catalogList()).filter(
+      (item) => item.kind !== "preset" && item.id !== "email",
+    ).length,
+  );
 });
 
 test("catalog dry runs and invalid metadata do not write project files", async (t) => {
@@ -160,6 +167,8 @@ test("catalog source inventory rejects symlinks before copying or evaluating sou
       targets: ["video"],
       tags: [],
       requirements: [],
+      parameters: { type: "object", properties: {} },
+      dependencies: [],
       entry: "source.js",
       files: [{ source: "source.js", target: "source.js" }],
     }),
@@ -179,4 +188,63 @@ test("catalog source inventory rejects symlinks before copying or evaluating sou
     /allowed root/,
   );
   assert.deepEqual(await fs.readdir(project), []);
+});
+
+test("every resource owns its manifest, primary source, usage and local preview", async () => {
+  const index = JSON.parse(
+    await fs.readFile(path.join(root, "catalog/index.json"), "utf8"),
+  );
+  for (const reference of index.items) {
+    const item = await catalogShow(reference.id);
+    const owned = "catalog/" + path.posix.dirname(reference.manifest) + "/";
+    assert.ok(
+      item.files
+        .find((file) => file.target === item.entry)
+        .source.startsWith(owned),
+    );
+    assert.ok(
+      item.files.some(
+        (file) =>
+          file.source === "catalog/" + reference.manifest &&
+          file.target === "manifest.json",
+      ),
+    );
+    assert.ok(item.files.some((file) => file.target === "README.md"));
+    assert.ok(item.files.some((file) => file.target === item.preview));
+    assert.equal(item.parameters.type, "object");
+    assert.ok(Array.isArray(item.dependencies));
+  }
+  assert.deepEqual((await catalogShow("native-composition")).dependencies, [
+    "video-lower-third",
+    "video-title",
+  ]);
+});
+
+test("portable source imports are rebased without editing quoted authored content or executing source", async (t) => {
+  const directory = await temporary(t);
+  await fs.writeFile(
+    path.join(directory, "source.js"),
+    'import { value } from "./value.js";\nconst caption=\'import "./untouched.js";\';\nthrow new Error("This source must never execute during copying");\n',
+  );
+  await fs.writeFile(
+    path.join(directory, "value.js"),
+    "export const value=7;\n",
+  );
+  const { resourceFiles } =
+    await import("../packages/catalog/src/resource-files.mjs");
+  const files = await resourceFiles(
+    {
+      files: [
+        { source: "source.js", target: "block.js" },
+        { source: "value.js", target: "dependencies/value.js" },
+      ],
+    },
+    { root: directory },
+  );
+  const copied = files
+    .find((file) => file.path === "block.js")
+    .bytes.toString();
+  assert.match(copied, /from "\.\/dependencies\/value.js"/);
+  assert.ok(copied.includes("caption='import \"./untouched.js\";'"));
+  assert.ok(copied.includes("This source must never execute during copying"));
 });

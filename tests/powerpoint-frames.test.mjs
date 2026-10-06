@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -22,11 +23,7 @@ export function frameFixture(
 }
 export async function frameDeck(t, slides) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const source = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Bounded compositing frames</title><style>body{margin:0}section{background:white}</style></head><body><deck-stage width="640" height="360">${slides}</deck-stage><script src="starters/deck.js"></script></body></html>`;
   await fs.writeFile(path.join(dir, "index.html"), source);
   const { server, url } = await serve(dir, 0);

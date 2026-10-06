@@ -2,7 +2,7 @@ import {
   printOptions,
   papers,
   pixels,
-} from "../../../runtime/src/browser/document-model.js";
+} from "../../../runtime/src/browser/documents/document-model.js";
 export async function renderPdf(page, output, options = {}) {
   const settings = printOptions(options),
     landscape = settings.orientation === "landscape";

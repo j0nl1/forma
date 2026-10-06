@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { chromium } from "playwright";
-import { createAudioPreview } from "../packages/runtime/src/browser/audio-plan.js";
+import { createAudioPreview } from "../packages/core/src/timeline/audio-plan.js";
 
 const makePlan = (
   media = {},
@@ -194,7 +194,7 @@ test("Chromium OfflineAudioContext renders the shared sample schedule with envel
   try {
     const page = await browser.newPage();
     const source = await fs.readFile(
-      new URL("../packages/runtime/src/browser/audio-plan.js", import.meta.url),
+      new URL("../packages/core/src/timeline/audio-plan.js", import.meta.url),
       "utf8",
     );
     const result = await page.evaluate(async (moduleSource) => {

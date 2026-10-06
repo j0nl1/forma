@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -10,11 +11,7 @@ const html =
   '<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0}section{background:white;color:#152f37;padding:40px;font:32px Arial}</style><deck-stage width="800" height="500"><section data-label="Opening"><h1>Opening</h1></section><section data-label="Details"><h1>Details</h1></section></deck-stage><script src="starters/deck.js"></script></html>';
 async function fixture(t) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.resolve("packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(path.join(dir, "deck.html"), html);
   const { server, url } = await serve(dir, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));

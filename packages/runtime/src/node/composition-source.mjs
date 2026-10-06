@@ -12,7 +12,7 @@ import {
   parseClipDocument,
   compileComposition,
   moveClip,
-} from "../browser/composition-model.js";
+} from "../../../core/src/timeline/composition-model.js";
 
 const histories = new Map();
 const hash = (source) => createHash("sha256").update(source).digest("hex");

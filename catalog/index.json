@@ -2,44 +2,84 @@
   "schemaVersion": 1,
   "items": [
     {
-      "id": "slide-deck",
-      "manifest": "items/slide-deck/item.json"
+      "id": "campaign",
+      "manifest": "interfaces/campaign/manifest.json"
+    },
+    {
+      "id": "platform-materials",
+      "manifest": "interfaces/platform-materials/manifest.json"
+    },
+    {
+      "id": "ios-frame",
+      "manifest": "interfaces/ios-frame/manifest.json"
+    },
+    {
+      "id": "android-frame",
+      "manifest": "interfaces/android-frame/manifest.json"
+    },
+    {
+      "id": "browser-window",
+      "manifest": "interfaces/browser-window/manifest.json"
     },
     {
       "id": "design-canvas",
-      "manifest": "items/design-canvas/item.json"
+      "manifest": "interfaces/design-canvas/manifest.json"
     },
     {
-      "id": "document-pages",
-      "manifest": "items/document-pages/item.json"
+      "id": "platforms",
+      "manifest": "interfaces/platforms/manifest.json"
     },
     {
-      "id": "data-chart",
-      "manifest": "items/data-chart/item.json"
-    },
-    {
-      "id": "native-composition",
-      "manifest": "items/native-composition/item.json"
+      "id": "macos-window",
+      "manifest": "interfaces/macos-window/manifest.json"
     },
     {
       "id": "audio-podcast",
-      "manifest": "items/audio-podcast/item.json"
+      "manifest": "audio/podcast/manifest.json"
     },
     {
       "id": "audio-explanation",
-      "manifest": "items/audio-explanation/item.json"
-    },
-    {
-      "id": "audio-video-narration",
-      "manifest": "items/audio-video-narration/item.json"
+      "manifest": "audio/explanation/manifest.json"
     },
     {
       "id": "audio-tutorial",
-      "manifest": "items/audio-tutorial/item.json"
+      "manifest": "audio/tutorial/manifest.json"
+    },
+    {
+      "id": "audio-video-narration",
+      "manifest": "audio/video-narration/manifest.json"
     },
     {
       "id": "audio-summary",
-      "manifest": "items/audio-summary/item.json"
+      "manifest": "audio/summary/manifest.json"
+    },
+    {
+      "id": "native-composition",
+      "manifest": "video/native-composition/manifest.json"
+    },
+    {
+      "id": "video-title",
+      "manifest": "video/title/manifest.json"
+    },
+    {
+      "id": "video-lower-third",
+      "manifest": "video/lower-third/manifest.json"
+    },
+    {
+      "id": "data-chart",
+      "manifest": "data/data-chart/manifest.json"
+    },
+    {
+      "id": "document-pages",
+      "manifest": "documents/document-pages/manifest.json"
+    },
+    {
+      "id": "email",
+      "manifest": "documents/email/manifest.json"
+    },
+    {
+      "id": "slide-deck",
+      "manifest": "slides/slide-deck/manifest.json"
     }
   ]
 }

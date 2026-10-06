@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { contained, write } from "../../../core/src/lib/files.mjs";
-import { validateCanvasState } from "../browser/canvas-model.js";
+import { validateCanvasState } from "../browser/canvas/canvas-model.js";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 export async function canvasSource(root, filename, token) {
   const html = contained(root, await fs.realpath(path.resolve(root, filename)));

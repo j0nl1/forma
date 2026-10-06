@@ -49,7 +49,7 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.resolve("packages/runtime/src/browser/street-libraries.js"),
+    path.resolve("packages/runtime/src/browser/data/street-libraries.js"),
     path.join(dir, "street.bundle.js"),
   );
   await fs.copyFile(

@@ -11,11 +11,11 @@ import {
   loadFig,
   renderDocument,
   select,
-} from "../packages/exports/src/lib/figma.mjs";
+} from "../packages/figma/src/decode/document.mjs";
 import {
   decodeVectorNetwork,
   vectorNetworkPaths,
-} from "../packages/exports/src/lib/figma-vector-network.mjs";
+} from "../packages/figma/src/render/vector-network.mjs";
 import {
   compile,
   preview,

@@ -8,10 +8,10 @@ From this repository:
 
 ```sh
 npm ci --ignore-scripts
-node packages/cli/src/commands/build.mjs packages/runtime/src/browser/three-stage.js /tmp/three-stage.bundle.js
+node packages/cli/src/commands/build.mjs packages/runtime/src/browser/three-d/three-stage.js /tmp/three-stage.bundle.js
 ```
 
-In an installed skill, run its `scripts/forma.mjs build` against its own `packages/runtime/src/browser/three-stage.js`. Load the resulting bundle before author code:
+In an installed skill, run its `scripts/forma.mjs build` against its own `packages/runtime/src/browser/three-d/three-stage.js`. Load the resulting bundle before author code:
 
 ```html
 <three-d-stage name="desk-lamp" background="#f0eee6" autorotate></three-d-stage>

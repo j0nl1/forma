@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -11,7 +12,7 @@ import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import { applyPptxMotion } from "../packages/exports/src/lib/pptx-motion.mjs";
-import { effects } from "../packages/runtime/src/browser/deck-effects.js";
+import { effects } from "../packages/runtime/src/browser/slides/deck-effects.js";
 
 const execute = promisify(execFile);
 const xml = (buffer, file = "ppt/slides/slide1.xml") =>
@@ -211,11 +212,7 @@ test("PowerPoint adds native builds beside existing media timing without replaci
 
 test("actual HTML export resolves grouped builds and static opt-out", async (t) => {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(
     path.join(dir, "index.html"),
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Native build fixture</title><style>body{margin:0}section{background:white}.target{position:absolute;left:100px;top:100px;width:250px;height:150px;background:#4488cc;color:white;font:24px Arial}.target span{display:block}</style></head><body><deck-stage width="800" height="500"><section><div class="target" data-anim="zoom-in" data-anim-trigger="click"><span>Editable first line</span><span>Editable second line</span></div></section><section><div class="target" data-anim="blinds-out" data-anim-trigger="click">Native filter</div></section></deck-stage><script src="starters/deck.js"></script></body></html>`,
@@ -240,11 +237,7 @@ test("actual HTML export resolves grouped builds and static opt-out", async (t) 
 
 async function affineFixture(t) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const simple = [
     ["spin", "transform-origin:0 0", "data-anim-rotate=90"],
     ["grow", "transform-origin:0 0", "data-anim-scale=1.5"],
@@ -283,7 +276,7 @@ async function affineFixture(t) {
     await page.emulateMedia({ media: "print" });
     return page.evaluate(async () => {
       const { parseEffect, effectFrames, effectOptions, buildSteps } =
-        await import("./starters/deck-effects.js");
+        await import("./starters/runtime/slides/deck-effects.js");
       return [...document.querySelector("deck-stage").slides].map((slide) => {
         const entries = [...slide.querySelectorAll("[data-anim]")].map(
           (element, documentIndex) => ({

@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -21,11 +22,7 @@ async function fixture(
   content = `<section style="background:#faf9f5"><h1>A real editable title</h1><p>Useful <b>bold</b> words.</p><ul><li>One visible bullet</li></ul><aside data-notes>Private presenter notes</aside></section><section data-deck-skip><h1>Skipped</h1></section><section style="background:#112233;color:white" data-speaker-notes="Final note"><h1>Final slide</h1><div data-anim="fade-in">Finished build</div><div style="background:linear-gradient(red,blue);width:100px;height:70px">Preserved artwork</div><img alt="Local mark" width="50" height="40" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='40'%3E%3Crect width='50' height='40' fill='green'/%3E%3C/svg%3E"></section>`,
 ) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(
     path.join(dir, "index.html"),
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PowerPoint fixture</title><style>body{margin:0}section{padding:30px;font:22px Arial}h1{font-size:40px;margin:0 0 15px}p{margin:0 0 10px}</style></head><body><deck-stage width="800" height="500">${content}</deck-stage><script src="starters/deck.js"></script></body></html>`,

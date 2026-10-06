@@ -30,7 +30,9 @@ export async function injectPlainCanvas(html) {
   if (!hasPlainCanvas(html)) return html;
   runtime ??= build({
     entryPoints: [
-      fileURLToPath(new URL("../browser/plain-canvas.js", import.meta.url)),
+      fileURLToPath(
+        new URL("../browser/canvas/plain-canvas.js", import.meta.url),
+      ),
     ],
     bundle: true,
     write: false,

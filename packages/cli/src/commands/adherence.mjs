@@ -2,8 +2,8 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { args, main, readJson } from "../../../core/src/lib/files.mjs";
-import { checkAdherence } from "../../../exports/src/adherence.mjs";
-export * from "../../../exports/src/adherence.mjs";
+import { checkAdherence } from "../../../design-systems/src/adherence/check.mjs";
+export * from "../../../design-systems/src/adherence/check.mjs";
 export async function run(argv = process.argv.slice(2)) {
   const { positional, flags } = args(argv, {
     "--strict": "boolean",

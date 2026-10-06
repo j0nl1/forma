@@ -11,7 +11,7 @@ import {
   validateDeckOperation,
   moveDeckItems,
   editDeckNotes,
-} from "../browser/deck-operations.js";
+} from "../browser/slides/deck-operations.js";
 const versionOf = (html) => createHash("sha256").update(html).digest("hex");
 const elements = (node) => [node, ...(node.childNodes ?? []).flatMap(elements)];
 const attr = (node, name) => node.attrs?.find((value) => value.name === name);

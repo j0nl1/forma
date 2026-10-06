@@ -6,7 +6,7 @@ import { temporary } from "./helpers.mjs";
 import {
   sourceAST,
   namedExports,
-} from "../packages/exports/src/lib/system-contracts.mjs";
+} from "../packages/design-systems/src/source/contracts.mjs";
 import {
   inspect,
   compile,

@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -7,16 +8,15 @@ import {
   reconcileCanvas,
   navigateFocus,
   validateCanvasState,
-} from "../packages/runtime/src/browser/canvas-model.js";
+} from "../packages/runtime/src/browser/canvas/canvas-model.js";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 import { bundle } from "../packages/cli/src/commands/build.mjs";
-const starters = path.resolve("packages/runtime/src/browser");
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>body{margin:0}design-canvas{height:100vh}article{padding:20px;background:#e6eed9;font:20px Georgia;height:180px;box-sizing:border-box}</style></head><body><design-canvas id="study"><design-section id="reading" title="Reading" subtitle="Compare reading density"><design-board id="a" label="Calm" width="240" height="180"><article>One clear collection<button onclick="this.textContent='Opened'">Open</button></article></design-board><design-board id="b" label="Dense" width="240" height="180"><article>Everything within reach</article></design-board><design-note top="-10" left="540" rotate="4" width="160">Keep the collection easy to scan.</design-note></design-section><design-section id="empty" title="Empty"></design-section><design-section id="writing" title="Writing"><design-board id="a" label="Draft" width="240" height="180"><article>A space to write.</article></design-board></design-section></design-canvas><script src="starters/canvas.js"></script></body></html>`;
 async function fixture(t, source = html, options = {}) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-canvas-test-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
-  await fs.cp(starters, path.join(dir, "starters"), { recursive: true });
+  await copyCatalogResource("design-canvas", path.join(dir, "starters"));
   await fs.writeFile(path.join(dir, "canvas.html"), source);
   const { server, url } = await serve(dir, 0, options);
   t.after(() => new Promise((resolve) => server.close(resolve)));
@@ -422,7 +422,7 @@ test("React canvas preserves authoring APIs, focus portals and dynamic source re
   const entry = path.join(dir, "main.jsx");
   await fs.writeFile(
     entry,
-    `import React,{useState} from '${path.resolve("node_modules/react/index.js")}';import{createRoot}from'${path.resolve("node_modules/react-dom/client.js")}';import{DesignCanvas,DCSection,DCArtboard,DCPostIt}from'${starters}/canvas-components.jsx';function Counter(){const[n,set]=useState(0);return <button onClick={()=>set(n+1)}>Count {n}</button>}function App(){const[extra,set]=useState(false);return <><button id="add" onClick={()=>set(true)}>Add source board</button><DesignCanvas id="react"><><DCSection id="section" title="React options"><DCArtboard id="a" label="Counter" width={240} height={180}><Counter/></DCArtboard><DCArtboard id="b" label="Text" width={240} height={180}><p>Text direction</p></DCArtboard>{extra&&<DCArtboard id="c" label="New" width={240} height={180}><p>New source direction</p></DCArtboard>}<DCPostIt top={-10} left={530}>A source note</DCPostIt></DCSection></></DesignCanvas></>}createRoot(document.getElementById('root')).render(<App/>);`,
+    `import React,{useState} from '${path.resolve("node_modules/react/index.js")}';import{createRoot}from'${path.resolve("node_modules/react-dom/client.js")}';import{DesignCanvas,DCSection,DCArtboard,DCPostIt}from'${path.resolve("catalog/interfaces/design-canvas/canvas-components.jsx")}';function Counter(){const[n,set]=useState(0);return <button onClick={()=>set(n+1)}>Count {n}</button>}function App(){const[extra,set]=useState(false);return <><button id="add" onClick={()=>set(true)}>Add source board</button><DesignCanvas id="react"><><DCSection id="section" title="React options"><DCArtboard id="a" label="Counter" width={240} height={180}><Counter/></DCArtboard><DCArtboard id="b" label="Text" width={240} height={180}><p>Text direction</p></DCArtboard>{extra&&<DCArtboard id="c" label="New" width={240} height={180}><p>New source direction</p></DCArtboard>}<DCPostIt top={-10} left={530}>A source note</DCPostIt></DCSection></></DesignCanvas></>}createRoot(document.getElementById('root')).render(<App/>);`,
   );
   await bundle(entry, path.join(dir, "bundle.js"));
   await fs.writeFile(

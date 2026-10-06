@@ -15,7 +15,7 @@ import {
   cssURLs,
   cssImport,
   rewriteCSSURLs,
-} from "../packages/runtime/src/browser/font-css.js";
+} from "../packages/runtime/src/browser/shared/font-css.js";
 import { fontRequestAllowed } from "../packages/runtime/src/node/font-network.mjs";
 
 test("font CSS handles escaped URLs and nested import conditions without treating strings or comments as requests", async () => {
@@ -116,7 +116,7 @@ async function setup(
   );
   const runtime = path.join(
     root,
-    "packages/runtime/src/browser/animations.jsx",
+    "packages/runtime/src/browser/motion/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
@@ -449,7 +449,7 @@ test("remote grants exclude scripts and unconfigured redirect targets, while ord
 test("the pinned default Inter is offline and retains an explicitly authored Inter face", async (t) => {
   const bundled = await fs.readFile(
     new URL(
-      "../packages/runtime/src/browser/fonts/inter-medium.woff2",
+      "../packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
       import.meta.url,
     ),
   );
@@ -459,7 +459,10 @@ test("the pinned default Inter is offline and retains an explicitly authored Int
   );
   assert.match(
     await fs.readFile(
-      new URL("../packages/runtime/src/browser/fonts/OFL.txt", import.meta.url),
+      new URL(
+        "../packages/runtime/src/browser/shared/fonts/OFL.txt",
+        import.meta.url,
+      ),
       "utf8",
     ),
     /SIL OPEN FONT LICENSE Version 1.1/,

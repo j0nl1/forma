@@ -15,7 +15,9 @@
     "@forma/runtime": "1.0.0",
     "@forma/media": "1.0.0",
     "@forma/exports": "1.0.0",
-    "@forma/catalog": "1.0.0"
+    "@forma/catalog": "1.0.0",
+    "@forma/design-systems": "1.0.0",
+    "@forma/figma": "1.0.0"
   },
   "bin": {
     "forma": "src/index.mjs"

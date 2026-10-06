@@ -19,8 +19,8 @@ import {
   reactRuntime,
   usesBrowserReact,
   rewriteCardGlobals,
-} from "../packages/exports/src/lib/system-authoring.mjs";
-import { sourceAST } from "../packages/exports/src/lib/system-contracts.mjs";
+} from "../packages/design-systems/src/compiler/authoring.mjs";
+import { sourceAST } from "../packages/design-systems/src/source/contracts.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 

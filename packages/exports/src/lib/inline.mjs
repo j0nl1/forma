@@ -8,7 +8,7 @@ import { safeFile, contained } from "../../../core/src/lib/files.mjs";
 import {
   IMAGE_STATE_FILE,
   IMAGE_LEGACY_FILE,
-} from "../../../runtime/src/browser/image-model.js";
+} from "../../../runtime/src/browser/images/image-model.js";
 const MIME = {
   ".json": "application/json",
   ".js": "text/javascript",

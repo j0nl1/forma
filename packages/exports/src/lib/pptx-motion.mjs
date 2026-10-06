@@ -2,7 +2,7 @@ import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
 import {
   parseEffect,
   buildSteps,
-} from "../../../runtime/src/browser/deck-effects.js";
+} from "../../../runtime/src/browser/slides/deck-effects.js";
 
 import {
   families,

@@ -8,7 +8,7 @@ import { bundle } from "../packages/cli/src/commands/build.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
-const starters = path.join(root, "packages/runtime/src/browser");
+const starters = path.join(root, "packages/runtime/src/browser/interfaces");
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(

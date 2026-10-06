@@ -6,7 +6,7 @@ Use `post-card.js` with its runtime and `social-model.js` / `social-dom.js` comp
 
 ```sh
 node packages/cli/src/commands/build.mjs \
-  packages/runtime/src/browser/social.js /absolute/project/social.bundle.js
+  packages/runtime/src/browser/interfaces/social.js /absolute/project/social.bundle.js
 ```
 
 ## Feed card

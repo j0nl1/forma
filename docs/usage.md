@@ -30,7 +30,7 @@ Provide timeline controls, inspect scene boundaries, and export MP4 with marked 
 
 For follow-up changes, refer to the same artifact. Canvas, motion, deck, literal-text and typed tweak editors support their documented persistence and opted-in project saves. The older native CSS controls remain session-only.
 
-For an HTML email, follow the [email recipe](../skills/forma/generations/documents/email.md) and copy `packages/runtime/src/browser/email.html` from the installed skill. Supply the actual destinations and sender/footer details. The showcase's `starters/email.html` demonstrates the table-based template; browser preview is one check, and actual target email-client rendering remains required before describing delivery readiness.
+For an HTML email, follow the [email recipe](../skills/forma/generations/documents/email.md) and copy `catalog/documents/email/email.html` from the installed skill. Supply the actual destinations and sender/footer details. The showcase's `starters/email.html` demonstrates the table-based template; browser preview is one check, and actual target email-client rendering remains required before describing delivery readiness.
 
 ## Preview and verify
 
@@ -177,7 +177,7 @@ Video duplicate-frame warnings require at least eight captured frames and more t
 
 ```sh
 node packages/cli/src/commands/build.mjs /path/to/app.jsx /path/to/app.bundle.js
-node packages/cli/src/commands/build.mjs packages/runtime/src/browser/three-stage.js /tmp/three-stage.bundle.js
+node packages/cli/src/commands/build.mjs packages/runtime/src/browser/three-d/three-stage.js /tmp/three-stage.bundle.js
 ```
 
 Load the bundle as a classic script. To try the full 3D contract, copy `examples/objects.html` and `examples/objects.js` alongside the generated bundle in the temporary folder and serve it. The [3D guide](../skills/forma/generations/video/three-dimensional.md) explains readiness, meter-scale authoring, studio lighting, camera gestures and actual GLB / OBJ + MTL exports. The earlier `examples/three.html` remains compatible.

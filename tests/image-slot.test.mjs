@@ -14,11 +14,11 @@ import {
   framing,
   zoomAt,
   resizeCorner,
-} from "../packages/runtime/src/browser/image-model.js";
+} from "../packages/runtime/src/browser/images/image-model.js";
 import {
   unsplash,
   creditUrl,
-} from "../packages/runtime/src/browser/image-credit.js";
+} from "../packages/runtime/src/browser/images/image-credit.js";
 const svg = (color) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100"><rect width="400" height="100" fill="${color}"/></svg>`)}`;
 const author = svg("#365bcf");
@@ -35,12 +35,12 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/image-slot.js"),
+    path.join(root, "packages/runtime/src/browser/images/image-slot.js"),
     path.join(dir, "image-slot.js"),
   );
   if (deck)
     await bundle(
-      path.join(root, "packages/runtime/src/browser/deck.js"),
+      path.join(root, "catalog/slides/slide-deck/deck.js"),
       path.join(dir, "deck.js"),
     );
   await fs.writeFile(

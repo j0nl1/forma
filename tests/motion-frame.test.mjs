@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
-import { createFrameController } from "../packages/runtime/src/browser/motion-frame.js";
+import { createFrameController } from "../packages/runtime/src/browser/motion/motion-frame.js";
 import { temporary } from "./helpers.mjs";
 import { bundle } from "../packages/cli/src/commands/build.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
@@ -45,7 +45,10 @@ test("frame completion rejects stale paints, changed participants, detached root
 async function fixture(t, body) {
   const dir = await temporary(t);
   const animations = fileURLToPath(
-    new URL("../packages/runtime/src/browser/animations.jsx", import.meta.url),
+    new URL(
+      "../packages/runtime/src/browser/motion/animations.jsx",
+      import.meta.url,
+    ),
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),

@@ -10,11 +10,11 @@ import { withPage } from "../packages/media/src/lib/browser.mjs";
 async function fixture(t, { libraries = true } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/chart-libraries.js"),
+    path.join(root, "packages/runtime/src/browser/data/chart-libraries.js"),
     path.join(dir, "libraries.js"),
   );
   await fs.copyFile(
-    path.join(root, "packages/runtime/src/browser/chart-stage.js"),
+    path.join(root, "packages/runtime/src/browser/data/chart-stage.js"),
     path.join(dir, "stage.js"),
   );
   await fs.writeFile(

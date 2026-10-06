@@ -12,7 +12,7 @@ import {
   campaignDefaults,
   campaignFormats,
   validateCampaignUnits,
-} from "../packages/runtime/src/browser/campaign-model.js";
+} from "../packages/runtime/src/browser/interfaces/campaign-model.js";
 const keys = [
   "instagramPost",
   "instagramPortrait",
@@ -62,13 +62,14 @@ async function fixture(
         'import portrait from "../social/portrait.svg";',
         `const portrait = ${JSON.stringify(blue)};`,
       )
+      .replaceAll('"../../catalog/', `"${path.join(root, "catalog")}/`)
       .replaceAll('"../../packages/', `"${path.join(root, "packages")}/`);
     entry = path.join(dir, "solid.jsx");
     await fs.writeFile(entry, authored);
   }
   await bundle(entry, path.join(dir, "campaign.bundle.js"));
   await bundle(
-    path.join(root, "packages/runtime/src/browser/plain-canvas.js"),
+    path.join(root, "packages/runtime/src/browser/canvas/plain-canvas.js"),
     path.join(dir, "starters/plain-canvas.js"),
   );
   if (portable) {

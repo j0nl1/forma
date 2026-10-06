@@ -7,7 +7,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
 import { contained } from "../../../core/src/lib/files.mjs";
-import { tweakValues, mergeTweaks } from "../browser/tweaks-model.js";
+import { tweakValues, mergeTweaks } from "../browser/controls/tweaks-model.js";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 export function tweakBinding(html) {
   const candidates = [];

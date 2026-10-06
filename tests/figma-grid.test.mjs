@@ -10,9 +10,9 @@ import {
   loadFig,
   renderDocument,
   select,
-} from "../packages/exports/src/lib/figma.mjs";
-import { applyNodeLayout } from "../packages/exports/src/lib/figma-layout.mjs";
-import { gridTemplate } from "../packages/exports/src/lib/figma-grid.mjs";
+} from "../packages/figma/src/decode/document.mjs";
+import { applyNodeLayout } from "../packages/figma/src/render/layout.mjs";
+import { gridTemplate } from "../packages/figma/src/render/grid.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import {
   compile,

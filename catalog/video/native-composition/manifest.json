@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "id": "native-composition",
+  "kind": "template",
+  "description": "A native motion stage with typed clips and scheduled audio.",
+  "targets": ["video"],
+  "tags": ["component", "video"],
+  "entry": "composition.jsx",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/video/lower-third/README.md",
+      "target": "dependencies/video-lower-third/README.md"
+    },
+    {
+      "source": "catalog/video/lower-third/lower-third.jsx",
+      "target": "dependencies/video-lower-third/lower-third.jsx"
+    },
+    {
+      "source": "catalog/video/lower-third/manifest.json",
+      "target": "dependencies/video-lower-third/manifest.json"
+    },
+    {
+      "source": "catalog/video/lower-third/preview.html",
+      "target": "dependencies/video-lower-third/preview.html"
+    },
+    {
+      "source": "catalog/video/lower-third/preview.jsx",
+      "target": "dependencies/video-lower-third/preview.jsx"
+    },
+    {
+      "source": "catalog/video/lower-third/styles.css",
+      "target": "dependencies/video-lower-third/styles.css"
+    },
+    {
+      "source": "catalog/video/native-composition/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/video/native-composition/composition.jsx",
+      "target": "composition.jsx"
+    },
+    {
+      "source": "catalog/video/native-composition/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/video/native-composition/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/video/native-composition/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "catalog/video/title/README.md",
+      "target": "dependencies/video-title/README.md"
+    },
+    {
+      "source": "catalog/video/title/manifest.json",
+      "target": "dependencies/video-title/manifest.json"
+    },
+    {
+      "source": "catalog/video/title/preview.html",
+      "target": "dependencies/video-title/preview.html"
+    },
+    {
+      "source": "catalog/video/title/preview.jsx",
+      "target": "dependencies/video-title/preview.jsx"
+    },
+    {
+      "source": "catalog/video/title/styles.css",
+      "target": "dependencies/video-title/styles.css"
+    },
+    {
+      "source": "catalog/video/title/title.jsx",
+      "target": "dependencies/video-title/title.jsx"
+    },
+    {
+      "source": "packages/core/src/timeline/audio-plan.js",
+      "target": "runtime/timeline/audio-plan.js"
+    },
+    {
+      "source": "packages/core/src/timeline/composition-model.js",
+      "target": "runtime/timeline/composition-model.js"
+    },
+    {
+      "source": "packages/core/src/timeline/motion-model.js",
+      "target": "runtime/timeline/motion-model.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/animations.jsx",
+      "target": "runtime/motion/animations.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/composition-components.jsx",
+      "target": "runtime/motion/composition-components.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/motion-export.jsx",
+      "target": "runtime/motion/motion-export.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/motion-fonts.js",
+      "target": "runtime/motion/motion-fonts.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/motion-frame.js",
+      "target": "runtime/motion/motion-frame.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/scene-components.jsx",
+      "target": "runtime/motion/scene-components.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/watercolor-components.jsx",
+      "target": "runtime/motion/watercolor-components.jsx"
+    },
+    {
+      "source": "packages/runtime/src/browser/motion/watercolor-kit.js",
+      "target": "runtime/motion/watercolor-kit.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/shared/font-css.js",
+      "target": "runtime/shared/font-css.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/shared/fonts/OFL.txt",
+      "target": "runtime/shared/fonts/OFL.txt"
+    },
+    {
+      "source": "packages/runtime/src/browser/shared/fonts/README.md",
+      "target": "runtime/shared/fonts/README.md"
+    },
+    {
+      "source": "packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
+      "target": "runtime/shared/fonts/inter-medium.woff2"
+    }
+  ],
+  "requirements": ["browser", "node-bundle"],
+  "license": "MIT",
+  "guide": "generations/video/composition.md",
+  "preview": "preview.html",
+  "export": "NativeComposition",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "default": "Turn ideas into media",
+        "description": "Opening title."
+      },
+      "subtitle": {
+        "type": "string",
+        "default": "Build a complete thought, then give it motion",
+        "description": "Supporting line."
+      },
+      "presenter": {
+        "type": "string",
+        "default": "Alex Morgan",
+        "description": "Presenter name."
+      },
+      "accent": {
+        "type": "string",
+        "default": "#397758",
+        "description": "Accent color."
+      },
+      "duration": {
+        "type": "number",
+        "default": 8,
+        "description": "Composition duration in seconds."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": ["video-lower-third", "video-title"],
+  "previewEntry": "preview.jsx"
+}

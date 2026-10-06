@@ -389,7 +389,7 @@ test("local editor exports and downloads a real audio stream with an explicit mu
   const { dir } = await setup(t, []);
   const runtime = path.join(
     root,
-    "packages/runtime/src/browser/animations.jsx",
+    "packages/runtime/src/browser/motion/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "entry.jsx"),

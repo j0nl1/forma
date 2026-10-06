@@ -12,7 +12,7 @@ async function fixture(t, bar) {
   const react = path.resolve("node_modules/react/index.js");
   const dom = path.resolve("node_modules/react-dom/client.js");
   const hooks = path.resolve(
-    "packages/runtime/src/browser/tweaks-suggestions.jsx",
+    "packages/runtime/src/browser/controls/tweaks-suggestions.jsx",
   );
   const authored = bar ? ["Add 🚀 spacing"] : ["A🚀B", "Tune 🚀"];
   const timing = {

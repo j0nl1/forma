@@ -10,7 +10,7 @@ Bundle `social.js` for all currently implemented social components and actual PN
 
 ```sh
 node packages/cli/src/commands/build.mjs \
-  packages/runtime/src/browser/x-shell.js /absolute/project/x.bundle.js
+  packages/runtime/src/browser/interfaces/x-shell.js /absolute/project/x.bundle.js
 ```
 
 ```html

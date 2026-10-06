@@ -10,13 +10,13 @@ import {
   loadFig,
   renderDocument,
   select,
-} from "../packages/exports/src/lib/figma.mjs";
+} from "../packages/figma/src/decode/document.mjs";
 import {
   applyNodeLayout,
   axisHugsContent,
   counterStretches,
   layoutChildrenStretched,
-} from "../packages/exports/src/lib/figma-layout.mjs";
+} from "../packages/figma/src/render/layout.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import {
   compile,

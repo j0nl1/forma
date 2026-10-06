@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -271,11 +272,7 @@ test("PowerPoint fonts reject malformed data, forbidden permissions, variable fo
 
 test("PowerPoint uses explicit font snapshots in Chromium and packages all editable variants", async (t) => {
   const { dir, paths } = await fontFixture(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   await fs.writeFile(
     path.join(dir, "index.html"),
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Portable fonts</title><style>body{margin:0}section{padding:30px;font:25px "Source Alias",sans-serif}h1{font-size:38px}</style></head><body><deck-stage width="800" height="500"><section><h1>Portable editable heading</h1><p>Regular <b>bold</b> <i>italic</i> <b><i>bold italic</i></b></p></section></deck-stage><script src="starters/deck.js"></script></body></html>`,

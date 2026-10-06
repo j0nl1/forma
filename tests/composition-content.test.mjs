@@ -9,7 +9,7 @@ import { bundle } from "../packages/cli/src/commands/build.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
-import { captionFrame } from "../packages/runtime/src/browser/motion-model.js";
+import { captionFrame } from "../packages/core/src/timeline/motion-model.js";
 
 const near = (actual, expected, tolerance = 1e-8) =>
   assert.ok(
@@ -98,7 +98,7 @@ async function setup(t, { media = false } = {}) {
   const dir = await temporary(t);
   const runtime = path.join(
     root,
-    "packages/runtime/src/browser/animations.jsx",
+    "packages/runtime/src/browser/motion/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
@@ -431,7 +431,7 @@ test("real encoded caption frames retain the authored fade envelope and explicit
   const { dir, url } = await setup(t);
   await fs.copyFile(
     new URL(
-      "../packages/runtime/src/browser/fonts/inter-medium.woff2",
+      "../packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
       import.meta.url,
     ),
     path.join(dir, "inter-medium.woff2"),

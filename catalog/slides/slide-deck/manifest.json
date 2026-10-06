@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "slide-deck",
+  "kind": "component",
+  "description": "An editable deck with builds, notes and local controls.",
+  "targets": ["slides"],
+  "tags": ["component", "slides"],
+  "entry": "deck.js",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/slides/slide-deck/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/slides/slide-deck/deck.js",
+      "target": "deck.js"
+    },
+    {
+      "source": "catalog/slides/slide-deck/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/slides/slide-deck/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/slides/slide-deck/preview.js",
+      "target": "preview.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-builds.js",
+      "target": "runtime/slides/deck-builds.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-editor.js",
+      "target": "runtime/slides/deck-editor.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-effects.js",
+      "target": "runtime/slides/deck-effects.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-labels.js",
+      "target": "runtime/slides/deck-labels.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-masks.js",
+      "target": "runtime/slides/deck-masks.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-operations.js",
+      "target": "runtime/slides/deck-operations.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-runtime.js",
+      "target": "runtime/slides/deck-runtime.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/slides/deck-thumbnails.js",
+      "target": "runtime/slides/deck-thumbnails.js"
+    }
+  ],
+  "requirements": ["browser"],
+  "preview": "preview.html",
+  "license": "MIT",
+  "guide": "generations/slides/slides.md",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "default": "One clear idea",
+        "description": "Opening slide heading, authored in HTML."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.js"
+}

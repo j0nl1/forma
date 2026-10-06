@@ -14,15 +14,15 @@ import {
   attributeName,
   closestMetric,
   triple,
-} from "../packages/runtime/src/browser/data-overlay-model.js";
+} from "../packages/runtime/src/browser/data/data-overlay-model.js";
 import {
   linearOf,
   ownLinear,
   mulLin,
   quadOffset,
   cornerRad,
-} from "../packages/runtime/src/browser/data-overlay-geometry.js";
-import { layoutCallouts } from "../packages/runtime/src/browser/data-overlay-layout.js";
+} from "../packages/runtime/src/browser/data/data-overlay-geometry.js";
+import { layoutCallouts } from "../packages/runtime/src/browser/data/data-overlay-layout.js";
 const data = {
   suggest: { window: ["last 28 days", "weekends only", "last 24 hours"] },
   views: [
@@ -95,7 +95,7 @@ const data = {
 async function fixture(t, { src = "", contents = data } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/data-overlay.js"),
+    path.join(root, "packages/runtime/src/browser/data/data-overlay.js"),
     path.join(dir, "overlay.js"),
   );
   await fs.writeFile(path.join(dir, "data.json"), JSON.stringify(contents));

@@ -12,7 +12,7 @@ import {
   postPlatforms,
   nominalFrame,
   assetName,
-} from "../packages/runtime/src/browser/social-model.js";
+} from "../packages/runtime/src/browser/interfaces/social-model.js";
 const photo =
   "data:image/svg+xml," +
   encodeURIComponent(
@@ -21,7 +21,7 @@ const photo =
 async function fixture(t, html, options = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/social.js"),
+    path.join(root, "packages/runtime/src/browser/interfaces/social.js"),
     path.join(dir, "app.js"),
   );
   const file = path.join(dir, "index.html");
@@ -499,7 +499,7 @@ test("portable social runtime survives source removal and React conditional boar
   const entry = path.join(dir, "react.jsx");
   await fs.writeFile(
     entry,
-    `import React from 'react';import{createRoot}from'react-dom/client';import ${JSON.stringify(path.join(root, "packages/runtime/src/browser/social.js"))};const root=createRoot(document.getElementById('app'));window.renderBoard=flag=>root.render(<social-frames id="board"><div><post-card name="Studio"><div className="asset" data-codex-frame-export="" data-codex-frame-label="One · 600×400"><input id="live" aria-label="React draft"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>React action</button></div></post-card></div>{flag&&<div><div className="asset" data-codex-frame-export="" data-codex-frame-label="Two · 600×400"/></div>}</social-frames>);renderBoard(true);`,
+    `import React from 'react';import{createRoot}from'react-dom/client';import ${JSON.stringify(path.join(root, "packages/runtime/src/browser/interfaces/social.js"))};const root=createRoot(document.getElementById('app'));window.renderBoard=flag=>root.render(<social-frames id="board"><div><post-card name="Studio"><div className="asset" data-codex-frame-export="" data-codex-frame-label="One · 600×400"><input id="live" aria-label="React draft"/><button onClick={()=>window.clicked=(window.clicked||0)+1}>React action</button></div></post-card></div>{flag&&<div><div className="asset" data-codex-frame-export="" data-codex-frame-label="Two · 600×400"/></div>}</social-frames>);renderBoard(true);`,
   );
   await bundle(entry, path.join(dir, "react.js"));
   await fs.writeFile(
@@ -593,7 +593,7 @@ test("actual shadow-local font declarations survive portable snapshot export wit
   );
   await fs.writeFile(path.join(dir, "face.ttf"), font);
   await fs.copyFile(
-    path.join(root, "packages/runtime/src/browser/canvas-export.js"),
+    path.join(root, "packages/runtime/src/browser/canvas/canvas-export.js"),
     path.join(dir, "capture.js"),
   );
   await withPage(url, async (page) => {

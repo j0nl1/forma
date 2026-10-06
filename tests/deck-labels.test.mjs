@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -5,7 +6,7 @@ import path from "node:path";
 import { temporary } from "./helpers.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
-import { slideLabel } from "../packages/runtime/src/browser/deck-labels.js";
+import { slideLabel } from "../packages/runtime/src/browser/slides/deck-labels.js";
 
 const longTitle = "A deliberately long heading describing quarterly growth";
 const names = [
@@ -20,11 +21,7 @@ const names = [
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0}section{background:white;color:#152f37;padding:40px;font:32px Arial}</style><deck-stage width="800" height="500"><section id="chart" data-screen-label="09 Revenue"><div>Quarterly chart</div></section><section id="audience" data-label=""><h2>Audience</h2></section><section id="conversion"><div data-title>Conversion</div></section><section id="explicit" data-label="Budget" data-screen-label="11 Ignored"><h2>Costs</h2></section><section id="empty"><h2> </h2></section><section id="long"><h2> ${longTitle} </h2></section><section id="number" data-screen-label="09"><div>Number-only title</div></section></deck-stage><script src="starters/deck.js"></script></html>`;
 async function fixture(t, connected = false) {
   const dir = await temporary(t);
-  await fs.cp(
-    path.resolve("packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const file = path.join(dir, "deck.html");
   await fs.writeFile(file, html);
   const { server, url } = await serve(

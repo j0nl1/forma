@@ -11,8 +11,18 @@ test("package dependencies follow the acyclic ownership graph and keep browser s
     runtime: ["core"],
     media: ["core", "runtime"],
     exports: ["core", "runtime", "media"],
-    catalog: ["core"],
-    cli: ["core", "runtime", "media", "exports", "catalog"],
+    "design-systems": ["core", "runtime", "exports"],
+    figma: ["core", "runtime"],
+    catalog: ["core", "runtime"],
+    cli: [
+      "core",
+      "runtime",
+      "media",
+      "exports",
+      "design-systems",
+      "figma",
+      "catalog",
+    ],
   };
   for (const [owner, dependencies] of Object.entries(allowed)) {
     const directory = path.join(root, "packages", owner);

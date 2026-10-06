@@ -37,7 +37,9 @@ export async function injectFixedSheet(html) {
   if (!needsFixedSheet(html)) return html;
   runtime ??= build({
     entryPoints: [
-      fileURLToPath(new URL("../browser/fixed-sheet.js", import.meta.url)),
+      fileURLToPath(
+        new URL("../browser/documents/fixed-sheet.js", import.meta.url),
+      ),
     ],
     bundle: true,
     write: false,

@@ -48,11 +48,11 @@ async function fixture(t, { browser = false, includeClips = true } = {}) {
   if (browser) {
     const runtime = path.join(
       root,
-      "packages/runtime/src/browser/animations.jsx",
+      "packages/runtime/src/browser/motion/animations.jsx",
     );
     const composition = path.join(
       root,
-      "packages/runtime/src/browser/composition-components.jsx",
+      "packages/runtime/src/browser/motion/composition-components.jsx",
     );
     await fs.writeFile(
       path.join(dir, "entry.jsx"),

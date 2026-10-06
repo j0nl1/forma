@@ -48,12 +48,23 @@ export async function catalogList(
     if (
       item.id !== reference.id ||
       item.schemaVersion !== 1 ||
-      !["component", "template", "preset"].includes(item.kind) ||
+      !["primitive", "component", "template", "preset"].includes(item.kind) ||
       typeof item.description !== "string" ||
       !Array.isArray(item.targets) ||
       !Array.isArray(item.tags) ||
       !Array.isArray(item.requirements) ||
-      !Array.isArray(item.files)
+      !Array.isArray(item.files) ||
+      !item.parameters ||
+      item.parameters.type !== "object" ||
+      !item.parameters.properties ||
+      typeof item.parameters.properties !== "object" ||
+      Array.isArray(item.parameters.properties) ||
+      !Array.isArray(item.dependencies) ||
+      item.dependencies.some(
+        (id) =>
+          !identifier(id) ||
+          !index.items.some((reference) => reference.id === id),
+      )
     )
       throw new Error(`Invalid catalog item: ${reference.id}`);
     if (
@@ -88,13 +99,34 @@ export async function catalogShow(id, paths = distributionPaths()) {
     names.add(file.target);
     await safeFile(paths.root, relative(file.source));
   }
-  if (item.kind !== "preset" && (!item.entry || !names.has(item.entry)))
+  if (!item.entry || !names.has(item.entry))
     throw new Error("Catalog entry is not in its file closure");
+  const entry = item.files.find((file) => file.target === item.entry);
+  const resourceDirectory = path.posix.dirname(reference.manifest);
+  if (
+    !entry.source.startsWith("catalog/" + resourceDirectory + "/") ||
+    !item.files.some(
+      (file) =>
+        file.source === "catalog/" + reference.manifest &&
+        file.target === "manifest.json",
+    )
+  )
+    throw new Error("Catalog resources must own their entry and manifest");
+  if (!item.preview || !names.has(item.preview))
+    throw new Error("Catalog resource has no local preview");
   if (item.guide) {
     item.instructions = await fs.readFile(
       await safeFile(paths.skill, relative(item.guide)),
       "utf8",
     );
+  }
+  if (!item.instructions) {
+    const readme = item.files.find((file) => file.target === "README.md");
+    if (readme)
+      item.instructions = await fs.readFile(
+        await safeFile(paths.root, readme.source),
+        "utf8",
+      );
   }
   return item;
 }
@@ -116,11 +148,11 @@ export async function catalogAdd(
   }
   if (await exists(destination))
     throw new Error(`Catalog destination exists: ${relativeDirectory}`);
-  const files = [];
-  for (const file of item.files) {
-    const bytes = await fs.readFile(await safeFile(paths.root, file.source));
-    files.push({ path: file.target, bytes, sha256: digest(bytes) });
-  }
+  const { resourceFiles } = await import("./resource-files.mjs");
+  const files = (await resourceFiles(item, paths)).map((file) => ({
+    ...file,
+    sha256: digest(file.bytes),
+  }));
   if (item.kind === "preset") {
     const seen = new Set();
     const copyGuide = async (name) => {

@@ -7,7 +7,7 @@ import {
   IMAGE_STATE_FILE,
   IMAGE_LEGACY_FILE,
   imageValue,
-} from "../browser/image-model.js";
+} from "../browser/images/image-model.js";
 export async function readImageState(root, directory) {
   if (contained(root, await fs.realpath(directory)) !== directory)
     throw new Error("Image state directory changed.");

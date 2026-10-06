@@ -6,7 +6,7 @@ import {
   textKey,
   escapedText,
   validateTextEdits,
-} from "../browser/text-editor-model.js";
+} from "../browser/editing/text-editor-model.js";
 export const textVersion = (source) =>
   createHash("sha256").update(source).digest("hex");
 export function inspectText(source) {

@@ -2,8 +2,8 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { args, main, readJson } from "../../../core/src/lib/files.mjs";
-import { importFig } from "../../../exports/src/figma.mjs";
-export * from "../../../exports/src/figma.mjs";
+import { importFig } from "../../../figma/src/import.mjs";
+export * from "../../../figma/src/import.mjs";
 export async function run(argv = process.argv.slice(2)) {
   const { positional: p, flags } = args(argv, {
     "--node": "value",

@@ -25,7 +25,7 @@ async function fixture(
   let html = content;
   if (document) {
     await bundle(
-      path.join(root, "packages/runtime/src/browser/document.js"),
+      path.join(root, "catalog/documents/document-pages/document.js"),
       path.join(dir, "document.js"),
     );
     html = html
@@ -35,7 +35,7 @@ async function fixture(
   }
   if (session) {
     await bundle(
-      path.join(root, "packages/runtime/src/browser/text-editor.js"),
+      path.join(root, "packages/runtime/src/browser/editing/text-editor.js"),
       path.join(dir, "editor.js"),
     );
     html = html.replace(

@@ -13,7 +13,7 @@ async function setup(t) {
   const dir = await temporary(t);
   const runtime = path.join(
     root,
-    "packages/runtime/src/browser/animations.jsx",
+    "packages/runtime/src/browser/motion/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),

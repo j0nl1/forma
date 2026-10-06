@@ -8,13 +8,13 @@ import {
   mergeTweaks,
   scrubNumber,
   segmentedOptions,
-} from "../packages/runtime/src/browser/tweaks-model.js";
+} from "../packages/runtime/src/browser/controls/tweaks-model.js";
 import { tweakBinding } from "../packages/runtime/src/node/tweaks-source.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { bundle } from "../packages/cli/src/commands/build.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 const starter = path.resolve(
-  "packages/runtime/src/browser/tweaks-components.jsx",
+  "packages/runtime/src/browser/controls/tweaks-components.jsx",
 );
 const defaults = {
   size: 16,

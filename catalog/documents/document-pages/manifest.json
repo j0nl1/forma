@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "document-pages",
+  "kind": "component",
+  "description": "Printable document pages with editable geometry and flow.",
+  "targets": ["documents"],
+  "tags": ["component", "documents"],
+  "entry": "document.js",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/documents/document-pages/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/documents/document-pages/document.js",
+      "target": "document.js"
+    },
+    {
+      "source": "catalog/documents/document-pages/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/documents/document-pages/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/documents/document-pages/preview.js",
+      "target": "preview.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/documents/document-model.js",
+      "target": "runtime/documents/document-model.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/documents/document-preview.js",
+      "target": "runtime/documents/document-preview.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/documents/document-print.js",
+      "target": "runtime/documents/document-print.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/documents/document-runtime.js",
+      "target": "runtime/documents/document-runtime.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/documents/document-style.js",
+      "target": "runtime/documents/document-style.js"
+    }
+  ],
+  "requirements": ["browser"],
+  "preview": "preview.html",
+  "license": "MIT",
+  "guide": "generations/documents/documents.md",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "default": "A clear document",
+        "description": "Document heading, authored in HTML."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.js"
+}

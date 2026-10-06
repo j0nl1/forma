@@ -5,7 +5,7 @@ import {
   cssImport,
   cssString,
   rewriteCSSURLs,
-} from "../browser/font-css.js";
+} from "../browser/shared/font-css.js";
 
 export { fontOrigins };
 export function fontRequestAllowed(url, method, type, origins) {

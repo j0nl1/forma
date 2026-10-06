@@ -2,7 +2,7 @@ import { affineTracks } from "./pptx-motion-affine.mjs";
 import {
   effectFrames,
   effectOptions,
-} from "../../../runtime/src/browser/deck-effects.js";
+} from "../../../runtime/src/browser/slides/deck-effects.js";
 
 export const families = new Set([
   "appear",

@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -12,11 +13,7 @@ import { capturePptxImage } from "../packages/exports/src/lib/pptx-layers.mjs";
 
 test("isolated paint on a later print-layout slide retains its full extent and pixels", async (t) => {
   const dir = await temporary(t);
-  await fs.cp(
-    path.join(root, "packages/runtime/src/browser"),
-    path.join(dir, "starters"),
-    { recursive: true },
-  );
+  await copyCatalogResource("slide-deck", path.join(dir, "starters"));
   const source = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Later slide paint</title><style>body{margin:0}section{background:white}</style></head><body><deck-stage width="1280" height="720"><section><h1>First slide</h1></section><section><h1>Second slide</h1></section><section><div style="position:absolute;left:288px;top:144px;width:672px;height:384px;background:linear-gradient(red,red)"></div></section></deck-stage><script src="starters/deck.js"></script></body></html>`;
   await fs.writeFile(path.join(dir, "index.html"), source);
   const { server, url } = await serve(dir, 0);

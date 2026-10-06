@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>macos-window — Forma</title>
+    <link rel="stylesheet" href="preview.bundle.css" />
+    <style>
+      body {
+        margin: 0;
+        background: #f5f5ef;
+        color: #202925;
+        font: 16px system-ui;
+      }
+      .preview-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px;
+        background: white;
+        border-bottom: 1px solid #d6dfd4;
+      }
+      .preview-controls label {
+        display: grid;
+        gap: 5px;
+        font-size: 13px;
+      }
+      .preview-controls input {
+        padding: 8px;
+        border: 1px solid #bdc7bd;
+        border-radius: 5px;
+        max-width: 220px;
+      }
+      .preview-stage {
+        position: relative;
+        min-height: 520px;
+        padding: 24px;
+        overflow: auto;
+      }
+      body > h1,
+      body > p,
+      body > h2,
+      body > ul {
+        margin: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="preview.bundle.js"></script>
+  </body>
+</html>

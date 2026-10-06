@@ -23,7 +23,7 @@ import {
   Easing,
   interpolate,
   animate,
-} from "../packages/runtime/src/browser/motion-model.js";
+} from "../packages/core/src/timeline/motion-model.js";
 
 test("retiming preserves authored cues, all choreography and cross-section motion", () => {
   const scenes = [

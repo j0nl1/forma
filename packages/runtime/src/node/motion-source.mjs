@@ -5,7 +5,10 @@ import {
   sourceTransaction,
   replaceSource,
 } from "../../../core/src/lib/source-transaction.mjs";
-import { parseScenes, parsePlayback } from "../browser/motion-model.js";
+import {
+  parseScenes,
+  parsePlayback,
+} from "../../../core/src/timeline/motion-model.js";
 
 const version = (html) => createHash("sha256").update(html).digest("hex");
 

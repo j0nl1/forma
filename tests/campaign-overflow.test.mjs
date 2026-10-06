@@ -37,7 +37,7 @@ async function fixture(t) {
     path.join(dir, "campaign.bundle.js"),
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/plain-canvas.js"),
+    path.join(root, "packages/runtime/src/browser/canvas/plain-canvas.js"),
     path.join(dir, "starters/plain-canvas.js"),
   );
   const { server, url } = await serve(dir, 0);

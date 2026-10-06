@@ -27,7 +27,7 @@ export async function run(argv = process.argv.slice(2)) {
     )
   )
     throw new Error(
-      "Usage: forma catalog list [--target <medium>] [--kind component|template|preset] [--tag <tag>] | show <id> | add <id> <project> [--dry-run]",
+      "Usage: forma catalog list [--target <medium>] [--kind primitive|component|template|preset] [--tag <tag>] | show <id> | add <id> <project> [--dry-run]",
     );
   const result =
     command === "list"

@@ -6,7 +6,7 @@ import { temporary } from "./helpers.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 
-const starter = path.resolve("packages/runtime/src/browser/email.html");
+const starter = path.resolve("catalog/documents/email/email.html");
 
 test("email remains readable and responsive with header styles stripped", async (t) => {
   const dir = await temporary(t);

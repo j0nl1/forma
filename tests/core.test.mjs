@@ -17,7 +17,7 @@ import {
   outline,
   select,
   renderDocument,
-} from "../packages/exports/src/lib/figma.mjs";
+} from "../packages/figma/src/decode/document.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import { record } from "../packages/cli/src/commands/project.mjs";

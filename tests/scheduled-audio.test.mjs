@@ -9,8 +9,8 @@ import {
   compileAudioSchedule,
   audioGainAt,
   addScheduledWindow,
-} from "../packages/runtime/src/browser/audio-plan.js";
-import { compileComposition } from "../packages/runtime/src/browser/composition-model.js";
+} from "../packages/core/src/timeline/audio-plan.js";
+import { compileComposition } from "../packages/core/src/timeline/composition-model.js";
 import { mixScheduledAudio } from "../packages/media/src/lib/scheduled-audio.mjs";
 import { createAudioExport } from "../packages/media/src/lib/audio.mjs";
 

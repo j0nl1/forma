@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import {
   compileAudioSchedule,
   addScheduledWindow,
-} from "../../../runtime/src/browser/audio-plan.js";
+} from "../../../core/src/timeline/audio-plan.js";
 
 const run = promisify(execFile);
 export function tempoFilters(speed) {

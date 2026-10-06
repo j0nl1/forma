@@ -11,16 +11,27 @@ import {
   compile,
   importSystem,
   preview,
-} from "../packages/exports/src/design-system.mjs";
-import { exists } from "../packages/core/src/lib/files.mjs";
+} from "../packages/design-systems/src/pipeline.mjs";
+import { exists, walk } from "../packages/core/src/lib/files.mjs";
 export async function prepareDemo(destination) {
   await buildCatalogSite(path.join(destination, "catalog"));
   const root = fileURLToPath(new URL("..", import.meta.url));
   await fs.cp(path.join(root, "examples"), destination, { recursive: true });
-  await fs.cp(
+  await fs.mkdir(path.join(destination, "starters"), { recursive: true });
+  for (const file of await walk(
     path.join(root, "packages/runtime/src/browser"),
-    path.join(destination, "starters"),
-    { recursive: true },
+  ))
+    await fs.copyFile(
+      file,
+      path.join(destination, "starters", path.basename(file)),
+    );
+  await fs.copyFile(
+    path.join(root, "catalog/documents/email/email.html"),
+    path.join(destination, "starters/email.html"),
+  );
+  await fs.copyFile(
+    path.join(root, "catalog/data/data-chart/chart.js"),
+    path.join(destination, "starters/chart.js"),
   );
   await bundle(
     path.join(root, "examples/motion/main.jsx"),
@@ -48,18 +59,23 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/deck.js"),
+    path.join(root, "catalog/interfaces/design-canvas/canvas.js"),
+    path.join(destination, "starters/canvas.js"),
+    { overwrite: true },
+  );
+  await bundle(
+    path.join(root, "catalog/slides/slide-deck/deck.js"),
     path.join(destination, "starters/deck.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/chart-libraries.js"),
+    path.join(root, "packages/runtime/src/browser/data/chart-libraries.js"),
     path.join(destination, "chart-libraries.bundle.js"),
     { overwrite: true },
   );
   for (const [entry, output] of [
-    ["geography-libraries.js", "geography.bundle.js"],
-    ["street-libraries.js", "street.bundle.js"],
+    ["data/geography-libraries.js", "geography.bundle.js"],
+    ["data/street-libraries.js", "street.bundle.js"],
   ]) {
     await bundle(
       path.join(root, "packages/runtime/src/browser", entry),
@@ -68,32 +84,32 @@ export async function prepareDemo(destination) {
     );
   }
   await bundle(
-    path.join(root, "packages/runtime/src/browser/data-overlay.js"),
+    path.join(root, "packages/runtime/src/browser/data/data-overlay.js"),
     path.join(destination, "starters/data-overlay.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/three-stage.js"),
+    path.join(root, "packages/runtime/src/browser/three-d/three-stage.js"),
     path.join(destination, "three-stage.bundle.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/document.js"),
+    path.join(root, "catalog/documents/document-pages/document.js"),
     path.join(destination, "starters/document.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/fixed-sheet.js"),
+    path.join(root, "packages/runtime/src/browser/documents/fixed-sheet.js"),
     path.join(destination, "starters/fixed-sheet.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/text-editor.js"),
+    path.join(root, "packages/runtime/src/browser/editing/text-editor.js"),
     path.join(destination, "starters/text-editor.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/image-slot.js"),
+    path.join(root, "packages/runtime/src/browser/images/image-slot.js"),
     path.join(destination, "starters/image-slot.js"),
     { overwrite: true },
   );
@@ -103,17 +119,17 @@ export async function prepareDemo(destination) {
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/frames.js"),
+    path.join(root, "packages/runtime/src/browser/interfaces/frames.js"),
     path.join(destination, "starters/frames.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/social.js"),
+    path.join(root, "packages/runtime/src/browser/interfaces/social.js"),
     path.join(destination, "starters/social.js"),
     { overwrite: true },
   );
   await bundle(
-    path.join(root, "packages/runtime/src/browser/plain-canvas.js"),
+    path.join(root, "packages/runtime/src/browser/canvas/plain-canvas.js"),
     path.join(destination, "starters/plain-canvas.js"),
     { overwrite: true },
   );

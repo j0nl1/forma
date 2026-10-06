@@ -18,8 +18,8 @@ import {
   cssVariables,
   resolveTokens,
   splitCSS,
-} from "../packages/exports/src/lib/system-css-values.mjs";
-import { fontFamilies } from "../packages/exports/src/lib/system-font-metadata.mjs";
+} from "../packages/design-systems/src/css/css-values.mjs";
+import { fontFamilies } from "../packages/design-systems/src/css/font-metadata.mjs";
 
 async function fingerprint(directory) {
   const result = {};
@@ -43,7 +43,10 @@ async function fixture(t) {
   await fs.mkdir(path.join(source, "tokens"), { recursive: true });
   await fs.mkdir(path.join(source, "assets"));
   await fs.copyFile(
-    path.join(root, "packages/runtime/src/browser/fonts/inter-medium.woff2"),
+    path.join(
+      root,
+      "packages/runtime/src/browser/shared/fonts/inter-medium.woff2",
+    ),
     path.join(source, "assets/Atlas font.woff2"),
   );
   await fs.writeFile(

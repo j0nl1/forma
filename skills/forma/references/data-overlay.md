@@ -8,7 +8,7 @@ Copy `data-overlay.js` and its `data-overlay-*.js` companions beside your HTML. 
 
 ```sh
 node /path/to/forma/scripts/forma.mjs build \
-  /path/to/forma/packages/runtime/src/browser/data-overlay.js \
+  /path/to/forma/packages/runtime/src/browser/data/data-overlay.js \
   /path/to/output/data-overlay.js
 ```
 

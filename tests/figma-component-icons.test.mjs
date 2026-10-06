@@ -6,11 +6,11 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
-import { loadFig } from "../packages/exports/src/lib/figma.mjs";
+import { loadFig } from "../packages/figma/src/decode/document.mjs";
 import {
   iconComponent,
   isIconFont,
-} from "../packages/exports/src/lib/figma-component-icons.mjs";
+} from "../packages/figma/src/components/icons.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import {
   compile,

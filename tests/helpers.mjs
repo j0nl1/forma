@@ -5,6 +5,17 @@ import { fileURLToPath } from "node:url";
 import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 export const root = fileURLToPath(new URL("..", import.meta.url));
+export async function copyCatalogResource(id, destination) {
+  const { catalogShow } = await import("../packages/catalog/src/index.mjs");
+  const { resourceFiles } =
+    await import("../packages/catalog/src/resource-files.mjs");
+  const item = await catalogShow(id);
+  for (const file of await resourceFiles(item, { root })) {
+    const output = path.join(destination, file.path);
+    await fs.mkdir(path.dirname(output), { recursive: true });
+    await fs.writeFile(output, file.bytes);
+  }
+}
 export async function temporary(t) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "forma-test-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));

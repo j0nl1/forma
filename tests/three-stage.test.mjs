@@ -11,12 +11,12 @@ import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   nameParts,
   releaseModel,
-} from "../packages/runtime/src/browser/three-stage-model.js";
+} from "../packages/runtime/src/browser/three-d/three-stage-model.js";
 
 async function fixture(t, { fail = false } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "packages/runtime/src/browser/three-stage.js"),
+    path.join(root, "packages/runtime/src/browser/three-d/three-stage.js"),
     path.join(dir, "stage.js"),
   );
   const loaderEntry = path.join(dir, "loaders.js");

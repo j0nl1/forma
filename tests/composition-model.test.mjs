@@ -6,8 +6,8 @@ import {
   clipFrame,
   playbackTime,
   moveClip,
-} from "../packages/runtime/src/browser/composition-model.js";
-import { authoredTime } from "../packages/runtime/src/browser/motion-model.js";
+} from "../packages/core/src/timeline/composition-model.js";
+import { authoredTime } from "../packages/core/src/timeline/motion-model.js";
 
 const scenes = [
   { name: "Same", dur: 2, nat: 4 },

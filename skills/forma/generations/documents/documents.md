@@ -3,7 +3,7 @@
 Use the independently written `document.js` loader and its `document-*.js` companions. The native element remains `<doc-page>`. Copy all companions beside the loader for an editable module-based preview, or bundle the entry for a portable classic script. The demonstration builder does this automatically.
 
 ```sh
-node packages/cli/src/commands/build.mjs packages/runtime/src/browser/document.js /tmp/document.bundle.js
+node packages/cli/src/commands/build.mjs catalog/documents/document-pages/document.js /tmp/document.bundle.js
 ```
 
 Choose the pagination contract before composing content. Preserve the user's real names, facts, dates and links; do not invent qualifications, events or research evidence. Author static HTML with deliberate typography. The component owns the desk/sheet geometry and print rules; content owns its hierarchy, color, internal layout and insets on fixed pages.
@@ -71,7 +71,7 @@ PDF and native print use the detected physical dimensions, remove screen zoom an
 Standalone export embeds the detector automatically. For an ordinary static server, bundle and load it explicitly:
 
 ```sh
-node packages/cli/src/commands/build.mjs packages/runtime/src/browser/fixed-sheet.js /absolute/project/fixed-sheet.bundle.js
+node packages/cli/src/commands/build.mjs packages/runtime/src/browser/documents/fixed-sheet.js /absolute/project/fixed-sheet.bundle.js
 ```
 
 ```html

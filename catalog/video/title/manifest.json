@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "video-title",
+  "kind": "primitive",
+  "description": "An animated title with an accent and supporting text.",
+  "targets": ["video"],
+  "tags": ["video", "primitive"],
+  "entry": "title.jsx",
+  "requirements": ["react", "node-bundle"],
+  "license": "MIT",
+  "export": "Title",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string",
+        "default": "A clear idea",
+        "description": "Main heading."
+      },
+      "subtitle": {
+        "type": "string",
+        "default": "Give the audience a reason to listen",
+        "description": "Supporting line."
+      },
+      "time": {
+        "type": "number",
+        "default": 1,
+        "description": "Authored time in seconds."
+      },
+      "enterSeconds": {
+        "type": "number",
+        "default": 0.6,
+        "description": "Entry duration in seconds."
+      },
+      "accent": {
+        "type": "string",
+        "default": "#397758",
+        "description": "Accent color."
+      }
+    },
+    "additionalProperties": false
+  },
+  "dependencies": [],
+  "previewEntry": "preview.jsx",
+  "preview": "preview.html",
+  "files": [
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    },
+    {
+      "source": "catalog/video/title/README.md",
+      "target": "README.md"
+    },
+    {
+      "source": "catalog/video/title/manifest.json",
+      "target": "manifest.json"
+    },
+    {
+      "source": "catalog/video/title/preview.html",
+      "target": "preview.html"
+    },
+    {
+      "source": "catalog/video/title/preview.jsx",
+      "target": "preview.jsx"
+    },
+    {
+      "source": "catalog/video/title/styles.css",
+      "target": "styles.css"
+    },
+    {
+      "source": "catalog/video/title/title.jsx",
+      "target": "title.jsx"
+    }
+  ]
+}

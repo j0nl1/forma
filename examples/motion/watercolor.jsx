@@ -5,7 +5,7 @@ import {
   WatercolorPainting,
   WatercolorReveal,
   useComposition,
-} from "../../packages/runtime/src/browser/animations.jsx";
+} from "../../packages/runtime/src/browser/motion/animations.jsx";
 import { paintBird } from "./painting.js";
 
 function Piece() {

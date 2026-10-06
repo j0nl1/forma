@@ -18,8 +18,8 @@ async function fixture(t) {
       path.join(source, name),
     );
   for (const [entry, output] of [
-    ["geography-libraries.js", "geography.bundle.js"],
-    ["street-libraries.js", "street.bundle.js"],
+    ["data/geography-libraries.js", "geography.bundle.js"],
+    ["data/street-libraries.js", "street.bundle.js"],
   ])
     await bundle(
       path.join(root, "packages/runtime/src/browser", entry),

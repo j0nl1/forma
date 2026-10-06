@@ -6,7 +6,7 @@ import { deflateRawSync } from "node:zlib";
 import { compileSchema, parseSchema, encodeBinarySchema } from "kiwi-schema";
 import { zipSync } from "fflate";
 import { temporary } from "./helpers.mjs";
-import { planSynthesis } from "../packages/exports/src/lib/figma-component-synthesis.mjs";
+import { planSynthesis } from "../packages/figma/src/components/synthesis.mjs";
 import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import {
   compile,

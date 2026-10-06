@@ -1,61 +1,81 @@
 # Packages, generations and reusable resources
 
-Forma separates technical ownership from creative guidance. Packages are npm workspaces with programmatic entry points. Generation folders contain task recipes, not copies of the engine. The local catalog describes reusable modules and editorial presets; complete demonstrations remain in `examples/`.
+Forma separates technical workflows from reusable creative resources. Packages own execution and integration logic. Catalog resources own their editable source, styles, assets, parameter schema, usage notes and local preview. Generation folders guide creative decisions.
 
 ```text
 packages/
-  core/       project metadata, preferences, contained files and source transactions
-  runtime/    editable browser modules, source editing and local bundling
-  media/      video capture, encoding, audio planning and assembly
-  exports/    format workflows, PowerPoint, source imports and design systems
-  catalog/    local discovery, dependency copies and the static browsing page
-  cli/        command parsing, local preview server and application composition
-skills/forma/
-  generations/  audio, video, slides, documents, interfaces and data recipes
-  references/   shared authoring and integration contracts
-  scripts/forma.mjs
+  core/            project preferences, metadata, timeline data and source transactions
+  runtime/         browser execution, controls, local bundling and source editing
+  media/           capture, encoding, audio planning and assembly
+  exports/         HTML, PDF, PNG and PowerPoint output
+  design-systems/  source inspection, CSS, compilation, project bindings and review
+  figma/           decoding, rendering and component extraction
+  catalog/         data inventory, contained copies and local browsing pages
+  cli/             command parsing and application composition
 catalog/
-  index.json
-  items/<id>/item.json
-examples/
+  audio/<resource>/
+  video/<resource>/
+  slides/<resource>/
+  documents/<resource>/
+  interfaces/<resource>/
+  data/<resource>/
+    manifest.json
+    source files, styles and assets as required
+    README.md
+    preview.html
+skills/forma/
+  generations/     creative guides by medium
+  references/      shared authoring and integration contracts
+  scripts/forma.mjs
+examples/          complete compositions
 ```
 
-`@forma/core` has no dependency on the other Forma packages. Runtime depends on core; media depends on core and runtime; exports depends on core, runtime and media; catalog depends on core. CLI composes these packages. Neither a workflow nor a browser module imports the CLI. The preview server is an application composition root: it connects source editing and export without making the browser runtime depend on the exporter.
+## Ownership
 
-The runtime package contains editable JavaScript and JSX implementations. It is not a separate React installation or version selector. Root and installed-skill manifests retain the single pinned React/ReactDOM 18.3.1 pair.
+Core has no dependency on another Forma package. Runtime and Figma depend on core; Figma may use runtime helpers. Media depends on core and runtime. Exports depends on core, runtime and media. Design systems depends on core, runtime and exports for portable HTML output. Catalog depends on core and runtime for optional preview compilation. CLI composes these packages. Workflows do not import the CLI.
 
-## Ports and adapters
+The runtime browser source is grouped into motion, slides, canvas, documents, data, images, interfaces, three-dimensional execution, controls, editing, design-system review and shared font helpers. Pure scene, clip and audio-plan contracts live in `core/src/timeline/`. These contracts can be used by the browser and local workflows without browser execution.
 
-A port belongs to the workflow consuming it. An adapter supplies the concrete execution. Dependency injection is explicit in the programmatic interface; a JSON configuration cannot load executable adapters.
+The Figma package groups decoding, rendering and component extraction. Design systems groups source/contracts, CSS/token interpretation, compilation, project bindings, review and adherence. Binding a design system means copying verified artifacts into a project and registering their identity; it is separate from rendering the project's final output.
 
-- `renderVideo(page, errors, output, temporary, options, adapters)` accepts `capture(page, settings)` and `encode(settings)`. A capture session provides `capture()`, `close()`, its effective `method` and diagnostics. `capture()` returns a PNG buffer. Chromium is the current adapter, with standard and explicitly selected fast capture paths. Timeline seeking, decoded-media readiness, frame-token verification, cancellation, backpressure and output diagnostics remain in the workflow. The encoder adapter starts a child process with an input stream and completion/error events; the workflow owns its lifetime. FFmpeg supplies that implementation.
-- `exportArtifact(mode, input, output, options, adapters)` accepts a page-session adapter and format implementations. The page-session interface calls the supplied work with a prepared page and runtime-error collection, then closes its owned resources on success or failure. Defaults retain the existing loopback/local-resource restrictions and supported font grants. Format adapters write to the workflow's temporary target; the workflow retains non-overwrite checks, cancellation checks and final publication.
-- Source-to-audio keeps source-grounded script planning separate from external voice production. The capability snapshot and episode/clip manifests are the data contract with the harness. No bundled inference adapter, automatic MCP connection, voice selection or model installation is introduced.
+React and ReactDOM use the single pinned 18.3.1 pair. Browser source introduces no alternate React installation. The harness remains responsible for user-selected speech and image inference.
 
-The contracts are deliberately specific to current behavior. Replacing Chromium with a native scene renderer would require defining which authored content it supports; a Rust implementation cannot automatically render arbitrary HTML/CSS/React with the same fidelity. A native implementation is worth experimenting with only after measured work identifies an appropriate target. FFmpeg already performs native media processing.
+## Resource manifests
 
-## Catalog interface
+Every indexed resource has a `manifest.json` beside its primary source. It declares an ID, kind (`primitive`, `component`, `template` or `preset`), description, supported targets, tags, requirements, editable parameter schema, dependency IDs, entry and explicit source inventory. The inventory includes the resource's manifest and local preview. Supporting assets are present when the implementation needs them; empty asset folders are not required.
 
-From a checkout:
+Existing canvas and platform authoring modules now live with their resource manifests. Shared clocks, controls and processing stay in packages. The video title and lower-third primitives accept authored time as a prop; the native composition template combines them with the shared timeline. Audio presets contain an editable authoring blueprint and the canonical editorial guide. A blueprint requires source and script work before it becomes a valid production episode; it does not select voices or install an inference engine.
+
+Parameter schemas describe the resource's editable interface. JSX previews expose scalar controls where provided. They are usage examples, not automatic adapters for arbitrary prop types or a comprehensive schema validator. Dependencies expose which other resources are reused, while the explicit inventory supplies the exact files to copy. A dependency's manifest accompanies its source. Implementations have one canonical source; the catalog does not duplicate the runtime.
+
+## Mechanical discovery and copying
 
 ```bash
-node skills/forma/scripts/forma.mjs catalog list --target video
-node skills/forma/scripts/forma.mjs catalog show native-composition
+node skills/forma/scripts/forma.mjs catalog list --target video --kind primitive
+node skills/forma/scripts/forma.mjs catalog show video-title
 node skills/forma/scripts/forma.mjs catalog add native-composition /absolute/project --dry-run
 node skills/forma/scripts/forma.mjs catalog add native-composition /absolute/project
 npm run catalog:site -- /absolute/preview-directory
 ```
 
-The installed launcher uses the same commands. `list` returns concise JSON metadata with filters for medium, kind and tag. `show` expands only the selected item, including its file list or canonical preset instructions. `add` copies reviewed local files into `assets/catalog/<id>/`, records SHA-256 provenance and registers the entry in `design.json` while preserving unrelated metadata. A component's file closure is explicit in its manifest; copying does not evaluate the source. Presets copy local Markdown dependencies and keep repository-only references as links. These links are not fetched by the helper. Existing destinations, escaping paths and escaping symlinks are rejected. Multi-file publication is not a database transaction; use fresh project folders for concurrent production.
+`list` reads concise metadata without installing the source parser. `show` reads only the selected manifest and its usage or canonical guide. `add` copies the selected source, dependencies and manifest into `assets/catalog/<id>/`, records SHA-256 provenance and registers its entry in `design.json`. Existing metadata is preserved. Source and destination symlink escapes and existing destinations are rejected.
 
-Each item has an ID, kind, description, supported targets, tags, requirements and either an entry with its files or an editorial guide. Requirements describe the necessary capabilities; the catalog does not discover or install them. The first collection contains five reusable modules and the five spoken-audio presets. These are editable starting resources, not a claim of complete compositions or universal export support.
+Literal JavaScript/TypeScript imports, exports, dynamic imports and `new URL(..., import.meta.url)` asset references are parsed as data and rebased to the copied layout. Ordinary strings, comments and authored content are preserved. Bare package imports remain dependencies of the consuming project. Executable imports must be in the declared source inventory; this is not automatic package resolution. Preset guide dependencies are copied mechanically, with repository-only references retained as links.
 
-The static catalog page is generated from that same index and filters entirely in the browser. Example links are optional and require network access; no hosted registry is required to list, inspect or copy resources. The agent searches concise metadata, reads the selected recipe and authors content. Copying dependencies, validation, hashing, recording and media assembly remain mechanical.
+The browsing page and CLI share the same index. Page generation copies the declared resources and bundles reviewed local preview entries. Browsing, filtering and local previews require no hosted registry. Complete demonstrations remain in `examples/`. The agent chooses a resource and writes content; copying, path rebasing, hashing, validation and media assembly are mechanical.
+
+## Execution ports
+
+`renderVideo(page, errors, output, temporary, options, adapters)` accepts capture and encoding implementations. A capture session supplies `capture()`, `close()`, its effective method and diagnostics. Chromium provides standard and opt-in fast PNG capture. FFmpeg provides the owned encoder process. Seeking, decoded-media readiness, frame verification, cancellation, backpressure and diagnostics belong to the workflow.
+
+`exportArtifact(mode, input, output, options, adapters)` accepts a page-session implementation and format implementations. Defaults preserve local-resource restrictions and configured font grants. Temporary output, non-overwrite checks, cancellation and final publication remain in the workflow. JSON configuration cannot load executable adapters.
+
+Source-to-audio uses capability snapshots and episode/clip manifests to communicate with the harness. Voice production stays external. There is no bundled speech engine, automatic MCP connection or Rust renderer.
 
 ## Installation and verification
 
-The installer stages the skill, all six packages and the local catalog into one self-contained distribution. Its own workspace lockfile supports `npm ci --ignore-scripts` without reaching back into the checkout. Managed updates still reject local changes; no earlier command aliases are retained. Authoring source lives in `packages/runtime/src/browser/` in a checkout and the corresponding path inside an installed skill.
+The installer stages the skill, all eight packages and catalog into one independent distribution. Its workspace lockfile supports `npm ci --ignore-scripts` without reaching into the checkout. Managed updates reject local changes. Earlier script locations and resource locations have no compatibility aliases.
 
-The refactor incorporates the previously separate native-motion worktree's typed compositions, audio scheduling, frame readiness, cancellation, fast PNG option and phase diagnostics. Standard capture remains the default and fast capture preserves its dimension fallback. Phase times distinguish seeking/rendering, capture, encoder backpressure and audio; encoder backpressure time is not total encoder CPU time and phases do not account for every setup operation. Existing fast-versus-standard tests compare decoded output and nested-video frames. No new end-to-end speed or RAM improvement is claimed by moving files into packages.
+The existing native composition, audio scheduling, frame readiness, cancellation, progress and phase diagnostics are preserved. Standard capture remains the default; fast capture retains its dimension fallback. Visible paused nested videos require a priming snapshot before final capture to avoid older retained surfaces. That adds capture work only to frames with visible nested video.
 
-Paused nested videos require a priming snapshot before their final frame capture so a retained surface cannot contribute an older decoded image. This adds capture work only to frames with visible nested video; the ordinary artwork-only fast path is unchanged.
+Phase times distinguish seeking/rendering, capture, encoder backpressure and audio; encoder backpressure is not total encoder CPU time. Reorganizing files does not establish an end-to-end speed or RAM improvement. Multi-file project publication is not a database transaction; use fresh folders for concurrent production.

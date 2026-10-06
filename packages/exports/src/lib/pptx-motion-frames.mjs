@@ -3,7 +3,7 @@ import {
   buildSteps,
   effectFrames,
   effectOptions,
-} from "../../../runtime/src/browser/deck-effects.js";
+} from "../../../runtime/src/browser/slides/deck-effects.js";
 import { composedTargets } from "./pptx-motion-compose.mjs";
 
 // This is a bounded compositor for nested declarative fade/wipe builds, not a

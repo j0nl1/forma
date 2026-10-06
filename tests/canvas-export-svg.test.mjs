@@ -1,3 +1,4 @@
+import { copyCatalogResource } from "./helpers.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
@@ -6,14 +7,13 @@ import { temporary } from "./helpers.mjs";
 import { serve } from "../packages/cli/src/commands/preview.mjs";
 import { withPage } from "../packages/media/src/lib/browser.mjs";
 
-const starters = path.resolve("packages/runtime/src/browser");
 const svg = (id, attribute) =>
   `<svg width="120" height="80" aria-label="Green reference tile"><defs><rect id="${id}" x="10" y="10" width="80" height="50" fill="lime"/></defs><use ${attribute}="#${id}"/></svg>`;
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0}design-canvas{height:100vh}svg{display:block}</style><design-canvas id="svg-exports"><design-section id="references" title="SVG references"><design-board id="legacy" label="Legacy reference" width="120" height="80">${svg("legacy-tile", "xlink:href")}</design-board></design-section><design-section id="modern-references" title="Modern SVG references"><design-board id="modern" label="Modern reference" width="120" height="80">${svg("modern-tile", "href")}</design-board></design-section></design-canvas><script src="starters/canvas.js"></script></html>`;
 
 test("artboard PNG downloads preserve SVG xlink/href references and exact solid pixels; portable HTML survives deleting runtime sources", async (t) => {
   const dir = await temporary(t);
-  await fs.cp(starters, path.join(dir, "starters"), { recursive: true });
+  await copyCatalogResource("design-canvas", path.join(dir, "starters"));
   await fs.writeFile(path.join(dir, "canvas.html"), html);
   const { server, url } = await serve(dir, 0);
   t.after(() => new Promise((resolve) => server.close(resolve)));
