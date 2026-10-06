@@ -2,7 +2,7 @@
 
 ## Local Figma files
 
-`scripts/figma.mjs outline <file.fig>` inventories pages, frames, and components offline. `mount <file.fig> <destination>` saves a navigable JSON tree and assets. `render <file.fig> <destination.html> --node <id-or-exact-name>` materializes a selected node as HTML. `materialize <file.fig> <destination> --node <id-or-exact-name>` writes selected HTML plus tokens. `design-system <file.fig> <destination>` creates a native system with extracted colors, editable React components and HTML examples, ready for the design-system compiler.
+`scripts/forma.mjs figma outline <file.fig>` inventories pages, frames, and components offline. `mount <file.fig> <destination>` saves a navigable JSON tree and assets. `render <file.fig> <destination.html> --node <id-or-exact-name>` materializes a selected node as HTML. `materialize <file.fig> <destination> --node <id-or-exact-name>` writes selected HTML plus tokens. `design-system <file.fig> <destination>` creates a native system with extracted colors, editable React components and HTML examples, ready for the design-system compiler.
 
 The independent decoder supports raw `fig-kiwi` and ZIP `canvas.fig`, deflate and Zstandard. It reconstructs parent-child order and preserves raw node properties and blob data in the mount. The renderer supports saved geometry, ordered solid/gradient/image fills, real text, vector path blobs, transforms, and common layout properties. Unsupported effects, mask compositing, constraints, and unavailable instance dependencies are recorded as warnings, so do not claim pixel-perfect conversion. Compare with supplied Figma exports when fidelity matters. Keep original files unchanged.
 
@@ -31,8 +31,8 @@ Text now retains font weight/style metadata, spacing and line-height units, deco
 Generate editable React modules for every component set or standalone symbol:
 
 ```bash
-node <skill>/scripts/figma.mjs components source.fig output-folder
-node <skill>/scripts/figma.mjs components source.fig selected-folder --node "1:42"
+node <skill>/scripts/forma.mjs figma components source.fig output-folder
+node <skill>/scripts/forma.mjs figma components source.fig selected-folder --node "1:42"
 ```
 
 Each module has a sibling `.d.ts`; `components.json` records defaults, source node IDs and every emitted variant's props. Exact names, generated names and variant child IDs also select a component; ambiguous names require a node ID. Names are bounded safe identifiers, reserve generator imports and deduplicate case-insensitively for portable filenames; variant children belong to their set instead of becoming duplicate exports. Variant value orders, size aliases, boolean axes and inherited property IDs determine the public props. Unknown combinations use the default body; collisions warn and retain the first reachable variant.

@@ -4,21 +4,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   length,
   pixels,
   geometry,
   printOptions,
-} from "../skills/forma/assets/starters/document-model.js";
+} from "../packages/runtime/src/browser/document-model.js";
 async function fixture(t, content, attributes = "", style = "", before = "") {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/forma/assets/starters/document.js"),
+    path.join(root, "packages/runtime/src/browser/document.js"),
     path.join(dir, "document.js"),
   );
   await fs.writeFile(
@@ -830,7 +830,7 @@ test("paper laboratory modes preserve named-paper geometry, panel order and nati
     path.join(dir, "documents.js"),
   );
   await bundle(
-    path.join(root, "skills/forma/assets/starters/document.js"),
+    path.join(root, "packages/runtime/src/browser/document.js"),
     path.join(dir, "starters/document.js"),
   );
   const { server, url } = await serve(dir, 0);

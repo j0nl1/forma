@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "data-chart",
+  "kind": "component",
+  "description": "A chart stage with local D3 libraries and SVG/PNG export.",
+  "targets": ["slides", "video", "data"],
+  "tags": ["component", "slides", "video", "data"],
+  "entry": "chart-stage.js",
+  "files": [
+    {
+      "source": "packages/runtime/src/browser/chart-libraries.js",
+      "target": "chart-libraries.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/chart-stage.js",
+      "target": "chart-stage.js"
+    },
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    }
+  ],
+  "requirements": ["browser", "node-bundle"],
+  "preview": "https://j0nl1.github.io/forma/charts.html",
+  "license": "MIT",
+  "guide": "references/charts.md"
+}

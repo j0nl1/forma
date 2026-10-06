@@ -4,174 +4,187 @@
     {
       "id": "slides",
       "name": "Presentations",
-      "reference": "references/slides.md",
+      "reference": "generations/slides/slides.md",
       "starters": [
-        "assets/starters/deck.js",
-        "assets/starters/deck-runtime.js",
-        "assets/starters/deck-builds.js",
-        "assets/starters/deck-effects.js",
-        "assets/starters/deck-masks.js",
-        "assets/starters/deck-editor.js",
-        "assets/starters/deck-thumbnails.js",
-        "assets/starters/deck-operations.js",
-        "assets/starters/deck-labels.js"
-      ]
+        "packages/runtime/src/browser/deck.js",
+        "packages/runtime/src/browser/deck-runtime.js",
+        "packages/runtime/src/browser/deck-builds.js",
+        "packages/runtime/src/browser/deck-effects.js",
+        "packages/runtime/src/browser/deck-masks.js",
+        "packages/runtime/src/browser/deck-editor.js",
+        "packages/runtime/src/browser/deck-thumbnails.js",
+        "packages/runtime/src/browser/deck-operations.js",
+        "packages/runtime/src/browser/deck-labels.js"
+      ],
+      "catalog": ["slide-deck"]
     },
     {
       "id": "mobile-app-design",
       "name": "Mobile app design",
-      "reference": "references/mobile.md",
-      "starters": ["assets/starters/frames.js"]
+      "reference": "generations/interfaces/mobile.md",
+      "starters": ["packages/runtime/src/browser/frames.js"]
     },
     {
       "id": "wireframe",
       "name": "Wireframe",
-      "reference": "references/wireframe.md",
+      "reference": "generations/interfaces/wireframe.md",
       "starters": [
-        "assets/starters/canvas.js",
-        "assets/starters/canvas-runtime.js",
-        "assets/starters/canvas-components.jsx",
-        "assets/starters/canvas-model.js",
-        "assets/starters/canvas-viewport.js",
-        "assets/starters/canvas-focus.js",
-        "assets/starters/canvas-export.js"
-      ]
+        "packages/runtime/src/browser/canvas.js",
+        "packages/runtime/src/browser/canvas-runtime.js",
+        "packages/runtime/src/browser/canvas-components.jsx",
+        "packages/runtime/src/browser/canvas-model.js",
+        "packages/runtime/src/browser/canvas-viewport.js",
+        "packages/runtime/src/browser/canvas-focus.js",
+        "packages/runtime/src/browser/canvas-export.js"
+      ],
+      "catalog": ["design-canvas"]
     },
     {
       "id": "document",
       "name": "Document",
-      "reference": "references/documents.md",
+      "reference": "generations/documents/documents.md",
       "starters": [
-        "assets/starters/document.js",
-        "assets/starters/document-runtime.js",
-        "assets/starters/document-model.js",
-        "assets/starters/document-style.js",
-        "assets/starters/document-print.js"
-      ]
+        "packages/runtime/src/browser/document.js",
+        "packages/runtime/src/browser/document-runtime.js",
+        "packages/runtime/src/browser/document-model.js",
+        "packages/runtime/src/browser/document-style.js",
+        "packages/runtime/src/browser/document-print.js"
+      ],
+      "catalog": ["document-pages"]
     },
     {
       "id": "animation",
       "name": "Animation",
-      "reference": "references/motion.md",
+      "reference": "generations/video/motion.md",
       "starters": [
-        "assets/starters/animations.jsx",
-        "assets/starters/motion-model.js",
-        "assets/starters/motion-fonts.js",
-        "assets/starters/font-css.js",
-        "assets/starters/fonts/inter-medium.woff2",
-        "assets/starters/fonts/OFL.txt",
-        "assets/starters/fonts/README.md",
-        "assets/starters/scene-components.jsx",
-        "assets/starters/watercolor-components.jsx",
-        "assets/starters/watercolor-kit.js"
-      ]
+        "packages/runtime/src/browser/animations.jsx",
+        "packages/runtime/src/browser/motion-model.js",
+        "packages/runtime/src/browser/motion-fonts.js",
+        "packages/runtime/src/browser/font-css.js",
+        "packages/runtime/src/browser/fonts/inter-medium.woff2",
+        "packages/runtime/src/browser/fonts/OFL.txt",
+        "packages/runtime/src/browser/fonts/README.md",
+        "packages/runtime/src/browser/scene-components.jsx",
+        "packages/runtime/src/browser/watercolor-components.jsx",
+        "packages/runtime/src/browser/watercolor-kit.js",
+        "packages/runtime/src/browser/motion-frame.js",
+        "packages/runtime/src/browser/motion-export.jsx",
+        "packages/runtime/src/browser/composition-model.js",
+        "packages/runtime/src/browser/composition-components.jsx",
+        "packages/runtime/src/browser/audio-plan.js"
+      ],
+      "catalog": ["native-composition"]
     },
     {
       "id": "ui-mockups",
       "name": "UI mockups",
-      "reference": "references/interface.md",
+      "reference": "generations/interfaces/interface.md",
       "starters": [
-        "assets/starters/canvas.js",
-        "assets/starters/canvas-runtime.js",
-        "assets/starters/canvas-components.jsx",
-        "assets/starters/canvas-model.js",
-        "assets/starters/canvas-viewport.js",
-        "assets/starters/canvas-focus.js",
-        "assets/starters/canvas-export.js",
-        "assets/starters/image-slot.js"
-      ]
+        "packages/runtime/src/browser/canvas.js",
+        "packages/runtime/src/browser/canvas-runtime.js",
+        "packages/runtime/src/browser/canvas-components.jsx",
+        "packages/runtime/src/browser/canvas-model.js",
+        "packages/runtime/src/browser/canvas-viewport.js",
+        "packages/runtime/src/browser/canvas-focus.js",
+        "packages/runtime/src/browser/canvas-export.js",
+        "packages/runtime/src/browser/image-slot.js"
+      ],
+      "catalog": ["design-canvas"]
     },
     {
       "id": "resume",
       "name": "Resume",
-      "reference": "references/documents.md",
+      "reference": "generations/documents/documents.md",
       "starters": [
-        "assets/starters/document.js",
-        "assets/starters/document-runtime.js",
-        "assets/starters/document-model.js",
-        "assets/starters/document-style.js",
-        "assets/starters/document-print.js"
-      ]
+        "packages/runtime/src/browser/document.js",
+        "packages/runtime/src/browser/document-runtime.js",
+        "packages/runtime/src/browser/document-model.js",
+        "packages/runtime/src/browser/document-style.js",
+        "packages/runtime/src/browser/document-print.js"
+      ],
+      "catalog": ["document-pages"]
     },
     {
       "id": "3d-object",
       "name": "3D object",
-      "reference": "references/three-dimensional.md",
+      "reference": "generations/video/three-dimensional.md",
       "starters": [
-        "assets/starters/three-stage.js",
-        "assets/starters/three-stage-model.js",
-        "assets/starters/three-stage-export.js",
-        "assets/starters/three-stage-style.js"
+        "packages/runtime/src/browser/three-stage.js",
+        "packages/runtime/src/browser/three-stage-model.js",
+        "packages/runtime/src/browser/three-stage-export.js",
+        "packages/runtime/src/browser/three-stage-style.js"
       ]
     },
     {
       "id": "research",
       "name": "Research",
-      "reference": "references/research.md",
+      "reference": "generations/data/research.md",
       "starters": [
-        "assets/starters/sources.js",
-        "assets/starters/data-overlay-controls.js",
-        "assets/starters/data-overlay-dom.js",
-        "assets/starters/data-overlay-geometry.js",
-        "assets/starters/data-overlay-layout.js",
-        "assets/starters/data-overlay-model.js",
-        "assets/starters/data-overlay-paint.js",
-        "assets/starters/data-overlay-runtime.js",
-        "assets/starters/data-overlay-style.js",
-        "assets/starters/data-overlay.js"
+        "packages/runtime/src/browser/sources.js",
+        "packages/runtime/src/browser/data-overlay-controls.js",
+        "packages/runtime/src/browser/data-overlay-dom.js",
+        "packages/runtime/src/browser/data-overlay-geometry.js",
+        "packages/runtime/src/browser/data-overlay-layout.js",
+        "packages/runtime/src/browser/data-overlay-model.js",
+        "packages/runtime/src/browser/data-overlay-paint.js",
+        "packages/runtime/src/browser/data-overlay-runtime.js",
+        "packages/runtime/src/browser/data-overlay-style.js",
+        "packages/runtime/src/browser/data-overlay.js"
       ]
     },
     {
       "id": "html-email",
       "name": "HTML email",
-      "reference": "references/email.md",
-      "starters": ["assets/starters/email.html"]
+      "reference": "generations/documents/email.md",
+      "starters": ["packages/runtime/src/browser/email.html"]
     },
     {
       "id": "color-type-system",
       "name": "Color and type system",
       "reference": "references/design-systems.md",
       "starters": [
-        "assets/starters/controls.js",
-        "assets/starters/tweaks-components.jsx",
-        "assets/starters/tweaks-suggestions.jsx",
-        "assets/starters/tweaks-panel.js",
-        "assets/starters/tweaks-model.js",
-        "assets/starters/tweaks-store.js"
+        "packages/runtime/src/browser/controls.js",
+        "packages/runtime/src/browser/tweaks-components.jsx",
+        "packages/runtime/src/browser/tweaks-suggestions.jsx",
+        "packages/runtime/src/browser/tweaks-panel.js",
+        "packages/runtime/src/browser/tweaks-model.js",
+        "packages/runtime/src/browser/tweaks-store.js"
       ]
     },
     {
       "id": "diagram",
       "name": "Diagram",
-      "reference": "references/data.md",
+      "reference": "generations/data/data.md",
       "starters": [
-        "assets/starters/chart.js",
-        "assets/starters/chart-stage.js",
-        "assets/starters/chart-libraries.js",
-        "assets/starters/data-overlay-controls.js",
-        "assets/starters/data-overlay-dom.js",
-        "assets/starters/data-overlay-geometry.js",
-        "assets/starters/data-overlay-layout.js",
-        "assets/starters/data-overlay-model.js",
-        "assets/starters/data-overlay-paint.js",
-        "assets/starters/data-overlay-runtime.js",
-        "assets/starters/data-overlay-style.js",
-        "assets/starters/data-overlay.js",
-        "assets/starters/geography-libraries.js",
-        "assets/starters/street-libraries.js"
-      ]
+        "packages/runtime/src/browser/chart.js",
+        "packages/runtime/src/browser/chart-stage.js",
+        "packages/runtime/src/browser/chart-libraries.js",
+        "packages/runtime/src/browser/data-overlay-controls.js",
+        "packages/runtime/src/browser/data-overlay-dom.js",
+        "packages/runtime/src/browser/data-overlay-geometry.js",
+        "packages/runtime/src/browser/data-overlay-layout.js",
+        "packages/runtime/src/browser/data-overlay-model.js",
+        "packages/runtime/src/browser/data-overlay-paint.js",
+        "packages/runtime/src/browser/data-overlay-runtime.js",
+        "packages/runtime/src/browser/data-overlay-style.js",
+        "packages/runtime/src/browser/data-overlay.js",
+        "packages/runtime/src/browser/geography-libraries.js",
+        "packages/runtime/src/browser/street-libraries.js"
+      ],
+      "catalog": ["data-chart"]
     },
     {
       "id": "flier",
       "name": "Flier",
-      "reference": "references/documents.md",
+      "reference": "generations/documents/documents.md",
       "starters": [
-        "assets/starters/document.js",
-        "assets/starters/document-runtime.js",
-        "assets/starters/document-model.js",
-        "assets/starters/document-style.js",
-        "assets/starters/document-print.js"
-      ]
+        "packages/runtime/src/browser/document.js",
+        "packages/runtime/src/browser/document-runtime.js",
+        "packages/runtime/src/browser/document-model.js",
+        "packages/runtime/src/browser/document-style.js",
+        "packages/runtime/src/browser/document-print.js"
+      ],
+      "catalog": ["document-pages"]
     }
   ]
 }

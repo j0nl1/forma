@@ -5,8 +5,8 @@ These independently written components restore the separate board, feed-card and
 Use `post-card.js` with its runtime and `social-model.js` / `social-dom.js` companions for a feed alone. Use `instagram-story.js` with its runtime, the local platform shell and image modules for a story. Both are classic loaders with editable module companions. The complete `social.js` entry also installs `social-frames` and preserves the earlier generic `social-frame` wrapper. **Bundle `social.js` or `social-frames.js`** to include the pinned local `fflate` ZIP writer and shared capture helper; no CDN or proprietary parent-window transport is required.
 
 ```sh
-node skills/forma/scripts/build.mjs \
-  skills/forma/assets/starters/social.js /absolute/project/social.bundle.js
+node packages/cli/src/commands/build.mjs \
+  packages/runtime/src/browser/social.js /absolute/project/social.bundle.js
 ```
 
 ## Feed card
@@ -61,7 +61,7 @@ The story composes a dark `ios-shell` and an `image-slot`. Default phone size is
 Use the source-connected image service for actual project persistence:
 
 ```sh
-node skills/forma/scripts/preview.mjs /absolute/project --image-file campaign.html
+node packages/cli/src/commands/preview.mjs /absolute/project --image-file campaign.html
 ```
 
 Uploaded bytes and reframing state save in the directory's `image-slots.state.json`, including slots inside story shadow roots. `editable="session"` explicitly enables browser-only editing for a static demonstration. Session hydration supports slots created after store initialization, while pending local edits retain priority. The routine session notice is explained outside the artwork; actual save/storage errors and draft-recovery controls stay visible. Static pages without that attribute or a source service remain read-only.
@@ -101,7 +101,7 @@ An explicit frame must belong to that board and be visible. Completed exports em
 
 ## Complete campaigns
 
-Use the [campaign guide](campaigns.md#complete-social-campaign) for the full fourteen-placement roster, platform selection rules, typed Formats/Display controls, conditional units, grouped carousel and actual project/portable delivery. `CampaignBoard` composes authored units over this board runtime; the individual components remain independently usable.
+Use the [campaign guide](../generations/interfaces/campaigns.md#complete-social-campaign) for the full fourteen-placement roster, platform selection rules, typed Formats/Display controls, conditional units, grouped carousel and actual project/portable delivery. `CampaignBoard` composes authored units over this board runtime; the individual components remain independently usable.
 
 ## Verification and remaining work
 

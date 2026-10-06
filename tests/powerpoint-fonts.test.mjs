@@ -8,18 +8,18 @@ import { pathToFileURL } from "node:url";
 import PptxGenJS from "pptxgenjs";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 import {
   readPptxFont,
   encodePptxFont,
-} from "../skills/forma/scripts/lib/pptx-fonts-metadata.mjs";
+} from "../packages/exports/src/lib/pptx-fonts-metadata.mjs";
 import {
   loadPptxFonts,
   preparePptxFonts,
   embedPptxFonts,
-} from "../skills/forma/scripts/lib/pptx-fonts.mjs";
+} from "../packages/exports/src/lib/pptx-fonts.mjs";
 
 const execute = promisify(execFile);
 
@@ -272,7 +272,7 @@ test("PowerPoint fonts reject malformed data, forbidden permissions, variable fo
 test("PowerPoint uses explicit font snapshots in Chromium and packages all editable variants", async (t) => {
   const { dir, paths } = await fontFixture(t);
   await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
+    path.join(root, "packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );

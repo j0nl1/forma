@@ -3,9 +3,9 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { slideLabel } from "../skills/forma/assets/starters/deck-labels.js";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { slideLabel } from "../packages/runtime/src/browser/deck-labels.js";
 
 const longTitle = "A deliberately long heading describing quarterly growth";
 const names = [
@@ -21,7 +21,7 @@ const html = `<!doctype html><html lang="en"><meta charset="utf-8"><style>body{m
 async function fixture(t, connected = false) {
   const dir = await temporary(t);
   await fs.cp(
-    path.resolve("skills/forma/assets/starters"),
+    path.resolve("packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );

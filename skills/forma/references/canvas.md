@@ -92,7 +92,7 @@ Static previews save edits in browser storage. Save canvas state downloads JSON;
 For actual project persistence, explicitly select the HTML document:
 
 ```sh
-node skills/forma/scripts/preview.mjs /path/to/design --canvas-file canvas.html
+node packages/cli/src/commands/preview.mjs /path/to/design --canvas-file canvas.html
 ```
 
 The preview connects the first canvas in that document to its fixed sibling `canvas.design-canvas.state.json`. Edits save after a 250ms debounce; a new empty sidecar is not written on initial load. State hydration settles before editing becomes active. Saves require the preview's origin and token, validate the state as data, and compare both HTML and sidecar versions before an atomic write. A conflicting source change is reported instead of overwriting it; download the browser state before reloading. Other canvases in the document retain browser persistence. Public static previews do not write project files.

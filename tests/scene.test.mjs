@@ -4,16 +4,16 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 async function setup(t) {
   const dir = await temporary(t);
   const runtime = path.join(
     root,
-    "skills/forma/assets/starters/animations.jsx",
+    "packages/runtime/src/browser/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),

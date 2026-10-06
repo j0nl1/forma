@@ -68,3 +68,7 @@ Install Forma from https://github.com/j0nl1/forma for this agent.
 - [Contributing](CONTRIBUTING.md)
 
 MIT licensed.
+
+## Packages and reusable resources
+
+Forma separates creative recipes by medium and technical implementations into six local packages. A shared catalog supplies reusable browser modules and the five audio presets, with mechanical dependency copies and provenance. See [packages and adapters](docs/packages-and-adapters.md) for the layout and command interface. Generate the browsing page with `npm run catalog:site -- /absolute/output-directory`; its filters use the same data as `forma catalog list`.

@@ -6,17 +6,17 @@ import { temporary } from "./helpers.mjs";
 import {
   sourceAST,
   namedExports,
-} from "../skills/forma/scripts/lib/system-contracts.mjs";
+} from "../packages/exports/src/lib/system-contracts.mjs";
 import {
   inspect,
   compile,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 test("named default components retain their real default import and local declaration identities", () => {
   const source = sourceAST(

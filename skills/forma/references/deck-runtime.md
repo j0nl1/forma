@@ -1,10 +1,10 @@
 # HTML deck runtime contract
 
-The independent HTML stage preserves slide content in the DOM, plays declarative builds, scales authored geometry, exposes local navigation events, and prints the finished base layout. PowerPoint export supports editable objects or full-slide screenshots with speaker notes; see [PowerPoint](powerpoint.md). HTML build effects remain required.
+The independent HTML stage preserves slide content in the DOM, plays declarative builds, scales authored geometry, exposes local navigation events, and prints the finished base layout. PowerPoint export supports editable objects or full-slide screenshots with speaker notes; see [PowerPoint](../generations/slides/powerpoint.md). HTML build effects remain required.
 
 ## Files and readiness
 
-Copy `deck.js` and its `deck-*.js` companions beside it, or bundle `deck.js` to one classic script with `scripts/build.mjs`. The showcase build does this automatically. The loader supports a classic script tag and exposes `window.CodexDeckReady`; await it before calling the component API. `deck.ready` becomes true after initialization and font readiness (capped at two seconds). Browser verification and export helpers wait for supported runtime-loader promises before capturing the page.
+Copy `deck.js` and its `deck-*.js` companions beside it, or bundle `deck.js` to one classic script with `scripts/forma.mjs build`. The showcase build does this automatically. The loader supports a classic script tag and exposes `window.CodexDeckReady`; await it before calling the component API. `deck.ready` becomes true after initialization and font readiness (capped at two seconds). Browser verification and export helpers wait for supported runtime-loader promises before capturing the page.
 
 ```html
 <deck-stage width="1920" height="1080">
@@ -61,7 +61,7 @@ The earlier native aliases remain supported: `data-trigger`, `data-order`, `data
 | `teeter` | 1000 ms | Alternating tilts with an initial hold, then settle |
 | `path` | 2000 ms | L/C offsets, cubics sampled 16 times, at most 32 points |
 
-Zero-degree spin/teeter, scale-1 grow/shrink/pulse, and unusable paths remain static and do not consume a build step. Mask effects use a registered numeric CSS property and stylesheet gradients, with a fade fallback when registration is unavailable. Box/diamond outward clip paths still work without property registration. Editable PowerPoint exports translate supported builds using the same effect parser and timing groups; unsupported targets report static fallback. Screenshot exports retain finished artwork and notes. The HTML effects remain intact. See [PowerPoint](powerpoint.md).
+Zero-degree spin/teeter, scale-1 grow/shrink/pulse, and unusable paths remain static and do not consume a build step. Mask effects use a registered numeric CSS property and stylesheet gradients, with a fade fallback when registration is unavailable. Box/diamond outward clip paths still work without property registration. Editable PowerPoint exports translate supported builds using the same effect parser and timing groups; unsupported targets report static fallback. Screenshot exports retain finished artwork and notes. The HTML effects remain intact. See [PowerPoint](../generations/slides/powerpoint.md).
 
 ## Step and navigation rules
 
@@ -101,7 +101,7 @@ Drag the rail separator to resize it between 120 and 360 px. Keyboard Left/Right
 Duplicated slides lose ordinary IDs to prevent duplicates. Components may implement `static cloneSlot(oldId, isFree)` to preserve ID-keyed state under a validated fresh ID. The canonical image slot copies uploaded bytes and framing into a fresh shared-state ID; the deck source service also connects image persistence, so reload retains both the duplicated HTML and its independent sidecar image. The earlier `storage-key` interface retains `static cloneStorageKey(from, to)` and copies its image/crop/alt into an independent browser-storage key. Those compatibility images remain local to that browser. See [image slots](images.md) for shared state, portable export and configured-picker limitations.
 
 ```sh
-node skills/forma/scripts/preview.mjs /path/to/design --deck-file deck.html
+node packages/cli/src/commands/preview.mjs /path/to/design --deck-file deck.html
 ```
 
 This opt-in service edits literal direct slides in the **first** `deck-stage` of the selected HTML file. It writes the HTML itself, preserves surrounding comments/scripts/styles/templates, and keeps a valid legacy speaker-notes array synchronized with moves, duplication and deletion. It does not write live form values or runtime animation attributes. Other decks remain session editors. Dynamically generated slides require a renderer-specific source binding and are not covered by this literal-source adapter.

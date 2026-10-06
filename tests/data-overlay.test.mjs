@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   buildRamp,
   metaParts,
@@ -14,15 +14,15 @@ import {
   attributeName,
   closestMetric,
   triple,
-} from "../skills/forma/assets/starters/data-overlay-model.js";
+} from "../packages/runtime/src/browser/data-overlay-model.js";
 import {
   linearOf,
   ownLinear,
   mulLin,
   quadOffset,
   cornerRad,
-} from "../skills/forma/assets/starters/data-overlay-geometry.js";
-import { layoutCallouts } from "../skills/forma/assets/starters/data-overlay-layout.js";
+} from "../packages/runtime/src/browser/data-overlay-geometry.js";
+import { layoutCallouts } from "../packages/runtime/src/browser/data-overlay-layout.js";
 const data = {
   suggest: { window: ["last 28 days", "weekends only", "last 24 hours"] },
   views: [
@@ -95,7 +95,7 @@ const data = {
 async function fixture(t, { src = "", contents = data } = {}) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/forma/assets/starters/data-overlay.js"),
+    path.join(root, "packages/runtime/src/browser/data-overlay.js"),
     path.join(dir, "overlay.js"),
   );
   await fs.writeFile(path.join(dir, "data.json"), JSON.stringify(contents));

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "audio-podcast",
+  "kind": "preset",
+  "description": "Source-grounded dialogue between two hosts.",
+  "targets": ["audio"],
+  "tags": ["audio", "podcast"],
+  "guide": "generations/audio/podcast.md",
+  "files": [],
+  "requirements": ["speech-or-supplied-recording"],
+  "license": "MIT"
+}

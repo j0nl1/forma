@@ -1,6 +1,6 @@
 # Typed design tweaks
 
-Use `tweaks-components.jsx` for the full React panel, or `TweakStore` from `tweaks-store.js` for a custom native control surface. Bundle JSX locally with `scripts/build.mjs`; copy its companion modules when building outside the checkout. No React CDN, runtime Babel, host messages or telemetry are required. The older `controls.js` remains a small native CSS-variable surface with its existing reset/download behavior.
+Use `tweaks-components.jsx` for the full React panel, or `TweakStore` from `tweaks-store.js` for a custom native control surface. Bundle JSX locally with `scripts/forma.mjs build`; copy its companion modules when building outside the checkout. No React CDN, runtime Babel, host messages or telemetry are required. The older `controls.js` remains a small native CSS-variable surface with its existing reset/download behavior.
 
 ## Defaults and live state
 
@@ -73,7 +73,7 @@ The segmented selection marker slides for keyboard/click changes and tracks drag
 ## Actual source saving
 
 ```sh
-node skills/forma/scripts/preview.mjs /path/to/design --tweaks-file prototype.html
+node packages/cli/src/commands/preview.mjs /path/to/design --tweaks-file prototype.html
 ```
 
 This explicitly enables writes to the selected HTML file. The server injects connection metadata only into that document. It accepts exactly one `script#codex-tweak-defaults[type="application/json"]`, or one legacy `/*EDITMODE-BEGIN*/.../*EDITMODE-END*/` JSON block in an inline literal variable declaration. Pass the legacy `TWEAK_DEFAULTS` value to `useTweaks`/`readTweakDefaults` as the fallback when using that format. Inventory and saving parse JSON and HTML; they do not evaluate the surrounding JavaScript. Defaults in an external bundle need a root-document JSON binding rather than arbitrary source rewriting.

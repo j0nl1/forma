@@ -20,7 +20,7 @@ Give every slot a distinct `id` across pages in the same directory. The director
 ## Local editing and persistence
 
 ```sh
-node skills/forma/scripts/preview.mjs /path/to/artifact --image-file artwork.html
+node packages/cli/src/commands/preview.mjs /path/to/artifact --image-file artwork.html
 ```
 
 The selected page gets image-service metadata in its HTTP response. Image edits save to the actual shared directory sidecar. `--deck-file` and `--canvas-file` also connect image state for their selected page, so duplicating a slide can retain its image and crop. The HTML itself is not changed by image edits. The service has a fixed sidecar target, exact origin/token checks, content versions and shared serialized writes. Larger groups of edits are split into bounded requests while newer revisions remain queued. Conflicts retain the current draft; saving pauses and **Download image state** produces the actual current JSON. A recovered browser draft is offered separately as **Download retained draft**, without automatically replacing newer disk state. Storage failure does not block using or downloading the current page state.

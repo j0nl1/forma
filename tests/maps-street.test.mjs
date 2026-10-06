@@ -5,8 +5,8 @@ import path from "node:path";
 import http from "node:http";
 import { deflateSync } from "node:zlib";
 import { temporary } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 // Synthetic solid tiles test interactions without contacting a public tile service.
 function tilePNG() {
@@ -49,7 +49,7 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.resolve("skills/forma/assets/starters/street-libraries.js"),
+    path.resolve("packages/runtime/src/browser/street-libraries.js"),
     path.join(dir, "street.bundle.js"),
   );
   await fs.copyFile(

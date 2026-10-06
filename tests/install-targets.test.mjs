@@ -85,15 +85,17 @@ test("CLI installs identical portable files in each project root and preserves l
       "references/harness.md",
       "references/codex.md",
       "agents/openai.yaml",
-      "scripts/preview.mjs",
-      "scripts/export.mjs",
-      "scripts/config.mjs",
-      "assets/config/forma.toml",
+      "packages/cli/src/commands/preview.mjs",
+      "packages/cli/src/commands/export.mjs",
+      "packages/cli/src/commands/config.mjs",
+      "packages/core/templates/forma.toml",
       "package-lock.json",
     ])
       assert.deepEqual(
         await fs.readFile(path.join(installed.destination, file)),
-        await fs.readFile(path.join(source, file)),
+        await fs.readFile(
+          path.join(file.startsWith("packages/") ? root : source, file),
+        ),
       );
     assert.deepEqual(await fs.readdir(project), [
       path.basename(path.dirname(path.dirname(installed.destination))),

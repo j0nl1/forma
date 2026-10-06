@@ -10,11 +10,11 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { shadowCss } from "../skills/forma/scripts/lib/system-review-data.mjs";
-import { scriptBindings } from "../skills/forma/scripts/lib/system-card-scripts.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { shadowCss } from "../packages/exports/src/lib/system-review-data.mjs";
+import { scriptBindings } from "../packages/exports/src/lib/system-card-scripts.mjs";
 
 async function fixture(t) {
   const directory = await temporary(t),
@@ -22,10 +22,7 @@ async function fixture(t) {
   await fs.mkdir(path.join(source, "cards"), { recursive: true });
   await fs.mkdir(path.join(source, "assets"));
   await fs.copyFile(
-    path.join(
-      root,
-      "skills/forma/assets/starters/fonts/inter-medium.woff2",
-    ),
+    path.join(root, "packages/runtime/src/browser/fonts/inter-medium.woff2"),
     path.join(source, "assets/font.woff2"),
   );
   await fs.writeFile(

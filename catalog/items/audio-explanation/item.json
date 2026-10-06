@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "audio-explanation",
+  "kind": "preset",
+  "description": "A guided explanation with examples and a coherent teaching arc.",
+  "targets": ["audio"],
+  "tags": ["audio", "explanation"],
+  "guide": "generations/audio/explanation.md",
+  "files": [],
+  "requirements": ["speech-or-supplied-recording"],
+  "license": "MIT"
+}

@@ -5,7 +5,7 @@ import {
   WatercolorPainting,
   WatercolorReveal,
   useComposition,
-} from "../../skills/forma/assets/starters/animations.jsx";
+} from "../../packages/runtime/src/browser/animations.jsx";
 import { paintBird } from "./painting.js";
 
 function Piece() {

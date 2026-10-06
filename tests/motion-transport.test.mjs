@@ -3,15 +3,15 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 async function setup(t) {
   const dir = await temporary(t);
   const runtime = path.join(
     root,
-    "skills/forma/assets/starters/animations.jsx",
+    "packages/runtime/src/browser/animations.jsx",
   );
   await fs.writeFile(
     path.join(dir, "main.jsx"),
@@ -296,6 +296,14 @@ test("external seeks renew a 400ms latch and yield atomically to pause, retiming
     await page.clock.runFor(149);
     assert.equal((await read(page)).external, true);
     await page.clock.runFor(1);
+    // The deadline fires at 400ms; React may commit on a later task under load.
+    // Wait for that commit without advancing the clock or relaxing the deadline.
+    await page.waitForFunction(
+      () =>
+        !JSON.parse(document.getElementById("probe").dataset.state).external,
+      null,
+      { polling: 10, timeout: 2000 },
+    );
     assert.equal((await read(page)).external, false);
     near((await read(page)).actual, 2.2);
     await seek(page, 3, true);
@@ -303,6 +311,12 @@ test("external seeks renew a 400ms latch and yield atomically to pause, retiming
     assert.equal((await read(page)).playing, false);
     await seek(page, 4, true);
     await timing(page, { duration: 3 });
+    await page.waitForFunction(
+      () =>
+        !JSON.parse(document.getElementById("probe").dataset.state).external,
+      null,
+      { polling: 10, timeout: 2000 },
+    );
     assert.equal((await read(page)).external, false);
     near((await read(page)).actual, 3);
     await seek(page, 1, true);

@@ -1,0 +1,17 @@
+{
+  "name": "@forma/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "smol-toml": "1.9.0",
+    "parse5": "8.0.1"
+  }
+}

@@ -6,12 +6,12 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { captureSlide } from "../skills/forma/scripts/lib/pptx-capture.mjs";
-import { preparePptxCompositingFrames } from "../skills/forma/scripts/lib/pptx-motion-frames.mjs";
-import { applyPptxMotion } from "../skills/forma/scripts/lib/pptx-motion.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { captureSlide } from "../packages/exports/src/lib/pptx-capture.mjs";
+import { preparePptxCompositingFrames } from "../packages/exports/src/lib/pptx-motion-frames.mjs";
+import { applyPptxMotion } from "../packages/exports/src/lib/pptx-motion.mjs";
 
 export function frameFixture(
   trigger = "with",
@@ -23,7 +23,7 @@ export function frameFixture(
 export async function frameDeck(t, slides) {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
+    path.join(root, "packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );

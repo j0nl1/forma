@@ -4,15 +4,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { renderPdf } from "../skills/forma/scripts/lib/pdf.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { renderPdf } from "../packages/exports/src/lib/pdf.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 import {
   injectFixedSheet,
   needsFixedSheet,
-} from "../skills/forma/scripts/lib/fixed-sheet.mjs";
+} from "../packages/runtime/src/node/fixed-sheet.mjs";
 async function fixture(
   t,
   {

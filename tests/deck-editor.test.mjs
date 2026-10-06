@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { applyDeckSource } from "../skills/forma/scripts/lib/deck-source.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-const starters = path.resolve("skills/forma/assets/starters");
+import { applyDeckSource } from "../packages/runtime/src/node/deck-source.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+const starters = path.resolve("packages/runtime/src/browser");
 const notes =
   '<script id="speaker-notes" type="application/json">["One note","Two note","Three note","Four note"]</script>';
 const content =

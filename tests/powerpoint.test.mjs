@@ -4,17 +4,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import http from "node:http";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { captureSlide } from "../skills/forma/scripts/lib/pptx-capture.mjs";
-import { capturePptxImage } from "../skills/forma/scripts/lib/pptx-layers.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { captureSlide } from "../packages/exports/src/lib/pptx-capture.mjs";
+import { capturePptxImage } from "../packages/exports/src/lib/pptx-layers.mjs";
 import {
   preparePptxMedia,
   preparePptxMediaElements,
-} from "../skills/forma/scripts/lib/pptx-media.mjs";
+} from "../packages/exports/src/lib/pptx-media.mjs";
 import { unzipSync, strFromU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 
 async function fixture(
   t,
@@ -22,7 +22,7 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
+    path.join(root, "packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );
@@ -92,7 +92,7 @@ test("PowerPoint screenshot CLI embeds one finished image per slide and retains 
       execFile(
         process.execPath,
         [
-          path.join(root, "skills/forma/scripts/export.mjs"),
+          path.join(root, "packages/cli/src/commands/export.mjs"),
           "pptx",
           url,
           out,

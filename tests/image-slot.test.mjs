@@ -4,21 +4,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { temporary, root } from "./helpers.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import {
   imageSlots,
   framing,
   zoomAt,
   resizeCorner,
-} from "../skills/forma/assets/starters/image-model.js";
+} from "../packages/runtime/src/browser/image-model.js";
 import {
   unsplash,
   creditUrl,
-} from "../skills/forma/assets/starters/image-credit.js";
+} from "../packages/runtime/src/browser/image-credit.js";
 const svg = (color) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100"><rect width="400" height="100" fill="${color}"/></svg>`)}`;
 const author = svg("#365bcf");
@@ -35,12 +35,12 @@ async function fixture(
 ) {
   const dir = await temporary(t);
   await bundle(
-    path.join(root, "skills/forma/assets/starters/image-slot.js"),
+    path.join(root, "packages/runtime/src/browser/image-slot.js"),
     path.join(dir, "image-slot.js"),
   );
   if (deck)
     await bundle(
-      path.join(root, "skills/forma/assets/starters/deck.js"),
+      path.join(root, "packages/runtime/src/browser/deck.js"),
       path.join(dir, "deck.js"),
     );
   await fs.writeFile(

@@ -10,12 +10,12 @@ import {
   loadFig,
   select,
   renderDocument,
-} from "../skills/forma/scripts/lib/figma.mjs";
-import { applyNodeLayout } from "../skills/forma/scripts/lib/figma-layout.mjs";
-import { importFig } from "../skills/forma/scripts/figma.mjs";
-import { bundle } from "../skills/forma/scripts/build.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+} from "../packages/exports/src/lib/figma.mjs";
+import { applyNodeLayout } from "../packages/exports/src/lib/figma-layout.mjs";
+import { importFig } from "../packages/cli/src/commands/figma.mjs";
+import { bundle } from "../packages/cli/src/commands/build.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 const guid = (localID) => ({ sessionID: 1, localID });
 const identity = { m00: 1, m01: 0, m02: 0, m10: 0, m11: 1, m12: 0 };

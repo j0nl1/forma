@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "audio-summary",
+  "kind": "preset",
+  "description": "A concise overview preserving the source claims and qualifications.",
+  "targets": ["audio"],
+  "tags": ["audio", "summary"],
+  "guide": "generations/audio/summary.md",
+  "files": [],
+  "requirements": ["speech-or-supplied-recording"],
+  "license": "MIT"
+}

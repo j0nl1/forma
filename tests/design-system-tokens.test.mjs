@@ -11,15 +11,15 @@ import {
   compile,
   preview,
   importSystem,
-} from "../skills/forma/scripts/design-system.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 import {
   cssVariables,
   resolveTokens,
   splitCSS,
-} from "../skills/forma/scripts/lib/system-css-values.mjs";
-import { fontFamilies } from "../skills/forma/scripts/lib/system-font-metadata.mjs";
+} from "../packages/exports/src/lib/system-css-values.mjs";
+import { fontFamilies } from "../packages/exports/src/lib/system-font-metadata.mjs";
 
 async function fingerprint(directory) {
   const result = {};
@@ -43,10 +43,7 @@ async function fixture(t) {
   await fs.mkdir(path.join(source, "tokens"), { recursive: true });
   await fs.mkdir(path.join(source, "assets"));
   await fs.copyFile(
-    path.join(
-      root,
-      "skills/forma/assets/starters/fonts/inter-medium.woff2",
-    ),
+    path.join(root, "packages/runtime/src/browser/fonts/inter-medium.woff2"),
     path.join(source, "assets/Atlas font.woff2"),
   );
   await fs.writeFile(
@@ -165,7 +162,7 @@ test("read-only CSS inventory preserves imported token roles, annotations, dupli
     execFileSync(
       process.execPath,
       [
-        path.join(root, "skills/forma/scripts/design-system.mjs"),
+        path.join(root, "packages/cli/src/commands/design-system.mjs"),
         "check",
         source,
         "--verbose",
@@ -213,7 +210,7 @@ test("CSS entry discovery supports nested preferred names and a safe legacy mani
   const failed = spawnSync(
     process.execPath,
     [
-      path.join(root, "skills/forma/scripts/design-system.mjs"),
+      path.join(root, "packages/cli/src/commands/design-system.mjs"),
       "check",
       directory,
     ],

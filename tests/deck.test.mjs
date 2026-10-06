@@ -10,10 +10,10 @@ import {
   buildSteps,
   effectOptions,
   effectFrames,
-} from "../skills/forma/assets/starters/deck-effects.js";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
+} from "../packages/runtime/src/browser/deck-effects.js";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
 import { execFileSync } from "node:child_process";
 const parse = (effect, options = {}) =>
   parseEffect({
@@ -33,7 +33,7 @@ async function fixture(
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "codex-deck-test-"));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
   await fs.cp(
-    path.resolve("skills/forma/assets/starters"),
+    path.resolve("packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );

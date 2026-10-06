@@ -1,0 +1,16 @@
+{
+  "name": "@forma/catalog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@forma/core": "1.0.0"
+  }
+}

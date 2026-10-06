@@ -7,15 +7,15 @@ import { createHash } from "node:crypto";
 import { execFile, execFileSync } from "node:child_process";
 import { promisify } from "node:util";
 import { temporary, root } from "./helpers.mjs";
-import { generateSound } from "../skills/forma/scripts/sound-effects.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { inlineHtml } from "../skills/forma/scripts/lib/inline.mjs";
+import { generateSound } from "../packages/cli/src/commands/sound-effects.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { inlineHtml } from "../packages/exports/src/lib/inline.mjs";
 
 const execute = promisify(execFile);
 const fixtureKey = "local-fixture-key-no-provider-credit";
 const prompt = "A gentle synthetic verification chime";
-const cli = path.join(root, "skills/forma/scripts/sound-effects.mjs");
+const cli = path.join(root, "packages/cli/src/commands/sound-effects.mjs");
 let encoded;
 function syntheticMp3() {
   // This local sine wave is test data, never a claimed provider generation.

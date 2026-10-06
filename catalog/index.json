@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "slide-deck",
+      "manifest": "items/slide-deck/item.json"
+    },
+    {
+      "id": "design-canvas",
+      "manifest": "items/design-canvas/item.json"
+    },
+    {
+      "id": "document-pages",
+      "manifest": "items/document-pages/item.json"
+    },
+    {
+      "id": "data-chart",
+      "manifest": "items/data-chart/item.json"
+    },
+    {
+      "id": "native-composition",
+      "manifest": "items/native-composition/item.json"
+    },
+    {
+      "id": "audio-podcast",
+      "manifest": "items/audio-podcast/item.json"
+    },
+    {
+      "id": "audio-explanation",
+      "manifest": "items/audio-explanation/item.json"
+    },
+    {
+      "id": "audio-video-narration",
+      "manifest": "items/audio-video-narration/item.json"
+    },
+    {
+      "id": "audio-tutorial",
+      "manifest": "items/audio-tutorial/item.json"
+    },
+    {
+      "id": "audio-summary",
+      "manifest": "items/audio-summary/item.json"
+    }
+  ]
+}

@@ -10,15 +10,15 @@ import {
   loadFig,
   renderDocument,
   select,
-} from "../skills/forma/scripts/lib/figma.mjs";
-import { importFig } from "../skills/forma/scripts/figma.mjs";
+} from "../packages/exports/src/lib/figma.mjs";
+import { importFig } from "../packages/cli/src/commands/figma.mjs";
 import {
   compile,
   preview,
-} from "../skills/forma/scripts/design-system.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
+} from "../packages/cli/src/commands/design-system.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
 
 const red = { r: 1, g: 0, b: 0, a: 1 },
   blue = { r: 0, g: 0, b: 1, a: 1 },

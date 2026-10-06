@@ -15,9 +15,9 @@ When generation is missing, explain the specific capability needed (for example 
 Once preferences are known, create or edit the optional file with those choices. Creating it is not a prerequisite to production. The provided template selects only the standard output folder, with other preferences commented out.
 
 ```sh
-node <skill>/scripts/config.mjs init /absolute/path/to/project
-node <skill>/scripts/config.mjs check /absolute/path/to/project
-node <skill>/scripts/config.mjs resolve /absolute/path/to/project \
+node <skill>/scripts/forma.mjs config init /absolute/path/to/project
+node <skill>/scripts/forma.mjs config check /absolute/path/to/project
+node <skill>/scripts/forma.mjs config resolve /absolute/path/to/project \
   --request task-preferences.json --capabilities session-capabilities.json \
   --needs speech,transcription
 ```

@@ -7,11 +7,11 @@ import { promisify } from "node:util";
 import PptxGenJS from "pptxgenjs";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
 import { temporary, root } from "./helpers.mjs";
-import { serve } from "../skills/forma/scripts/preview.mjs";
-import { withPage } from "../skills/forma/scripts/lib/browser.mjs";
-import { exportArtifact } from "../skills/forma/scripts/export.mjs";
-import { applyPptxMotion } from "../skills/forma/scripts/lib/pptx-motion.mjs";
-import { effects } from "../skills/forma/assets/starters/deck-effects.js";
+import { serve } from "../packages/cli/src/commands/preview.mjs";
+import { withPage } from "../packages/media/src/lib/browser.mjs";
+import { exportArtifact } from "../packages/cli/src/commands/export.mjs";
+import { applyPptxMotion } from "../packages/exports/src/lib/pptx-motion.mjs";
+import { effects } from "../packages/runtime/src/browser/deck-effects.js";
 
 const execute = promisify(execFile);
 const xml = (buffer, file = "ppt/slides/slide1.xml") =>
@@ -212,7 +212,7 @@ test("PowerPoint adds native builds beside existing media timing without replaci
 test("actual HTML export resolves grouped builds and static opt-out", async (t) => {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
+    path.join(root, "packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );
@@ -241,7 +241,7 @@ test("actual HTML export resolves grouped builds and static opt-out", async (t) 
 async function affineFixture(t) {
   const dir = await temporary(t);
   await fs.cp(
-    path.join(root, "skills/forma/assets/starters"),
+    path.join(root, "packages/runtime/src/browser"),
     path.join(dir, "starters"),
     { recursive: true },
   );

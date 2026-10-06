@@ -7,8 +7,8 @@
 Copy `data-overlay.js` and its `data-overlay-*.js` companions beside your HTML. The classic loader exposes `window.CodexOverlayReady`; wait for it before calling the imperative API. For a single runtime file, use the local build helper:
 
 ```sh
-node /path/to/forma/scripts/build.mjs \
-  /path/to/forma/assets/starters/data-overlay.js \
+node /path/to/forma/scripts/forma.mjs build \
+  /path/to/forma/packages/runtime/src/browser/data-overlay.js \
   /path/to/output/data-overlay.js
 ```
 

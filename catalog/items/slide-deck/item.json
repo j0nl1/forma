@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "slide-deck",
+  "kind": "component",
+  "description": "An editable deck with builds, notes and local controls.",
+  "targets": ["slides"],
+  "tags": ["component", "slides"],
+  "entry": "deck.js",
+  "files": [
+    {
+      "source": "packages/runtime/src/browser/deck-builds.js",
+      "target": "deck-builds.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-editor.js",
+      "target": "deck-editor.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-effects.js",
+      "target": "deck-effects.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-labels.js",
+      "target": "deck-labels.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-masks.js",
+      "target": "deck-masks.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-operations.js",
+      "target": "deck-operations.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-runtime.js",
+      "target": "deck-runtime.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck-thumbnails.js",
+      "target": "deck-thumbnails.js"
+    },
+    {
+      "source": "packages/runtime/src/browser/deck.js",
+      "target": "deck.js"
+    },
+    {
+      "source": "LICENSE",
+      "target": "LICENSE"
+    }
+  ],
+  "requirements": ["browser"],
+  "preview": "https://j0nl1.github.io/forma/deck.html",
+  "license": "MIT",
+  "guide": "generations/slides/slides.md"
+}
